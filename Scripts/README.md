@@ -9,7 +9,7 @@ bwa-mem2 index CocciRefGenome.fna
 ```
 
 #### 2. Align sequences to reference genome    
-File name: bwamem
+File name: bwamem_align
 ```
 module load bwa-mem2/2.2.1
 for infile in *_1.fastq

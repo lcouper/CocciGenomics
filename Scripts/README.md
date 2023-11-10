@@ -12,6 +12,11 @@ bwa-mem2 index CocciRefGenome.fna
 File name: bwamem
 ```
 module load bwa-mem2/2.2.1
-bwa-mem2 mem CocciRefGenome.fna SJV_1_1.fastq SJV_1_2.fastq > SJV_1_Aligned.sam
+for infile in *_1.fastq
+do
+base=$(basename ${infile} _1.fastq)
+bwa-mem2 mem -t 12 CocciRefGenome.fna \
+${base}_1.fastq ${base}_2.fastq > "${base}.aligned.sam"
+done
 ```
 

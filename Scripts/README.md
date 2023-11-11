@@ -4,14 +4,12 @@ Relevant code snippet for each shown below
 #### 1. Index reference genome  
 Script name: bwamem_index
 ```
-module load bwa-mem2/2.2.1
 bwa-mem2 index CocciRefGenome.fna
 ```
 
 #### 2. Align sequences to reference genome    
 Script name: bwamem_align
 ```
-module load bwa-mem2/2.2.1
 for infile in *_1.fastq
 do
 base=$(basename ${infile} _1.fastq)
@@ -23,8 +21,6 @@ done
 #### 3. Compress .sam to .bam using samtools
 Script name: sam2bam.sh
 ```
-module load samtools/1.8
-
 for infile in Aligned/*.aligned.sam
 do
 echo "working with file $infile"
@@ -36,8 +32,6 @@ done
 #### 4. Sort bam file by coordinates using samtools
 Script name: sortbam.sh
 ```
-module load samtools/1.8
-
 for infile in *.bam
 do
 echo "working with file $infile"
@@ -45,3 +39,13 @@ base=$(basename ${infile} .bam)
 samtools sort -@ 12 -o "${base}.sorted.bam" ${base}.bam
 done
 ```
+
+### 5. Obtain summary stats about bam file
+Script name: summarystats.sh
+```
+for infile in *.bam
+do
+echo "working with file $infile"
+base=$(basename ${infile} .bam)
+samtools flagstat ${base}.bam > "${base}.bam.stats.txt"
+done

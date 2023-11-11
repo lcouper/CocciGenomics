@@ -21,7 +21,7 @@ done
 ```
 
 #### 3. Compress .sam to .bam using samtools
-Script name: sam2bam
+Script name: sam2bam.sh
 ```
 module load samtools/1.8
 

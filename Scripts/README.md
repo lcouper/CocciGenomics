@@ -32,3 +32,16 @@ base=$(basename ${infile} .aligned.sam)
 samtools view -@ 12 -b Aligned/${base}.aligned.sam > Aligned/"${base}.aligned.bam"
 done
 ```
+
+#### 4. Sort bam file by coordinates using samtools
+Script name: sortbam.sh
+```
+module load samtools/1.8
+
+for infile in *.bam
+do
+echo "working with file $infile"
+base=$(basename ${infile} .bam)
+samtools sort -@ 12 -o "${base}.sorted.bam" ${base}.bam
+done
+```

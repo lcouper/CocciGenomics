@@ -1,13 +1,13 @@
 ## Steps and scripts used to analyze Coccidiodides genomes 
 Relevant code snippet for each shown below
 
-#### 1. Index reference genome  
+### 1. Index reference genome  
 Script name: bwamem_index
 ```
 bwa-mem2 index CocciRefGenome.fna
 ```
 
-#### 2. Align sequences to reference genome    
+### 2. Align sequences to reference genome    
 Script name: bwamem_align
 ```
 for infile in *_1.fastq
@@ -18,7 +18,7 @@ ${base}_1.fastq ${base}_2.fastq > "${base}.aligned.sam"
 done
 ```
 
-#### 3. Compress .sam to .bam using samtools
+### 3. Compress .sam to .bam using samtools
 Script name: sam2bam.sh
 ```
 for infile in Aligned/*.aligned.sam
@@ -29,7 +29,7 @@ samtools view -@ 12 -b Aligned/${base}.aligned.sam > Aligned/"${base}.aligned.ba
 done
 ```
 
-#### 4. Sort bam file by coordinates using samtools
+### 4. Sort bam file by coordinates using samtools
 Script name: sortbam.sh
 ```
 for infile in *.bam

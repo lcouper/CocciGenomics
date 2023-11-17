@@ -49,3 +49,20 @@ echo "working with file $infile"
 base=$(basename ${infile} .bam)
 samtools flagstat ${base}.bam > "${base}.bam.stats.txt"
 done
+```
+
+### 6. Mark and remove duplicates using picard
+Note: picard.jar was downloaded from the Broad institute here: https://github.com/broadinstitute/picard/releases/tag/3.1.1
+Script name: MarkDups.sh
+```
+for infile in *.aligned.sorted.bam
+do
+echo "working with file $infile"
+base=$(basename ${infile} .aligned.sorted.bam)
+java -jar picard.jar MarkDuplicates \
+-REMOVE_DUPLICATES TRUE \
+-I ${base}.aligned.sorted.bam \
+-O "${base}.deduped.bam" \
+-M "${base}.dup_metrics.txt"
+done
+```

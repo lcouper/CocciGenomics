@@ -51,7 +51,7 @@ samtools flagstat ${base}.bam > "${base}.bam.stats.txt"
 done
 ```
 
-### 6. Mark and remove duplicates using picard
+### 6. Mark and remove duplicates 
 Note: picard.jar was downloaded from the Broad institute here: https://github.com/broadinstitute/picard/releases/tag/3.1.1
 Script name: MarkDups.sh
 ```
@@ -64,5 +64,16 @@ java -jar picard.jar MarkDuplicates \
 -I ${base}.aligned.sorted.bam \
 -O "${base}.deduped.bam" \
 -M "${base}.dup_metrics.txt"
+done
+```
+
+### 7. Index de-duplicated bam files 
+Script name: IndexBam.sh
+```
+for infile in *.bam
+do
+echo "working with file $infile"
+base=$(basename ${infile} .bam)
+samtools index -b ${base}.bam
 done
 ```

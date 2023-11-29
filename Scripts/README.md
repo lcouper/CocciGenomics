@@ -77,3 +77,18 @@ base=$(basename ${infile} .bam)
 samtools index -b ${base}.bam
 done
 ```
+
+### 8. Compute alignment statistics
+Note: calculates statistics including total reads, mapped reads, % failed QC, % duplicates, % paired-end reads, % singletons
+Script: AlignStats.sh   
+```
+for infile in *.deduped.bam
+do
+echo "working with file $infile"
+base=$(basename ${infile} .deduped.bam)
+bamtools stats -in ${base}.deduped.bam > "${base}.AlignStats.txt"
+done
+```
+
+
+

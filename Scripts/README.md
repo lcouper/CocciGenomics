@@ -98,4 +98,9 @@ bcftools mpileup --threads 12 -f /global/scratch/users/lcouper/SJV_Genomes/Cocci
 ```
 
 
+## Additional downstream steps of interest:
+- calculate # of SNPs differing between each possible pair
+- generate phylogenetic tree
+- calculate overall nucleotide diversity
+- plot PCA
 

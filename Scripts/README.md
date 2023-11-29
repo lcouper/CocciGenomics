@@ -99,8 +99,8 @@ bcftools mpileup --threads 12 -f /global/scratch/users/lcouper/SJV_Genomes/Cocci
 
 
 ## Additional downstream steps of interest:
-- calculate # of SNPs differing between each possible pair
-- generate phylogenetic tree
+- calculate # of SNPs differing between each possible pair (can maybe be done with program 'plink' (Available as a module on savio) according to : https://www.biostars.org/p/351404/ 
+- generate phylogenetic tree: have seen 'MrBayes' as gold standard for this, but have never used it before
 - calculate overall nucleotide diversity
 - plot PCA
 

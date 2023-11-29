@@ -90,5 +90,12 @@ bamtools stats -in ${base}.deduped.bam > "${base}.AlignStats.txt"
 done
 ```
 
+### 9. Detect single nucleotide variants
+Script: CallVariants.sh
+```
+bcftools mpileup --threads 12 -f /global/scratch/users/lcouper/SJV_Genomes/CocciRefGenome.fna -q 20 -Q 20 *.deduped.bam \
+| bcftools call --threads 12 -mv --ploidy 1 -Oz -o VCFFILE
+```
+
 
 

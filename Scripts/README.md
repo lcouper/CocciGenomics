@@ -105,5 +105,5 @@ bcftools mpileup --threads 12 -f /global/scratch/users/lcouper/SJV_Genomes/Cocci
 - plot PCA
 
 Downloaded MrBayes here: https://github.com/NBISweden/MrBayes/tree/v3.2.7a
-
+followed instruction manual here: https://github.com/NBISweden/MrBayes/blob/develop/doc/manual/Manual_MrBayes_v3.2.pdf
 

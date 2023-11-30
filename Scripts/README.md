@@ -106,4 +106,5 @@ bcftools mpileup --threads 12 -f /global/scratch/users/lcouper/SJV_Genomes/Cocci
 
 Downloaded MrBayes here: https://github.com/NBISweden/MrBayes/tree/v3.2.7a
 followed instruction manual here: https://github.com/NBISweden/MrBayes/blob/develop/doc/manual/Manual_MrBayes_v3.2.pdf
+may require using: https://github.com/edgardomortiz/vcf2phylip to get VCFFILE into Nexus format for use with MrBayes
 

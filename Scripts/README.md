@@ -104,3 +104,6 @@ bcftools mpileup --threads 12 -f /global/scratch/users/lcouper/SJV_Genomes/Cocci
 - calculate overall nucleotide diversity
 - plot PCA
 
+Downloaded MrBayes here: https://github.com/NBISweden/MrBayes/tree/v3.2.7a
+
+

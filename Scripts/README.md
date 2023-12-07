@@ -97,6 +97,13 @@ bcftools mpileup --threads 12 -f /global/scratch/users/lcouper/SJV_Genomes/Cocci
 | bcftools call --threads 12 -mv --ploidy 1 -Oz -o VCFFILE
 ```
 
+### 10. Filter low quality variants
+Script: FilterSNP.sh
+```
+bcftools view -O z -o Filtered_VCFFILE.vcf.gz -e 'QUAL<=40' VCFFILE.vcf
+```
+
+### 11. 
 
 ## Additional downstream steps of interest:
 - calculate # of SNPs differing between each possible pair (can maybe be done with program 'plink' (Available as a module on savio) according to : https://www.biostars.org/p/351404/ 

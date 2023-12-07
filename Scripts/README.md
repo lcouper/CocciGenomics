@@ -103,7 +103,33 @@ Script: FilterSNP.sh
 bcftools view -O z -o Filtered_VCFFILE.vcf.gz -e 'QUAL<=40' VCFFILE.vcf
 ```
 
-### 11. 
+### 11. Index filtered vcffiles
+* Note: required installing tabix. Followed instructions here : https://github.com/trinityrnaseq/Griffithlab_rnaseq_tutorial_wiki/blob/master/AWS-Setup.md to install to SJV_Genomes/Aligned/SortedBams
+* Set export path as: export PATH=$PATH:/global/scratch/users/lcouper/SJV_Genomes/Aligned/SortedBams/tabix-0.2.6
+```
+tabix *.vcf
+```
+
+### 12. Create dictionary for reference genome
+* Note picard.jar uploaded to working directory
+```
+module load java
+java -jar picard.jar CreateSequenceDictionary -R ../../CocciRefGenome.fna -O ../../CocciRef.dict
+```
+
+### 13. Sort vcf according to refeference dictionary 
+```
+module load bwa
+module load java
+java -jar picard.jar SortVcf \
+-I Filtered_VCFFILE.vcf.gz \
+-O Filtered_Sorted_VCFFILE.vcf.gz \
+-SD /global/scratch/users/lcouper/SJV_Genomes/CocciRef.dict
+```
+
+### 14. 
+* required installing vcftools, following instructions here: https://vcftools.github.io/examples.html
+
 
 ## Additional downstream steps of interest:
 - calculate # of SNPs differing between each possible pair (can maybe be done with program 'plink' (Available as a module on savio) according to : https://www.biostars.org/p/351404/ 

@@ -127,9 +127,14 @@ java -jar picard.jar SortVcf \
 -SD /global/scratch/users/lcouper/SJV_Genomes/CocciRef.dict
 ```
 
-### 14. Filter SNVs using vcftools
+### 14. Filter SNVs using vcftools and remove multi-allelic sites 
 * will require installing vcftools. Have requested this from BCR help
+```
+vcftools --vcf Filtered_Sorted_VCFFFILE.vcf --maf 0.05 --minQ 40 --max-missing 0.95 --minDP 10 --recode --recode-INFO-all --out VCF_AllVariants.vcf
+# check output to see how many SNPs retained
 
+bcftools view -m2 -M2 -v snps VCF_AllVariants.vcf > VCF_Biallelic.vcf
+```
 
 ## Additional downstream steps of interest:
 - calculate # of SNPs differing between each possible pair (can maybe be done with program 'plink' (Available as a module on savio) according to : https://www.biostars.org/p/351404/ 

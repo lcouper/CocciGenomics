@@ -127,8 +127,8 @@ java -jar picard.jar SortVcf \
 -SD /global/scratch/users/lcouper/SJV_Genomes/CocciRef.dict
 ```
 
-### 14. 
-* required installing vcftools, following instructions here: https://vcftools.github.io/examples.html
+### 14. Filter SNVs using vcftools
+* will require installing vcftools. Have requested this from BCR help
 
 
 ## Additional downstream steps of interest:

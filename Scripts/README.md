@@ -136,6 +136,10 @@ vcftools --vcf Filtered_Sorted_VCFFFILE.vcf --maf 0.05 --minQ 40 --max-missing 0
 bcftools view -m2 -M2 -v snps VCF_AllVariants.vcf > VCF_Biallelic.vcf
 ```
 
+* Note: 
+uploaded VCFfile to SCG (to ThermalSelectionExpSeqFiles > results > bam > deduped_bams > filtered_VCF. Name “Filtered_Sorted_VCFFILE_SJV_Genomes.vcf”
+
+
 ## Additional downstream steps of interest:
 - calculate # of SNPs differing between each possible pair (can maybe be done with program 'plink' (Available as a module on savio) according to : https://www.biostars.org/p/351404/ 
 - generate phylogenetic tree: have seen 'MrBayes' as gold standard for this, but have never used it before

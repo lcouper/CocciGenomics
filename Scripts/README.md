@@ -128,6 +128,8 @@ java -jar picard.jar SortVcf \
 ```
 
 ### 14. Filter SNVs using vcftools and remove multi-allelic sites 
+Script name: vcf_filter.sh
+
 * Note vcftools installed by BRC into the module farm. Load and run using the following:
 ```
 module unload gcc/6.3.0

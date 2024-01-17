@@ -137,7 +137,7 @@ module load gcc/11.3.0
 export MODULEPATH=${MODULEPATH}:/clusterfs/vector/home/groups/software/sl-7.x86_64/modfiles
 module load vcftools/0.1.16
 
-vcftools --vcf Filtered_Sorted_VCFFFILE.vcf --maf 0.05 --minQ 40 --max-missing 0.95 --minDP 10 --recode --recode-INFO-all --out VCF_AllVariants.vcf
+vcftools --vcf Filtered_Sorted_VCFFILE.vcf --maf 0.05 --minQ 30 --max-missing 0.75 --minDP 10 --recode --recode-INFO-all --out VCF_AllVariants.vcf
 # check output to see how many SNPs retained
 
 bcftools view -m2 -M2 -v snps VCF_AllVariants.vcf > VCF_Biallelic.vcf

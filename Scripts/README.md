@@ -136,12 +136,15 @@ module unload gcc/6.3.0
 module load gcc/11.3.0
 export MODULEPATH=${MODULEPATH}:/clusterfs/vector/home/groups/software/sl-7.x86_64/modfiles
 module load vcftools/0.1.16
+module load bcftools/1.6
 
 vcftools --vcf Filtered_Sorted_VCFFILE.vcf --maf 0.05 --minQ 30 --max-missing 0.75 --minDP 10 --recode --recode-INFO-all --out VCF_AllVariants.vcf
-# check output to see how many SNPs retained
+# 202,550 out of a possible 260,032 Sites retained
 
 bcftools view -m2 -M2 -v snps VCF_AllVariants.vcf > VCF_Biallelic.vcf
 ```
+To identify number of SNPs in vcf file:
+grep -v "^#" VCF_Biallelic.vcf|wc -l
 
 * Note: 
 uploaded VCFfile to SCG (to ThermalSelectionExpSeqFiles > results > bam > deduped_bams > filtered_VCF. Name “Filtered_Sorted_VCFFILE_SJV_Genomes.vcf”

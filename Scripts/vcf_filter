@@ -1,0 +1,17 @@
+#!/bin/bash
+#SBATCH --job-name=vcf_attempt
+#SBATCH --account=fc_envids
+#SBATCH --partition=savio3
+#SBATCH --time=6:00:00
+#SBATCH --output=vcf_attempt.out
+
+## commands to run:
+
+cd /global/scratch/users/lcouper/SJV_Genomes/Aligned/SortedBams
+
+module unload gcc/6.3.0
+module load gcc/11.3.0
+export MODULEPATH=${MODULEPATH}:/clusterfs/vector/home/groups/software/sl-7.x86_64/modfiles
+module load vcftools/0.1.16
+
+vcftools --vcf Filtered_Sorted_VCFFFILE.vcf --maf 0.05 --minQ 40 --max-missing 0.95 --minDP 10 --recode --recode-INFO-all --out VCF_AllVariants.vcf

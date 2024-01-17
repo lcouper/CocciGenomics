@@ -128,8 +128,13 @@ java -jar picard.jar SortVcf \
 ```
 
 ### 14. Filter SNVs using vcftools and remove multi-allelic sites 
-* will require installing vcftools. Have requested this from BCR help
+* Note vcftools installed by BRC into the module farm. Load and run using the following:
 ```
+module unload gcc/6.3.0
+module load gcc/11.3.0
+export MODULEPATH=${MODULEPATH}:/clusterfs/vector/home/groups/software/sl-7.x86_64/modfiles
+module load vcftools/0.1.16
+
 vcftools --vcf Filtered_Sorted_VCFFFILE.vcf --maf 0.05 --minQ 40 --max-missing 0.95 --minDP 10 --recode --recode-INFO-all --out VCF_AllVariants.vcf
 # check output to see how many SNPs retained
 

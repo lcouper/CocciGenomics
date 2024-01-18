@@ -142,6 +142,8 @@ vcftools --vcf Filtered_Sorted_VCFFILE.vcf --maf 0.05 --minQ 30 --max-missing 0.
 # 202,550 out of a possible 260,032 Sites retained
 
 bcftools view -m2 -M2 -v snps VCF_AllVariants.vcf > VCF_Biallelic.vcf
+
+# 194668 SNPs retained
 ```
 To identify number of SNPs in vcf file:
 grep -v "^#" VCF_Biallelic.vcf|wc -l

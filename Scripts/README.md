@@ -151,7 +151,16 @@ uploaded VCFfile to SCG (to ThermalSelectionExpSeqFiles > results > bam > dedupe
 
 
 ## Additional downstream steps of interest:
-- calculate # of SNPs differing between each possible pair (can maybe be done with program 'plink' (Available as a module on savio) according to : https://www.biostars.org/p/351404/ 
+1. calculate # of SNPs differing between each possible pair using plink.
+Note I run this on SCG, using the pre-filtered VCFFILE. Followed guidance here: https://www.biostars.org/p/351404/
+
+```
+module load plink/1.90
+plink --vcf Filtered_Sorted_VCFFILE_SJV_Genomes.vcf --allow-extra-chr --genome full --out plink.genome.SJV
+# in resulting --out plink.genome.SJV file, if you sum the IBS0 and IBS1 columns (in R), you get the pairwise SNP differences
+
+
+
 - generate phylogenetic tree: have seen 'MrBayes' as gold standard for this, but have never used it before
 - calculate overall nucleotide diversity
 - plot PCA

@@ -156,6 +156,7 @@ uploaded VCFfile to SCG (to ThermalSelectionExpSeqFiles > results > bam > dedupe
 
 1. calculate # of SNPs differing between each possible pair using plink.
 Note I run this on SCG, using the pre-filtered VCFFILE. Followed guidance here: https://www.biostars.org/p/351404/
+Note: Prior work found 1000s of SNPs separate strains from the same region  (mentioned here: https://academic.oup.com/cid/article/60/1/e1/2895394)
 
 ```
 module load plink/1.90

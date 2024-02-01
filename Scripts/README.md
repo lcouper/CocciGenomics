@@ -154,12 +154,12 @@ uploaded VCFfile to SCG (to ThermalSelectionExpSeqFiles > results > bam > dedupe
 ### 15. Generate genotype matrix
 Done using vcftools. Outputs 3 files: ‘.012’ contains the genotypes of each individual on a separate line (with 0, 1, 2 denoting the number of non-reference alleles at the site), ‘.ind’ lists the individuals included in the main file, ‘.pos’ details the site location included in the main file. 
 ```
-vcftools --012 --vcf Filtered_VCF_All_sorted_0.995_bialleliconly.vcf --out output_geno.vcf
+vcftools --012 --vcf Filtered_Sorted_VCFFILE_SJV_Genomes.vcf --out SJV_genotype_matr
 ```
 
 ## Additional downstream steps of interest:
 
-1. calculate # of SNPs differing between each possible pair using plink.
+### 1. calculate # of SNPs differing between each possible pair using plink.
 Note I run this on SCG, using the pre-filtered VCFFILE. Followed guidance here: https://www.biostars.org/p/351404/
 Note: Prior work found 1000s of SNPs separate strains from the same region  (mentioned here: https://academic.oup.com/cid/article/60/1/e1/2895394)
 
@@ -169,11 +169,15 @@ plink --vcf VCF_Biallelic.vcf --allow-extra-chr --genome full --out plink.genome
 # in resulting --out plink.genome.SJV.genome file, if you sum the IBS0 and IBS1 columns (in R), you get the pairwise SNP differences
 ```
 
-2. Generate phylogenetic tree: have seen 'MrBayes' as gold standard for this, but have never used it before
-- calculate overall nucleotide diversity
-- plot PCA
+### 2. Generate phylogenetic tree
+Note this is done in R, using the genotype matrix created above (i.e., SJV_genotype_matr) and the ape package
+```
+SJV_gm <- fread("GenotypeMatrix/SJV_genotype_matr.csv", header = TRUE)
+stree = nj(dist.gene(datasub)) # this specifies the 'neighbor-joining' method for tree-construction (appears to be most common)
 
-Downloaded MrBayes here: https://github.com/NBISweden/MrBayes/tree/v3.2.7a
-followed instruction manual here: https://github.com/NBISweden/MrBayes/blob/develop/doc/manual/Manual_MrBayes_v3.2.pdf
-may require using: https://github.com/edgardomortiz/vcf2phylip to get VCFFILE into Nexus format for use with MrBayes
+
+### 3. Plot PCA
+Note this is done in R, using the genotype matrix created above (i.e., SJV_genotype_matr) along with metadata labels
+
+
 

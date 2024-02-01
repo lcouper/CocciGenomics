@@ -162,7 +162,7 @@ Note: Prior work found 1000s of SNPs separate strains from the same region  (men
 module load plink/1.90
 plink --vcf VCF_Biallelic.vcf --allow-extra-chr --genome full --out plink.genome.SJV
 # in resulting --out plink.genome.SJV.genome file, if you sum the IBS0 and IBS1 columns (in R), you get the pairwise SNP differences
-
+```
 
 2. Generate phylogenetic tree: have seen 'MrBayes' as gold standard for this, but have never used it before
 - calculate overall nucleotide diversity

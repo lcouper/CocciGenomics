@@ -4,6 +4,7 @@ Relevant code snippet for each shown below
 
 ### 1. Obtained raw reads from Berkeley QB3.  
 The fastq.gz files (1 forward, 1 reverse) are stored here on the Remais Group Shared Drive: SPORE/WGS/Sequence data (All)/ 
+and Berkeley's HPC BRC at: /global/scratch/users/lcouper/SoilCocciSeqs
 
 ### 2. Filter poor quality reads and trim poor quality bases 
 

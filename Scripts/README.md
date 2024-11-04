@@ -1,9 +1,22 @@
-## Steps and scripts used to analyze Coccidiodides genomes 
+## Steps and scripts used to process WGS data on environmetnal Coccidiodides samples ### 
 
 Relevant code snippet for each shown below
 
 ### 1. Obtained raw reads from Berkeley QB3.  
 The fastq.gz files (1 forward, 1 reverse) are stored here on the Remais Group Shared Drive: SPORE/WGS/Sequence data (All)/ 
+
+### 2. Filter poor quality reads and trim poor quality bases 
+Using trimmomatic
+Software used: Trimmomatic V 0.39 (Bolger et al. 2014)
+Script: trim.sbatch
+Code snippet for single sample:
+```
+java -jar trimmomatic.jar PE E-014_S10_L001_R1_001.fastq.gz E-014_S10_L001_R2_001.fastq.gz \
+E-014_S10_L001_R1_001.trim.fastq.gz E-014_S10_L001_R1_001un.trim.fastq.gz \
+E-014_S10_L001_R2_001.trim.fastq.gz E-014_S10_L001_R2_001un.trim.fastq.gz \
+ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:35 SLIDINGWINDOW:4:15
+```
+
 
 ### 1. Index reference genome  
 Script name: bwamem_index

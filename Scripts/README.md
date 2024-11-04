@@ -1,5 +1,9 @@
 ## Steps and scripts used to analyze Coccidiodides genomes 
+
 Relevant code snippet for each shown below
+
+### 1. Obtained raw reads from Berkeley QB3.  
+The fastq.gz files (1 forward, 1 reverse) are stored here on the Remais Group Shared Drive: SPORE/WGS/Sequence data (All)/ 
 
 ### 1. Index reference genome  
 Script name: bwamem_index

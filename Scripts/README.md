@@ -6,18 +6,26 @@ Relevant code snippet for each shown below
 The fastq.gz files (1 forward, 1 reverse) are stored here on the Remais Group Shared Drive: SPORE/WGS/Sequence data (All)/ 
 
 ### 2. Filter poor quality reads and trim poor quality bases 
-Using trimmomatic
+
 Software used: Trimmomatic V 0.39 (Bolger et al. 2014)
 Script: trim.sbatch
 Code snippet for single sample:
 ```
 module load bio/trimmomatic/0.39-gcc-11.4.0
-PE PS02PN14-1_S1_L007_R1_001.fastq.gz PS02PN14-1_S1_L007_R2_001.fastq.gz \
+trimmomatic PE PS02PN14-1_S1_L007_R1_001.fastq.gz PS02PN14-1_S1_L007_R2_001.fastq.gz \
 PS02PN14-1_S1_L007_R1_001.trim.fastq.gz PS02PN14-1_S1_L007_R1_001.untrim.fastq.gz \
 PS02PN14-1_S1_L007_R2_001.trim.fastq.gz PS02PN14-1_S1_L007_R2_001.untrim.fastq.gz\
 ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:35 SLIDINGWINDOW:4:15
 ```
+### 3. 
 
+Software used: bio/fastqc/0.12.1-gcc-11.4.0
+Script: fastqc.sbatch
+Code snippet for single sample:
+```
+module load bio/fastqc/0.12.1-gcc-11.4.0
+fastqc trimmed_fastqc/*.fastq*
+```
 
 ### 1. Index reference genome  
 Script name: bwamem_index

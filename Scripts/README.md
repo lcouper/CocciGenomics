@@ -21,9 +21,9 @@ ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:35 SLIDINGWINDOW:
 
 ### 3. Perform quality check on samples using fastqc
 
-Software used: bio/fastqc/0.12.1-gcc-11.4.0
-Script: fastqc.sbatch
-Code snippet for single sample:
+Software used: bio/fastqc/0.12.1-gcc-11.4.0   
+Script: fastqc.sbatch   
+Code snippet for single sample:   
 ```
 module load bio/fastqc/0.12.1-gcc-11.4.0
 fastqc trimmed_fastqc/*.fastq.gz

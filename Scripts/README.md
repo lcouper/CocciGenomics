@@ -29,15 +29,29 @@ module load bio/fastqc/0.12.1-gcc-11.4.0
 fastqc trimmed_fastqc/*.fastq.gz
 ```
 
-### 1. Index reference genome  
+### 4. Index reference genome  
+
+Note: Using reference genome for Coccidioides immitis RS (GCA_000149335.2)   
+Downloaded here: https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000149335.2/   
+Saved/uploaded as: CocciRef_GCA_000149335.2.fna  
+
+Software used: bio/bwa-mem2/2.2.1
 Script name: bwamem_index
+Code snippet:
 ```
-bwa-mem2 index CocciRefGenome.fna
+module load bio/bwa-mem2/2.2.1
+bwa-mem2 index CocciRef_GCA_000149335.2.fna
 ```
 
-### 2. Align sequences to reference genome    
+#### 5. Align sequences to reference genome    
+
 Script name: bwamem_align
+
+bwa-mem2 mem -t 12 ../RefGenome/CocciRef_GCA_000149335.2.fna \
+trimmed_fastq/PS02PN14-1_S1_L007_R1_001.trim.fastq.gz PS02PN14-1_S1_L007_R2_001.trim.fastq.g > test.sam
+
 ```
+bio/bwa-mem2/2.2.1
 for infile in *_1.fastq
 do
 base=$(basename ${infile} _1.fastq)

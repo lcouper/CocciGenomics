@@ -45,20 +45,24 @@ bwa-mem2 index CocciRef_GCA_000149335.2.fna
 
 #### 5. Align sequences to reference genome    
 
-Script name: bwamem_align
-
-bwa-mem2 mem -t 12 ../RefGenome/CocciRef_GCA_000149335.2.fna \
-trimmed_fastq/PS02PN14-1_S1_L007_R1_001.trim.fastq.gz PS02PN14-1_S1_L007_R2_001.trim.fastq.g > test.sam
+Software used: bio/bwa-mem2/2.2.1
+Script name: alignreads
+Code snippet:
 
 ```
-bio/bwa-mem2/2.2.1
-for infile in *_1.fastq
+#First unzip trimmed fastq files if not done already
+gunzip trimmed_fastq/*.gz
+
+#Then align to cocci immitis RS ref genome
+
+for infile in trimmed_fastq/*_R1_001.trim.fastq
 do
-base=$(basename ${infile} _1.fastq)
-bwa-mem2 mem -t 12 CocciRefGenome.fna \
-${base}_1.fastq ${base}_2.fastq > "${base}.aligned.sam"
+base=$(basename ${infile} _R1_001.trim.fastq)
+bwa-mem2 mem -t 12 RefGenome/CocciRef_GCA_000149335.2.fna \
+trimmed_fastq/${base}_R1_001.trim.fastq trimmed_fastq/${base}_R2_001.trim.fastq > results/sam/"${base}.aligned.sam"
 done
 ```
+
 
 ### 3. Compress .sam to .bam using samtools
 Script name: sam2bam.sh

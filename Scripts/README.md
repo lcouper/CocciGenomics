@@ -45,9 +45,9 @@ bwa-mem2 index CocciRef_GCA_000149335.2.fna
 
 ### 5. Align sequences to reference genome    
 
-Software used: bio/bwa-mem2/2.2.1
-Script name: alignreads
-Code snippet:
+Software used: bio/bwa-mem2/2.2.1  
+Script name: alignreads  
+Code snippet:   
 
 ```
 #First unzip trimmed fastq files if not done already

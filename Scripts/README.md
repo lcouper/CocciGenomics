@@ -3,13 +3,14 @@
 Relevant code snippet for each shown below
 
 ### 1. Obtained raw reads from Berkeley QB3.  
+
 The fastq.gz files (1 forward, 1 reverse) are stored here on the Remais Group Shared Drive: SPORE/WGS/Sequence data (All)/ 
 and Berkeley's HPC BRC at: /global/scratch/users/lcouper/SoilCocciSeqs
 
 ### 2. Filter poor quality reads and trim poor quality bases 
 
 Software used: Trimmomatic V 0.39 (Bolger et al. 2014)   
-Script: trim.sbatch  
+Script: trim.sh
 Code snippet for single sample:  
 ```
 module load bio/trimmomatic/0.39-gcc-11.4.0
@@ -22,7 +23,7 @@ ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:35 SLIDINGWINDOW:
 ### 3. Perform quality check on samples using fastqc
 
 Software used: bio/fastqc/0.12.1-gcc-11.4.0   
-Script: fastqc.sbatch   
+Script: fastqc.sh
 Code snippet for single sample:   
 ```
 module load bio/fastqc/0.12.1-gcc-11.4.0
@@ -36,7 +37,7 @@ Downloaded here: https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000149335.2/
 Saved/uploaded as: CocciRef_GCA_000149335.2.fna  
 
 Software used: bio/bwa-mem2/2.2.1
-Script name: bwamem_index
+Script name: bwamem_index.sh
 Code snippet:
 ```
 module load bio/bwa-mem2/2.2.1
@@ -46,7 +47,7 @@ bwa-mem2 index CocciRef_GCA_000149335.2.fna
 ### 5. Align sequences to reference genome    
 
 Software used: bio/bwa-mem2/2.2.1  
-Script name: alignreads  
+Script name: alignreads.sh 
 Code snippet:   
 
 ```
@@ -63,37 +64,20 @@ trimmed_fastq/${base}_R1_001.trim.fastq trimmed_fastq/${base}_R2_001.trim.fastq 
 done
 ```
 
+### 6. Compress sam to bam, sort bam files, and extract mapping stats
 
-### 3. Compress .sam to .bam using samtools
-Script name: sam2bam.sh
+Software used: bio/samtools/1.17-gcc-11.4.0
+Script name: sam2bam.sh 
+Code snippet:   
+
 ```
-for infile in Aligned/*.aligned.sam
+for infile in results/sam/*.aligned.sam
 do
 echo "working with file $infile"
 base=$(basename ${infile} .aligned.sam)
-samtools view -@ 12 -b Aligned/${base}.aligned.sam > Aligned/"${base}.aligned.bam"
-done
-```
-
-### 4. Sort bam file by coordinates using samtools
-Script name: sortbam.sh
-```
-for infile in *.bam
-do
-echo "working with file $infile"
-base=$(basename ${infile} .bam)
-samtools sort -@ 12 -o "${base}.sorted.bam" ${base}.bam
-done
-```
-
-### 5. Obtain summary stats about bam file
-Script name: summarystats.sh
-```
-for infile in *.bam
-do
-echo "working with file $infile"
-base=$(basename ${infile} .bam)
-samtools flagstat ${base}.bam > "${base}.bam.stats.txt"
+samtools view -@ 12 -b results/sam/${base}.aligned.sam > results/bam/"${base}.aligned.bam"
+samtools sort -@ 12 results/bam/${base}.bam -o "${base}.sorted.bam"
+samtools flagstat results/bam/${base}.bam > "${base}.bam.stats.txt"
 done
 ```
 

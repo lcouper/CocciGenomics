@@ -1,4 +1,4 @@
-## Steps and scripts used to process WGS data on environmetnal Coccidiodides samples ### 
+## Steps and scripts used to process WGS data on environmetnal _Coccidiodides_ samples ### 
 
 Relevant code snippet for each shown below
 
@@ -76,29 +76,31 @@ do
 echo "working with file $infile"
 base=$(basename ${infile} .aligned.sam)
 samtools view -@ 12 -b results/sam/${base}.aligned.sam > results/bam/"${base}.aligned.bam"
-samtools sort -@ 12 results/bam/${base}.bam -o "${base}.sorted.bam"
-samtools flagstat results/bam/${base}.bam > "${base}.bam.stats.txt"
+samtools sort -@ 12 results/bam/${base}.aligned.bam -o "${base}.sorted.bam"
+samtools flagstat results/bam/${base}.aligned.bam > results/bam/"${base}.bam.stats.txt"
 done
 ```
 
-### 6. Mark and remove duplicates 
-Note: picard.jar was downloaded from the Broad institute here: https://github.com/broadinstitute/picard/releases/tag/3.1.1
-Script name: MarkDups.sh
+### 7. Mark and remove duplicates 
+
+Software used: bio/picard/3.0.0-gcc-11.4.0       
+Script name: markdups.sh    
+Code snippet:
+
 ```
-for infile in *.aligned.sorted.bam
+for infile in *.aligned.bam
 do
-echo "working with file $infile"
-base=$(basename ${infile} .aligned.sorted.bam)
-java -jar picard.jar MarkDuplicates \
+base=$(basename ${infile} .aligned.bam)
+picard MarkDuplicates \
 -REMOVE_DUPLICATES TRUE \
--I ${base}.aligned.sorted.bam \
+-I ${base}.aligned.bam \
 -O "${base}.deduped.bam" \
 -M "${base}.dup_metrics.txt"
 done
 ```
 
-### 7. Index de-duplicated bam files 
-Script name: IndexBam.sh
+### 8. Index de-duplicated bam files 
+Script name: indexbam.sh
 ```
 for infile in *.bam
 do

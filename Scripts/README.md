@@ -43,7 +43,7 @@ module load bio/bwa-mem2/2.2.1
 bwa-mem2 index CocciRef_GCA_000149335.2.fna
 ```
 
-#### 5. Align sequences to reference genome    
+### 5. Align sequences to reference genome    
 
 Software used: bio/bwa-mem2/2.2.1
 Script name: alignreads

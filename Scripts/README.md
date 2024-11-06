@@ -11,7 +11,7 @@ and Berkeley's HPC BRC at: /global/scratch/users/lcouper/SoilCocciSeqs
 
 Software used: Trimmomatic V 0.39 (Bolger et al. 2014)   
 Script: trim.sh
-Code snippet for single sample:  
+Code snippet for single sample:    
 ```
 module load bio/trimmomatic/0.39-gcc-11.4.0
 trimmomatic PE PS02PN14-1_S1_L007_R1_001.fastq.gz PS02PN14-1_S1_L007_R2_001.fastq.gz \
@@ -23,8 +23,8 @@ ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:35 SLIDINGWINDOW:
 ### 3. Perform quality check on samples using fastqc
 
 Software used: bio/fastqc/0.12.1-gcc-11.4.0   
-Script: fastqc.sh
-Code snippet for single sample:   
+Script: fastqc.sh    
+Code snippet for single sample:      
 ```
 module load bio/fastqc/0.12.1-gcc-11.4.0
 fastqc trimmed_fastqc/*.fastq.gz
@@ -36,9 +36,10 @@ Note: Using reference genome for Coccidioides immitis RS (GCA_000149335.2)
 Downloaded here: https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000149335.2/   
 Saved/uploaded as: CocciRef_GCA_000149335.2.fna  
 
-Software used: bio/bwa-mem2/2.2.1
-Script name: bwamem_index.sh
-Code snippet:
+Software used: bio/bwa-mem2/2.2.1  
+Script name: bwamem_index.sh    
+Code snippet:   
+
 ```
 module load bio/bwa-mem2/2.2.1
 bwa-mem2 index CocciRef_GCA_000149335.2.fna
@@ -46,8 +47,8 @@ bwa-mem2 index CocciRef_GCA_000149335.2.fna
 
 ### 5. Align sequences to reference genome    
 
-Software used: bio/bwa-mem2/2.2.1  
-Script name: alignreads.sh 
+Software used: bio/bwa-mem2/2.2.1   
+Script name: alignreads.sh    
 Code snippet:   
 
 ```
@@ -67,7 +68,7 @@ done
 ### 6. Compress sam to bam, sort bam files, and extract mapping stats
 
 Software used: bio/samtools/1.17-gcc-11.4.0
-Script name: sam2bam.sh 
+Script name: sam2bam.sh   
 Code snippet:   
 
 ```

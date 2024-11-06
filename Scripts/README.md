@@ -67,9 +67,9 @@ done
 
 ### 6. Compress sam to bam, sort bam files, and extract mapping stats
 
-Software used: bio/samtools/1.17-gcc-11.4.0
-Script name: sam2bam.sh   
-Code snippet:   
+Software used: bio/samtools/1.17-gcc-11.4.0    
+Script name: sam2bam.sh      
+Code snippet:     
 
 ```
 for infile in results/sam/*.aligned.sam

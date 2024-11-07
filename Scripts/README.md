@@ -89,37 +89,44 @@ Script name: markdups.sh
 Code snippet:
 
 ```
-for infile in *.aligned.bam
+for infile in results/sortedbams/*.sorted.bam
 do
-base=$(basename ${infile} .aligned.bam)
+base=$(basename ${infile} .sorted.bam)
 picard MarkDuplicates \
 -REMOVE_DUPLICATES TRUE \
--I ${base}.aligned.bam \
--O "${base}.deduped.bam" \
--M "${base}.dup_metrics.txt"
+-I results/sortedbams/${base}.sorted.bam \
+-O results/dedupedbams/"${base}.deduped.bam" \
+-M results/sortedbams/"${base}.dup_metrics.txt"
 done
 ```
 
 ### 8. Index de-duplicated bam files 
+
+Software used: bio/samtools/1.17-gcc-11.4.0    
 Script name: indexbam.sh
+Code snippet:
+
 ```
-for infile in *.bam
+for infile in results/dedupedbams/*.deduped.bam
 do
-echo "working with file $infile"
-base=$(basename ${infile} .bam)
-samtools index -b ${base}.bam
+base=$(basename ${infile} .deduped.bam)
+samtools index -b results/dedupedbams/${base}.deduped.bam
 done
 ```
 
-### 8. Compute alignment statistics
+### 9. Compute alignment statistics
+
 Note: calculates statistics including total reads, mapped reads, % failed QC, % duplicates, % paired-end reads, % singletons
-Script: AlignStats.sh   
+
+Software used: bio/bamtools/2.5.2-gcc-11.4.0
+Script: alignstats.sh  
+Code snippet:
+
 ```
-for infile in *.deduped.bam
+for infile in results/dedupedbams/*.deduped.bam
 do
-echo "working with file $infile"
 base=$(basename ${infile} .deduped.bam)
-bamtools stats -in ${base}.deduped.bam > "${base}.AlignStats.txt"
+bamtools stats -in results/dededupedbams/${base}.deduped.bam > results/dedupedbams/"${base}.AlignStats.txt"
 done
 ```
 

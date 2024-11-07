@@ -130,6 +130,9 @@ bamtools stats -in results/dededupedbams/${base}.deduped.bam > results/dedupedba
 done
 ```
 
+#### Look into repeat masking! 
+
+
 ### 9. Detect single nucleotide variants
 Script: CallVariants.sh
 ```

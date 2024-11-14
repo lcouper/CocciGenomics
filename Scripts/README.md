@@ -147,12 +147,16 @@ next to do, try validating bam file (e.g., through suggestion here: https://gatk
 
 
 ### 10. Filter low quality variants
-Script: FilterSNP.sh
+
+Software used: bcftools/1.16-gcc-11.4.0
+Script: filtervariants.sh
+
 ```
-bcftools view -O z -o Filtered_VCFFILE.vcf.gz -e 'QUAL<=40' VCFFILE.vcf
+bcftools view -O z -o results/vcf/Filtered_VCFFILE.vcf.gz -e 'QUAL<=40' results/vcf/VCFFILE.vcf
 ```
 
 ### 11. Index filtered vcffiles
+
 * Note: required installing tabix. Followed instructions here : https://github.com/trinityrnaseq/Griffithlab_rnaseq_tutorial_wiki/blob/master/AWS-Setup.md to install to SJV_Genomes/Aligned/SortedBams
 * Set export path as: export PATH=$PATH:/global/scratch/users/lcouper/SJV_Genomes/Aligned/SortedBams/tabix-0.2.6
 ```

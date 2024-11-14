@@ -130,15 +130,21 @@ bamtools stats -in results/dededupedbams/${base}.deduped.bam > results/dedupedba
 done
 ```
 
-#### Look into repeat masking! 
-
-
-### 9. Detect single nucleotide variants
-Script: CallVariants.sh
+### 10a. Detect single nucleotide variants
+Script: callvariants.sh
 ```
-bcftools mpileup --threads 12 -f /global/scratch/users/lcouper/SJV_Genomes/CocciRefGenome.fna -q 20 -Q 20 *.deduped.bam \
+bcftools mpileup --threads 12 -f RefGenome/CocciRef_GCA_000149335.2.fna -q 20 -Q 20 results/dedupedbams/*.deduped.bam \
 | bcftools call --threads 12 -mv --ploidy 1 -Oz -o VCFFILE
 ```
+
+### 10b. Detect single nucleotide variants using GATK 
+Script: gatk_callvariants.sh
+
+not able to run through as a script (can't find 'gatk' command)
+Trying to run this at the command line: gatk HaplotypeCaller -R RefGenome/CocciRef_GCA_000149335.2.fna -I results/dedupedbams/PS02PN14-1_S1_L007.deduped.bam -O testvariants.g.vcf
+but getting error message: java.lang.IllegalStateException: the sample list cannot be null or empty
+next to do, try validating bam file (e.g., through suggestion here: https://gatk.broadinstitute.org/hc/en-us/community/posts/4412745467931-HaplotypeCaller-does-not-work) 
+
 
 ### 10. Filter low quality variants
 Script: FilterSNP.sh

@@ -157,52 +157,50 @@ bcftools view -O z -o results/vcf/Filtered_VCFFILE.vcf.gz -e 'QUAL<=40' results/
 
 ### 11. Index filtered vcffiles
 
-* Note: required installing tabix. Followed instructions here : https://github.com/trinityrnaseq/Griffithlab_rnaseq_tutorial_wiki/blob/master/AWS-Setup.md to install to SJV_Genomes/Aligned/SortedBams
-* Set export path as: export PATH=$PATH:/global/scratch/users/lcouper/SJV_Genomes/Aligned/SortedBams/tabix-0.2.6
+* Note: required installing tabix. Followed instructions here : https://github.com/trinityrnaseq/Griffithlab_rnaseq_tutorial_wiki/blob/master/AWS-Setup.md to install to SoilCocciSeq/results/vcf
+* Set export path as:
+export PATH=$PATH:/global/scratch/users/lcouper/SoilCocciSeqs/results/vcf/tabix-0.2.6
+
 ```
-tabix *.vcf
+# in the SoilCocciSeq/results/vcf directory:
+tabix *.vcf.gz # e.g. this should be the filtered vcf file
 ```
 
 ### 12. Create dictionary for reference genome
-* Note picard.jar uploaded to working directory
+
+Software used: bio/picard/3.0.0-gcc-11.4.0
+Command:
+
 ```
-module load java
-java -jar picard.jar CreateSequenceDictionary -R ../../CocciRefGenome.fna -O ../../CocciRef.dict
+picard CreateSequenceDictionary -R RefGenome/CocciRef_GCA_000149335.2.fna
 ```
 
 ### 13. Sort vcf according to refeference dictionary 
+
+Softwared used: bio/picard/3.0.0-gcc-11.4.0
+Script: sortvcf.sh
+
 ```
-module load bwa
-module load java
-java -jar picard.jar SortVcf \
+picard SortVcf \
 -I Filtered_VCFFILE.vcf.gz \
 -O Filtered_Sorted_VCFFILE.vcf.gz \
--SD /global/scratch/users/lcouper/SJV_Genomes/CocciRef.dict
+-SD /global/scratch/users/lcouper/SoilCocciSeqs/RefGenome/CocciRef_GCA_000149335.2.dict
 ```
+
 
 ### 14. Filter SNVs using vcftools and remove multi-allelic sites 
-Script name: vcf_filter.sh
 
-* Note vcftools installed by BRC into the module farm. Load and run using the following:
+Software used: bio/vcftools/0.1.16-gcc-11.4.0, bio/bcftools/1.16-gcc-11.4.0
+Script name: filtersnps.sh
+Relevant snippet:
+
 ```
-module unload gcc/6.3.0
-module load gcc/11.3.0
-export MODULEPATH=${MODULEPATH}:/clusterfs/vector/home/groups/software/sl-7.x86_64/modfiles
-module load vcftools/0.1.16
-module load bcftools/1.6
-
-vcftools --vcf Filtered_Sorted_VCFFILE.vcf --maf 0.05 --minQ 30 --max-missing 0.75 --minDP 10 --recode --recode-INFO-all --out VCF_AllVariants.vcf
-# 202,550 out of a possible 260,032 Sites retained
-
-bcftools view -m2 -M2 -v snps VCF_AllVariants.vcf > VCF_Biallelic.vcf
-
-# 194668 SNPs retained
+vcftools --gzvcf Filtered_Sorted_VCFFILE.vcf.gz --maf 0.05 --minQ 30 --max-missing 0.75 --minDP 10 --recode --recode-INFO-all --out VCF_AllVariants.vcf # 202,550 out of a possible 260,032 Sites retained
+bcftools view -m2 -M2 -v snps VCF_AllVariants.vcf > VCF_Biallelic.vcf # 194668 SNPs retained
 ```
+
 To identify number of SNPs in vcf file:
 grep -v "^#" VCF_Biallelic.vcf|wc -l
-
-* Note: 
-uploaded VCFfile to SCG (to ThermalSelectionExpSeqFiles > results > bam > deduped_bams > filtered_VCF. Name “Filtered_Sorted_VCFFILE_SJV_Genomes.vcf”
 
 ### 15. Generate genotype matrix
 Done using vcftools. Outputs 3 files: ‘.012’ contains the genotypes of each individual on a separate line (with 0, 1, 2 denoting the number of non-reference alleles at the site), ‘.ind’ lists the individuals included in the main file, ‘.pos’ details the site location included in the main file. 

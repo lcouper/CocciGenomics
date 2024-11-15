@@ -203,7 +203,7 @@ vcftools --gzvcf Filtered_Sorted_VCFFILE.vcf.gz --maf 0.05 --minQ 30 --max-missi
 #### 15. Remove multi-allelic sites
 
 Software used: bio/vcftools/0.1.16-gcc-11.4.0, bio/bcftools/1.16-gcc-11.4.0
-Script name: filtersnps.sh
+Script name: biallelic.sh
 
 Relevant snippet:
 ```
@@ -212,6 +212,7 @@ bcftools view -m2 -M2 -v snps VCF_AllVariants.vcf > VCF_Biallelic.vcf
 
 To identify number of SNPs in vcf file:
 grep -v "^#" VCF_Biallelic.vcf|wc -l
+*Here, 8935 SNPs remained*
 
 ### 15. Generate genotype matrix
 Done using vcftools. Outputs 3 files: ‘.012’ contains the genotypes of each individual on a separate line (with 0, 1, 2 denoting the number of non-reference alleles at the site), ‘.ind’ lists the individuals included in the main file, ‘.pos’ details the site location included in the main file. 

@@ -177,8 +177,8 @@ picard CreateSequenceDictionary -R RefGenome/CocciRef_GCA_000149335.2.fna
 
 ### 13. Sort vcf according to refeference dictionary 
 
-Softwared used: bio/picard/3.0.0-gcc-11.4.0
-Script: sortvcf.sh
+Softwared used: bio/picard/3.0.0-gcc-11.4.0   
+Script: sortvcf.sh   
 
 ```
 picard SortVcf \
@@ -190,9 +190,9 @@ picard SortVcf \
 
 ### 14. Filter low quality and rare SNPs SNVs using vcftools 
 
-Software used: bio/vcftools/0.1.16-gcc-11.4.0, bio/bcftools/1.16-gcc-11.4.0
-Script name: filtersnps.sh
-Relevant snippet:
+Software used: bio/vcftools/0.1.16-gcc-11.4.0, bio/bcftools/1.16-gcc-11.4.0    
+Script name: filtersnps.sh    
+Relevant snippet:   
 
 ```
 vcftools --gzvcf Filtered_Sorted_VCFFILE.vcf.gz --maf 0.05 --minQ 30 --max-missing 0.75 --minDP 10 --recode --recode-INFO-all --out VCF_AllVariants.vcf
@@ -202,9 +202,8 @@ vcftools --gzvcf Filtered_Sorted_VCFFILE.vcf.gz --maf 0.05 --minQ 30 --max-missi
 
 #### 15. Remove multi-allelic sites
 
-Software used: bio/vcftools/0.1.16-gcc-11.4.0, bio/bcftools/1.16-gcc-11.4.0
-Script name: biallelic.sh
-
+Software used: bio/vcftools/0.1.16-gcc-11.4.0, bio/bcftools/1.16-gcc-11.4.0   
+Script name: biallelic.sh   
 Relevant snippet:
 ```
 bcftools view -m2 -M2 -v snps VCF_AllVariants.vcf > VCF_Biallelic.vcf 
@@ -214,11 +213,16 @@ To identify number of SNPs in vcf file:
 grep -v "^#" VCF_Biallelic.vcf|wc -l
 *Here, 8935 SNPs remained*
 
-### 15. Generate genotype matrix
-Done using vcftools. Outputs 3 files: ‘.012’ contains the genotypes of each individual on a separate line (with 0, 1, 2 denoting the number of non-reference alleles at the site), ‘.ind’ lists the individuals included in the main file, ‘.pos’ details the site location included in the main file. 
+### 16. Generate genotype matrix
+
+Software used: bio/vcftools/0.1.16-gcc-11.4.0
+Scriptname: genotypematx.sh
+Relevant snippet: 
+
 ```
 vcftools --012 --vcf Filtered_Sorted_VCFFILE_SJV_Genomes.vcf --out SJV_genotype_matr
 ```
+*Note, this command outputs 3 files: ‘.012’ contains the genotypes of each individual on a separate line (with 0, 1, 2 denoting the number of non-reference alleles at the site), ‘.ind’ lists the individuals included in the main file, ‘.pos’ details the site location included in the main file.* 
 
 ## Additional downstream steps of interest:
 

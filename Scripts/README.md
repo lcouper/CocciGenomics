@@ -188,15 +188,26 @@ picard SortVcf \
 ```
 
 
-### 14. Filter SNVs using vcftools and remove multi-allelic sites 
+### 14. Filter low quality and rare SNPs SNVs using vcftools 
 
 Software used: bio/vcftools/0.1.16-gcc-11.4.0, bio/bcftools/1.16-gcc-11.4.0
 Script name: filtersnps.sh
 Relevant snippet:
 
 ```
-vcftools --gzvcf Filtered_Sorted_VCFFILE.vcf.gz --maf 0.05 --minQ 30 --max-missing 0.75 --minDP 10 --recode --recode-INFO-all --out VCF_AllVariants.vcf # 202,550 out of a possible 260,032 Sites retained
-bcftools view -m2 -M2 -v snps VCF_AllVariants.vcf > VCF_Biallelic.vcf # 194668 SNPs retained
+vcftools --gzvcf Filtered_Sorted_VCFFILE.vcf.gz --maf 0.05 --minQ 30 --max-missing 0.75 --minDP 10 --recode --recode-INFO-all --out VCF_AllVariants.vcf
+```
+*kept 9113 out of a possible 164930 Sites. Note here that many SNPs with AF of '0' were retained. Examine 'AF.frq.frq' file for further info*
+
+
+#### 15. Remove multi-allelic sites
+
+Software used: bio/vcftools/0.1.16-gcc-11.4.0, bio/bcftools/1.16-gcc-11.4.0
+Script name: filtersnps.sh
+
+Relevant snippet:
+```
+bcftools view -m2 -M2 -v snps VCF_AllVariants.vcf > VCF_Biallelic.vcf 
 ```
 
 To identify number of SNPs in vcf file:

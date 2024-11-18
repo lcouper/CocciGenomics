@@ -1,8 +1,8 @@
-## Steps and scripts used to process _Coccidiodides_ genomes ### 
+## Steps and scripts used to process _Coccidiodides_ genomes from environmental samples or SRA ### 
 
 Relevant code snippet for each shown below
 
-### 1. Obtained raw reads from Berkeley QB3.  
+### 1. Obtained raw reads from Berkeley QB3 or SRA.  
 
 The fastq.gz files (1 forward, 1 reverse) are stored here on the Remais Group Shared Drive: SPORE/WGS/Sequence data (All)/ 
 and Berkeley's HPC BRC at: /global/scratch/users/lcouper/SoilCocciSeqs

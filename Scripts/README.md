@@ -74,11 +74,24 @@ Code snippet:
 ```
 for infile in results/sam/*.aligned.sam
 do
-echo "working with file $infile"
 base=$(basename ${infile} .aligned.sam)
 samtools view -@ 12 -b results/sam/${base}.aligned.sam > results/bam/"${base}.aligned.bam"
 samtools sort -@ 12 results/bam/${base}.aligned.bam -o "${base}.sorted.bam"
 samtools flagstat results/bam/${base}.aligned.bam > results/bam/"${base}.bam.stats.txt"
+done
+```
+
+### 6.1 Compute depth at each position of sample 
+
+Software used: bio/samtools/1.17-gcc-11.4.0    
+Script name: depth.sh
+Code snippet:
+
+```
+for infile in *.bam
+do
+base=$(basename ${infile} .bam)
+samtools depth -a ${base}.bam > "${base}.depth.txt"
 done
 ```
 

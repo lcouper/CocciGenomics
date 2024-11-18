@@ -132,7 +132,7 @@ done
 ### 9.1 Compute depth at each position of sample 
 
 Software used: bio/samtools/1.17-gcc-11.4.0    
-Script name: depth.sh
+Script name: depth.sh    
 Code snippet:
 
 ```

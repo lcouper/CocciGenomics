@@ -81,20 +81,6 @@ samtools flagstat results/bam/${base}.aligned.bam > results/bam/"${base}.bam.sta
 done
 ```
 
-### 6.1 Compute depth at each position of sample 
-
-Software used: bio/samtools/1.17-gcc-11.4.0    
-Script name: depth.sh
-Code snippet:
-
-```
-for infile in *.bam
-do
-base=$(basename ${infile} .bam)
-samtools depth -a ${base}.bam > "${base}.depth.txt"
-done
-```
-
 ### 7. Mark and remove duplicates 
 
 Software used: bio/picard/3.0.0-gcc-11.4.0       
@@ -140,6 +126,20 @@ for infile in results/dedupedbams/*.deduped.bam
 do
 base=$(basename ${infile} .deduped.bam)
 bamtools stats -in results/dededupedbams/${base}.deduped.bam > results/dedupedbams/"${base}.AlignStats.txt"
+done
+```
+
+### 9.1 Compute depth at each position of sample 
+
+Software used: bio/samtools/1.17-gcc-11.4.0    
+Script name: depth.sh
+Code snippet:
+
+```
+for infile in *.bam
+do
+base=$(basename ${infile} .bam)
+samtools depth -a ${base}.bam > "${base}.depth.txt"
 done
 ```
 

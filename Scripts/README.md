@@ -1,4 +1,4 @@
-## Steps and scripts used to process WGS data on environmetnal _Coccidiodides_ samples ### 
+## Steps and scripts used to process _Coccidiodides_ genomes ### 
 
 Relevant code snippet for each shown below
 

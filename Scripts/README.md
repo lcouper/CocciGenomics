@@ -14,7 +14,7 @@ Tracker for sequences downloaded and metadata [here](https://docs.google.com/spr
 ### 2. Filter poor quality reads and trim poor quality bases 
 
 Software used: Trimmomatic V 0.39 (Bolger et al. 2014)   
-Script: trim.sh   
+Script: trim.sh and trim.sra.sh
 Code snippet for single sample:    
 ```
 module load bio/trimmomatic/0.39-gcc-11.4.0

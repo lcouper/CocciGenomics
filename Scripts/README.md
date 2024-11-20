@@ -242,6 +242,12 @@ vcftools --012 --vcf Filtered_Sorted_VCFFILE_SJV_Genomes.vcf --out SJV_genotype_
 ```
 *Note, this command outputs 3 files: ‘.012’ contains the genotypes of each individual on a separate line (with 0, 1, 2 denoting the number of non-reference alleles at the site), ‘.ind’ lists the individuals included in the main file, ‘.pos’ details the site location included in the main file.* 
 
+### LIC:
+
+look to this paper for next steps including PCA, fastADMIXTURE, using Nucmer to remove repetitive regions, etc:
+https://journals.asm.org/doi/full/10.1128/mbio.01976-19 
+
+
 ## Additional downstream steps of interest:
 
 ### 1. calculate # of SNPs differing between each possible pair using plink.

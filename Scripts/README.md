@@ -13,6 +13,7 @@ Tracker for sequences downloaded and metadata [here](https://docs.google.com/spr
 
 ### 2. Filter poor quality reads and trim poor quality bases 
 
+Note that Illumina adapters [available and downlaoded from here](https://github.com/usadellab/Trimmomatic/blob/main/adapters/TruSeq3-PE.fa) 
 Software used: Trimmomatic V 0.39 (Bolger et al. 2014)   
 Job Script: trim.sh and trim.sra.sh   
 Relevant code snippet:       

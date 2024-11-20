@@ -14,8 +14,8 @@ Tracker for sequences downloaded and metadata [here](https://docs.google.com/spr
 ### 2. Filter poor quality reads and trim poor quality bases 
 
 Software used: Trimmomatic V 0.39 (Bolger et al. 2014)   
-Script: trim.sh and trim.sra.sh
-Code snippet for single sample:    
+Job Script: trim.sh and trim.sra.sh   
+Relevant code snippet:       
 ```
 module load bio/trimmomatic/0.39-gcc-11.4.0
 trimmomatic PE PS02PN14-1_S1_L007_R1_001.fastq.gz PS02PN14-1_S1_L007_R2_001.fastq.gz \
@@ -28,8 +28,8 @@ trimmomatic PE
 ### 3. Perform quality check on samples using fastqc
 
 Software used: bio/fastqc/0.12.1-gcc-11.4.0   
-Script: fastqc.sh    
-Code snippet for single sample:      
+Script: fastqc.sh     
+Relevant code snippet:      
 ```
 module load bio/fastqc/0.12.1-gcc-11.4.0
 fastqc trimmed_fastqc/*.fastq.gz

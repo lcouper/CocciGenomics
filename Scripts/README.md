@@ -7,12 +7,12 @@ Relevant code snippet for each shown below
 The fastq.gz files (1 forward, 1 reverse) are stored here on the Remais Group Shared Drive: SPORE/WGS/Sequence data (All)/ 
 and Berkeley's HPC BRC at: /global/scratch/users/lcouper/SoilCocciSeqs
 
-Prior cocci sequences were downloaded from NCBI's SRA using the run browser
+Prior cocci sequences were downloaded from NCBI using the SRA toolkit. Additional notes [here](https://docs.google.com/document/d/1gkM7m6TjQAOO1pwxe4X2DrIuMPuA3uGd6UalImpb-h4/edit?tab=t.0)
 
 ### 2. Filter poor quality reads and trim poor quality bases 
 
 Software used: Trimmomatic V 0.39 (Bolger et al. 2014)   
-Script: trim.sh
+Script: trim.sh   
 Code snippet for single sample:    
 ```
 module load bio/trimmomatic/0.39-gcc-11.4.0
@@ -21,6 +21,7 @@ PS02PN14-1_S1_L007_R1_001.trim.fastq.gz PS02PN14-1_S1_L007_R1_001.untrim.fastq.g
 PS02PN14-1_S1_L007_R2_001.trim.fastq.gz PS02PN14-1_S1_L007_R2_001.untrim.fastq.gz \
 ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:35 SLIDINGWINDOW:4:15
 ```
+trimmomatic PE
 
 ### 3. Perform quality check on samples using fastqc
 

@@ -7,6 +7,8 @@ Relevant code snippet for each shown below
 The fastq.gz files (1 forward, 1 reverse) are stored here on the Remais Group Shared Drive: SPORE/WGS/Sequence data (All)/ 
 and Berkeley's HPC BRC at: /global/scratch/users/lcouper/SoilCocciSeqs
 
+Prior cocci sequences were downloaded from NCBI's SRA using the run browser
+
 ### 2. Filter poor quality reads and trim poor quality bases 
 
 Software used: Trimmomatic V 0.39 (Bolger et al. 2014)   

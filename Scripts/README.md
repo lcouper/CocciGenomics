@@ -28,7 +28,7 @@ ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:35 SLIDINGWINDOW:
 ### 3. Perform quality check on samples using fastqc
 
 Software used: bio/fastqc/0.12.1-gcc-11.4.0   
-Script: fastqc.sh     
+Script: fastqc.sh, fastqc.sra.sh        
 Relevant code snippet:      
 ```
 module load bio/fastqc/0.12.1-gcc-11.4.0
@@ -73,7 +73,7 @@ done
 ### 6. Compress sam to bam, sort bam files, and extract mapping stats
 
 Software used: bio/samtools/1.17-gcc-11.4.0    
-Script name: sam2bam.sh      
+Script name: sam2bam.sh, sam2bam.sra.sh          
 Code snippet:     
 
 ```
@@ -89,7 +89,7 @@ done
 ### 7. Mark and remove duplicates 
 
 Software used: bio/picard/3.0.0-gcc-11.4.0       
-Script name: markdups.sh    
+Script name: markdups.sh, markdups.sra.sh,  
 Code snippet:
 
 ```
@@ -107,7 +107,7 @@ done
 ### 8. Index de-duplicated bam files 
 
 Software used: bio/samtools/1.17-gcc-11.4.0    
-Script name: indexbam.sh
+Script name: indexbam_dedupedbams.sh, indexbam_dedupedbams.sra.sh    
 Code snippet:
 
 ```
@@ -123,7 +123,7 @@ done
 Note: calculates statistics including total reads, mapped reads, % failed QC, % duplicates, % paired-end reads, % singletons
 
 Software used: bio/bamtools/2.5.2-gcc-11.4.0
-Script: alignstats.sh  
+Script: alignstats.sh, alignstats.sra.sh    
 Code snippet:
 
 ```
@@ -137,7 +137,7 @@ done
 ### 9.1 Compute depth at each position of sample 
 
 Software used: bio/samtools/1.17-gcc-11.4.0    
-Script name: depth.sh    
+Script name: depth.sh, depth.sra.sh     
 Code snippet:
 
 ```

@@ -122,9 +122,9 @@ done
 
 Note: calculates statistics including total reads, mapped reads, % failed QC, % duplicates, % paired-end reads, % singletons
 
-Software used: bio/bamtools/2.5.2-gcc-11.4.0
-Script: alignstats.sh, alignstats.sra.sh    
-Code snippet:
+Software used: bio/bamtools/2.5.2-gcc-11.4.0   
+Script: alignstats.sh, alignstats.sra.sh     
+Code snippet:  
 
 ```
 for infile in results/dedupedbams/*.deduped.bam

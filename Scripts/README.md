@@ -100,7 +100,7 @@ picard MarkDuplicates \
 -REMOVE_DUPLICATES TRUE \
 -I results/sortedbams/${base}.sorted.bam \
 -O results/dedupedbams/"${base}.deduped.bam" \
--M results/sortedbams/"${base}.dup_metrics.txt"
+-M results/dedupedbams/"${base}.dup_metrics.txt"
 done
 ```
 

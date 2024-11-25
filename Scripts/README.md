@@ -206,16 +206,16 @@ picard SortVcf \
 ```
 
 
-### 14. Filter low quality and rare SNPs SNVs using vcftools 
+### 14. Filter low quality and rare SNPs using vcftools 
 
 Software used: bio/vcftools/0.1.16-gcc-11.4.0, bio/bcftools/1.16-gcc-11.4.0    
 Script name: filtersnps.sh    
 Relevant snippet:   
 
 ```
-vcftools --gzvcf Filtered_Sorted_VCFFILE.vcf.gz --maf 0.05 --minQ 30 --max-missing 0.75 --minDP 10 --recode --recode-INFO-all --out VCF_AllVariants.vcf
+vcftools --gzvcf Filtered_Sorted_VCFFILE.vcf.gz --maf 0.01 --minQ 30 --max-missing 0.75 --minDP 10 --recode --recode-INFO-all --out VCF_AllVariants.vcf
 ```
-*kept 9113 out of a possible 164930 Sites. Note here that many SNPs with AF of '0' were retained. Examine 'AF.frq.frq' file for further info*
+*kept 457279 out of a possible 634596 Sites
 
 
 #### 15. Remove multi-allelic sites
@@ -229,7 +229,7 @@ bcftools view -m2 -M2 -v snps VCF_AllVariants.vcf > VCF_Biallelic.vcf
 
 To identify number of SNPs in vcf file:
 grep -v "^#" VCF_Biallelic.vcf|wc -l
-*Here, 8935 SNPs remained*
+*Here, 436,947 SNPs remained*
 
 ### 16. Generate genotype matrix
 

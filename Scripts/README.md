@@ -215,7 +215,7 @@ Relevant snippet:
 ```
 vcftools --gzvcf Filtered_Sorted_VCFFILE.vcf.gz --maf 0.01 --minQ 30 --max-missing 0.75 --minDP 10 --recode --recode-INFO-all --out VCF_AllVariants.vcf
 ```
-*kept 457279 out of a possible 634596 Sites
+*kept 332,621 out of a possible 634596 Sites
 
 
 #### 15. Remove multi-allelic sites
@@ -229,7 +229,7 @@ bcftools view -m2 -M2 -v snps VCF_AllVariants.vcf > VCF_Biallelic.vcf
 
 To identify number of SNPs in vcf file:
 grep -v "^#" VCF_Biallelic.vcf|wc -l
-*Here, 436,947 SNPs remained*
+*Here, 320505 SNPs remained*
 
 ### 16. Generate genotype matrix
 

@@ -213,7 +213,7 @@ Script name: filtersnps.sh
 Relevant snippet:   
 
 ```
-vcftools --gzvcf Filtered_Sorted_VCFFILE.vcf.gz --maf 0.01 --minQ 30 --max-missing 0.75 --minDP 10 --recode --recode-INFO-all --out VCF_AllVariants.vcf
+vcftools --gzvcf Filtered_Sorted_VCFFILE.vcf.gz --maf 0.01 --minQ 30 --max-missing 0.90 --minDP 10 --recode --recode-INFO-all --out VCF_AllVariants.vcf
 ```
 *kept 332,621 out of a possible 634596 Sites
 
@@ -241,6 +241,13 @@ Relevant snippet:
 vcftools --012 --vcf Filtered_Sorted_VCFFILE_SJV_Genomes.vcf --out SJV_genotype_matr
 ```
 *Note, this command outputs 3 files: ‘.012’ contains the genotypes of each individual on a separate line (with 0, 1, 2 denoting the number of non-reference alleles at the site), ‘.ind’ lists the individuals included in the main file, ‘.pos’ details the site location included in the main file.* 
+
+#### LIC : 
+for some reason, the genotype matrix output from above only included 1s and 0s... which is not correct.
+So I then tried querying the VCFFILE and outputing this by doing the following: 
+bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%SAMPLE=%GT]\n' VCF_Biallelic.vcf > output.txt
+And playing with the resulting output.txt file in R...
+
 
 ### LIC:
 

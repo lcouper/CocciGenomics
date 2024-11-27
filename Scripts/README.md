@@ -215,7 +215,8 @@ Relevant snippet:
 ```
 vcftools --gzvcf Filtered_Sorted_VCFFILE.vcf.gz --maf 0.01 --minQ 30 --max-missing 0.90 --minDP 10 --recode --recode-INFO-all --out VCF_AllVariants.vcf
 ```
-*kept 243,596 out of a possible 634596 Sites
+*kept 243,596 out of a possible 634596 Sites  
+*or 156654 when run on just my 3 soil samples   
 
 
 #### 15. Remove multi-allelic sites

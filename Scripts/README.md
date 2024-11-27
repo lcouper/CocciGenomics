@@ -231,6 +231,7 @@ bcftools view -m2 -M2 -v snps VCF_AllVariants.vcf > VCF_Biallelic.vcf
 To identify number of SNPs in vcf file:
 grep -v "^#" VCF_Biallelic.vcf|wc -l
 *Here, 232,417 SNPs remained*
+*or 151843 when run on just my 3 sapmles 
 
 ### 16. Generate genotype matrix
 

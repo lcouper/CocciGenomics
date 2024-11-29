@@ -217,6 +217,7 @@ vcftools --gzvcf Filtered_Sorted_VCFFILE.vcf.gz --maf 0.01 --minQ 30 --max-missi
 ```
 *kept 243,596 out of a possible 634596 Sites  
 *or 156654 when run on just my 3 soil samples   
+*or 9113 if you set -maf 0.05
 
 
 #### 15. Remove multi-allelic sites

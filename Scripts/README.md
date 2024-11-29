@@ -163,6 +163,9 @@ Trying to run this at the command line: gatk HaplotypeCaller -R RefGenome/CocciR
 but getting error message: java.lang.IllegalStateException: the sample list cannot be null or empty
 next to do, try validating bam file (e.g., through suggestion here: https://gatk.broadinstitute.org/hc/en-us/community/posts/4412745467931-HaplotypeCaller-does-not-work) 
 
+java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" HaplotypeCaller -R ../RefGenome/CocciRef_GCA_000149335.2.fna -I ../results/dedupedbams/PS02PN14-1_S1_L007.deduped.bam -O test.variants.g.vcf
+
+
 
 ### 10. Filter low quality variants
 

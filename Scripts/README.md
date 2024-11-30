@@ -104,7 +104,28 @@ picard MarkDuplicates \
 done
 ```
 
-### 8. Index de-duplicated bam files 
+### 9. Add read groups 
+
+*Followed guidance here: https://gatk.broadinstitute.org/hc/en-us/articles/360035532352-Errors-about-read-group-RG-information
+and issue was diagnosed here: https://gatk.broadinstitute.org/hc/en-us/community/posts/4412745467931-HaplotypeCaller-does-not-work
+Softwared used: bio/picard/3.0.0-gcc-11.4.0, java  
+Script name: 
+Code snippet:
+
+```
+module load java
+module load bio/picard/3.0.0-gcc-11.4.0 
+
+picard AddOrReplaceReadGroups I=../results/dedupedbams/PS02PN14-1_S1_L007.deduped.bam \
+O=output.bam \
+RGID=4 \
+RGLB=lib1 \
+RGPL=ILLUMINA \
+RGPU=unit1 \
+RGSM=20
+```
+
+### 10. Index de-duplicated bam files 
 
 Software used: bio/samtools/1.17-gcc-11.4.0    
 Script name: indexbam_dedupedbams.sh, indexbam_dedupedbams.sra.sh    
@@ -117,6 +138,7 @@ base=$(basename ${infile} .deduped.bam)
 samtools index -b results/dedupedbams/${base}.deduped.bam
 done
 ```
+
 
 ### 9. Compute alignment statistics
 

@@ -114,7 +114,7 @@ https://docs.google.com/spreadsheets/d/1wrwSLeURp-E7LDD0SKT1wXEnrET5IziknmJWmXCB
 
 
 Softwared used: bio/picard/3.0.0-gcc-11.4.0, java  
-Script name: 
+Script name: addrg.sbatch
 Code snippet:
 
 ```
@@ -122,14 +122,15 @@ module load java
 module load bio/picard/3.0.0-gcc-11.4.0 
 
 picard AddOrReplaceReadGroups \
-I=../results/dedupedbams/PS02PN14-1_S1_L007.deduped.bam \
-O=output.bam \
+I=results/dedupedbams/PS02PN14-2_S2_L007.deduped.bam \
+O=output1.bam \
 RGID=4 \
 RGLB=lib1 \
 RGPL=ILLUMINA \
 RGPU=unit1 \
-RGSM=20
+RGSM=21
 ```
+
 
 ### 10. Index de-duplicated bam files 
 

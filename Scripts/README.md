@@ -108,6 +108,11 @@ done
 
 *Followed guidance here: https://gatk.broadinstitute.org/hc/en-us/articles/360035532352-Errors-about-read-group-RG-information
 and issue was diagnosed here: https://gatk.broadinstitute.org/hc/en-us/community/posts/4412745467931-HaplotypeCaller-does-not-work
+
+See this spreadsheet for what read group parameters were added:
+https://docs.google.com/spreadsheets/d/1wrwSLeURp-E7LDD0SKT1wXEnrET5IziknmJWmXCB_7o/edit?gid=1963297784#gid=1963297784
+
+
 Softwared used: bio/picard/3.0.0-gcc-11.4.0, java  
 Script name: 
 Code snippet:
@@ -116,7 +121,8 @@ Code snippet:
 module load java
 module load bio/picard/3.0.0-gcc-11.4.0 
 
-picard AddOrReplaceReadGroups I=../results/dedupedbams/PS02PN14-1_S1_L007.deduped.bam \
+picard AddOrReplaceReadGroups \
+I=../results/dedupedbams/PS02PN14-1_S1_L007.deduped.bam \
 O=output.bam \
 RGID=4 \
 RGLB=lib1 \

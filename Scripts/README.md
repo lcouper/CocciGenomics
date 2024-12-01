@@ -196,6 +196,30 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 
 
 
+SEE HERE FOR NEXT STEP: 
+https://www.biostars.org/p/405702/
+```
+gatk --java-options "-Xmx4g" HaplotypeCaller  \
+   -R $reference \
+   -I input.bam \
+   -O output1.g.vcf.gz \
+   -ERC GVCF
+Then, combine all your gvcf files:
+
+gatk --java-options "-Xmx96g -Xms96g" CombineGVCFs \
+-R $reference \
+--variant output1.g.vcf.gz \
+--variant output2.g.vcf.gz \
+--variant output3.g.vcf.gz \
+-O combined.g.vcf.gz
+Finally, perform joint-genotyping on the combined gvcf:
+
+gatk --java-options "-Xmx96g -Xms96g" GenotypeGVCFs \
+ -R $reference \
+-V combined.g.vcf.gz \
+-O final.vcf.gz
+```
+
 ### 10. Filter low quality variants
 
 Software used: bio/bcftools/1.16-gcc-11.4.0

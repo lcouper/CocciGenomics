@@ -163,6 +163,32 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 
 
 
+SEE HERE FOR NEXT STEP: 
+https://www.biostars.org/p/405702/
+```
+gatk --java-options "-Xmx4g" HaplotypeCaller  \
+   -R $reference \
+   -I input.bam \
+   -O output1.g.vcf.gz \
+   -ERC GVCF
+Then, combine all your gvcf files:
+
+gatk --java-options "-Xmx96g -Xms96g" CombineGVCFs \
+-R $reference \
+--variant output1.g.vcf.gz \
+--variant output2.g.vcf.gz \
+--variant output3.g.vcf.gz \
+-O combined.g.vcf.gz
+Finally, perform joint-genotyping on the combined gvcf:
+
+gatk --java-options "-Xmx96g -Xms96g" GenotypeGVCFs \
+ -R $reference \
+-V combined.g.vcf.gz \
+-O final.vcf.gz
+```
+
+
+
 ## Option 2: Use bcftools for variant calling (this one giving issues 
 
 ### 10. Index de-duplicated bam files 
@@ -209,47 +235,11 @@ samtools depth -a ${base}.bam > "${base}.depth.txt"
 done
 ```
 
-### 10a. Detect single nucleotide variants
+### 10. Detect single nucleotide variants
 Script: callvariants.sh
 ```
 bcftools mpileup --threads 12 -f RefGenome/CocciRef_GCA_000149335.2.fna -q 20 -Q 20 results/dedupedbams/*.deduped.bam \
 | bcftools call --threads 12 -mv --ploidy 1 -Oz -o VCFFILE
-```
-
-### 10b. Detect single nucleotide variants using GATK 
-Script: gatk_callvariants.sh
-
-not able to run through as a script (can't find 'gatk' command)
-Trying to run this at the command line: gatk HaplotypeCaller -R RefGenome/CocciRef_GCA_000149335.2.fna -I results/dedupedbams/PS02PN14-1_S1_L007.deduped.bam -O testvariants.g.vcf
-but getting error message: java.lang.IllegalStateException: the sample list cannot be null or empty
-next to do, try validating bam file (e.g., through suggestion here: https://gatk.broadinstitute.org/hc/en-us/community/posts/4412745467931-HaplotypeCaller-does-not-work) 
-
-java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" HaplotypeCaller -R ../RefGenome/CocciRef_GCA_000149335.2.fna -I ../results/dedupedbams/PS02PN14-1_S1_L007.deduped.bam -O test.variants.g.vcf
-
-
-
-SEE HERE FOR NEXT STEP: 
-https://www.biostars.org/p/405702/
-```
-gatk --java-options "-Xmx4g" HaplotypeCaller  \
-   -R $reference \
-   -I input.bam \
-   -O output1.g.vcf.gz \
-   -ERC GVCF
-Then, combine all your gvcf files:
-
-gatk --java-options "-Xmx96g -Xms96g" CombineGVCFs \
--R $reference \
---variant output1.g.vcf.gz \
---variant output2.g.vcf.gz \
---variant output3.g.vcf.gz \
--O combined.g.vcf.gz
-Finally, perform joint-genotyping on the combined gvcf:
-
-gatk --java-options "-Xmx96g -Xms96g" GenotypeGVCFs \
- -R $reference \
--V combined.g.vcf.gz \
--O final.vcf.gz
 ```
 
 ### 10. Filter low quality variants
@@ -271,6 +261,10 @@ export PATH=$PATH:/global/scratch/users/lcouper/SoilCocciSeqs/results/vcf/tabix-
 # in the SoilCocciSeq/results/vcf directory:
 tabix *.vcf.gz # e.g. this should be the filtered vcf file
 ```
+
+
+
+
 
 ### 12. Create dictionary for reference genome
 

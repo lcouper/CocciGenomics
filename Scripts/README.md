@@ -251,7 +251,7 @@ picard CreateSequenceDictionary -R RefGenome/CocciRef_GCA_000149335.2.fna
 
 ### 13. Sort vcf according to refeference dictionary 
 
-Softwared used: bio/picard/3.0.0-gcc-11.4.0   
+Softwared used: bio/picard/3.0.0-gcc-11.4.0    
 Script: sortvcf.sh   
 
 ```

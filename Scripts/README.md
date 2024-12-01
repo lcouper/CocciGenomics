@@ -104,7 +104,9 @@ picard MarkDuplicates \
 done
 ```
 
-### 9. Add read groups 
+## Option 1: Use GATK for variant calling 
+
+### 8. Add read groups 
 
 *Followed guidance here: https://gatk.broadinstitute.org/hc/en-us/articles/360035532352-Errors-about-read-group-RG-information
 and issue was diagnosed here: https://gatk.broadinstitute.org/hc/en-us/community/posts/4412745467931-HaplotypeCaller-does-not-work
@@ -113,7 +115,7 @@ See this spreadsheet for what read group parameters were added:
 https://docs.google.com/spreadsheets/d/1wrwSLeURp-E7LDD0SKT1wXEnrET5IziknmJWmXCB_7o/edit?gid=1963297784#gid=1963297784
 
 
-Softwared used: bio/picard/3.0.0-gcc-11.4.0, java  
+Software used: bio/picard/3.0.0-gcc-11.4.0, java  
 Script name: addrg.sbatch
 Code snippet:
 
@@ -123,7 +125,7 @@ module load bio/picard/3.0.0-gcc-11.4.0
 
 picard AddOrReplaceReadGroups \
 I=results/dedupedbams/PS02PN14-2_S2_L007.deduped.bam \
-O=output1.bam \
+O=results/bamswithrg/PS02PN14-2_S2_L007.rg.bam \
 RGID=4 \
 RGLB=lib1 \
 RGPL=ILLUMINA \
@@ -131,6 +133,37 @@ RGPU=unit1 \
 RGSM=21
 ```
 
+### 9. Index bam files with read group added
+
+Software used: bio/samtools/1.17-gcc-11.4.0    
+Code snippet:
+
+```
+samtools index -b results/bamswithrg/${base}.rg.bam
+done
+```
+
+### 10. Call variants using GATK HaplotypeCaller 
+
+*Note that I downloaded gatk from [here](https://github.com/broadinstitute/gatk/releases) and then uploaded the jar file to savio to the SoilCocciSeqs directory
+Software used: java, gatk 4.5.0.0
+Script name: haplo.sh
+Code snippet:
+
+```
+module load java
+java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" HaplotypeCaller \
+-R ../RefGenome/CocciRef_GCA_000149335.2.fna \
+-ploidy 1 \
+-ERC BP_RESOLUTION \
+-I results/bamswithrg/B0727_Argentina.rg.bam \    # Note this code is run on each sample individually (could also do in loop, but does take a while to run for each)
+--output-mode EMIT_ALL_CONFIDENT_SITES \
+-O results/haplocalled/B0727_Argentina.g.vcf.gz
+```
+
+
+
+## Option 2: Use bcftools for variant calling (this one giving issues 
 
 ### 10. Index de-duplicated bam files 
 
@@ -145,7 +178,6 @@ base=$(basename ${infile} .deduped.bam)
 samtools index -b results/dedupedbams/${base}.deduped.bam
 done
 ```
-
 
 ### 9. Compute alignment statistics
 

@@ -193,13 +193,23 @@ module load java
 java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" GenotypeGVCFs \
 -R ../RefGenome/CocciRef_GCA_000149335.2.fna \
 -ploidy 1 \
---include-non-variant-sites false \
+--include-non-variant-sitess \
 -V combined.g.vcf.gz \
 -O final.vcf.gz
-
-
 ```
 
+Next, unzip final.vcf.gz file and identify number of variant sites:
+
+```
+gunzip final.vcf.gz
+grep -v "^#" AllGenomesHaploCalled/final.vcf | wc -l   # 29,016,019
+```
+
+
+##### 10d. Filter variants #####
+
+First, unzip final.vcf.gz file
+gunzip final.vcf.gz 
 
 
 ## Option 2: Use bcftools for variant calling (this one giving issues 

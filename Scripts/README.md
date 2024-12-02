@@ -145,7 +145,9 @@ done
 
 ### 10. Call variants using GATK HaplotypeCaller 
 
+##### 10a. Call variants #####
 *Note that I downloaded gatk from [here](https://github.com/broadinstitute/gatk/releases) and then uploaded the jar file to savio to the SoilCocciSeqs directory
+Guidance on these steps found here: https://www.biostars.org/p/405702/   
 Software used: java, gatk 4.5.0.0
 Script name: haplo.sh
 Code snippet:
@@ -161,28 +163,35 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -O results/haplocalled/B0727_Argentina.g.vcf.gz
 ```
 
+##### 10b. Combine GVCF files #####
 
-
-SEE HERE FOR NEXT STEP: 
-https://www.biostars.org/p/405702/
+*Note, combined all the above files into a single directory 'AllGenomesHaploCalled'. Then, created a list of files in this directory using*
 ```
-gatk --java-options "-Xmx4g" HaplotypeCaller  \
-   -R $reference \
-   -I input.bam \
-   -O output1.g.vcf.gz \
-   -ERC GVCF
-Then, combine all your gvcf files:
+ls AllGenomesHaploCalled/*.vcf.gz > gvcfs.list
+```
 
-gatk --java-options "-Xmx96g -Xms96g" CombineGVCFs \
--R $reference \
---variant output1.g.vcf.gz \
---variant output2.g.vcf.gz \
---variant output3.g.vcf.gz \
+Software used: java, gatk 4.5.0.0
+Script name: combinegvcfs.sh
+
+```
+module load java
+
+java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" CombineGVCFs \
+-R ../RefGenome/CocciRef_GCA_000149335.2.fna \
+--variant gvcfs.list \
 -O combined.g.vcf.gz
-Finally, perform joint-genotyping on the combined gvcf:
 
-gatk --java-options "-Xmx96g -Xms96g" GenotypeGVCFs \
- -R $reference \
+```
+
+##### 10c. Joint-genotyping on combined GVCF files #####
+
+Software used: java, gatk 4.5.0.0
+Script name: genotypegvcfs.sh
+
+```
+module load java
+java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" GenotypeGVCFs \
+-R ../RefGenome/CocciRef_GCA_000149335.2.fna \
 -V combined.g.vcf.gz \
 -O final.vcf.gz
 ```

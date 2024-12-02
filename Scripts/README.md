@@ -192,8 +192,12 @@ Script name: genotypegvcfs.sh
 module load java
 java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" GenotypeGVCFs \
 -R ../RefGenome/CocciRef_GCA_000149335.2.fna \
+-ploidy 1 \
+--include-non-variant-sites false \
 -V combined.g.vcf.gz \
 -O final.vcf.gz
+
+
 ```
 
 

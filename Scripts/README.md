@@ -193,23 +193,53 @@ module load java
 java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" GenotypeGVCFs \
 -R ../RefGenome/CocciRef_GCA_000149335.2.fna \
 -ploidy 1 \
---include-non-variant-sitess \
+# --include-non-variant-sitess \    <- note this is an optional argument for retaining all SNPs, which I did not want/use
 -V combined.g.vcf.gz \
--O final.vcf.gz
+-O final.withoutNonSNPs.vcf.gz
 ```
 
-Next, unzip final.vcf.gz file and identify number of variant sites:
+Next, unzip final.withoutNonSNPs.vcf.gz file and identify number of variant sites:
 
 ```
-gunzip final.vcf.gz
-grep -v "^#" AllGenomesHaploCalled/final.vcf | wc -l   # 29,016,019
+gunzip final.withoutNonSNPs.vcf.gz
+grep -v "^#" AllGenomesHaploCalled/final.withoutNonSNPs.vcf | wc -l   # 748,817
 ```
 
 
 ##### 10d. Filter variants #####
 
-First, unzip final.vcf.gz file
-gunzip final.vcf.gz 
+Software used: java, gatk 4.5.0.0    
+Script: filtervcfs.sbatch    
+Code snippet:    
+
+```
+module load java
+
+java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" VariantFiltration \
+-R ../RefGenome/CocciRef_GCA_000149335.2.fna \
+--variant final.withoutNonSNPs.vcf \
+--filter-expression "QD < 2.0 || MQ < 40.0 || FS > 60.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0" \
+--filter-name "AllFilters" \
+-O final.filtered.withoutNonSNPs.vcf
+```
+
+
+
+##### 103. Select variants #####
+
+Software used: java, gatk 4.5.0.0    
+Script: selectsnps.sbatch    
+Code snippet:    
+
+```
+java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" SelectVariants \
+-R ../RefGenome/CocciRef_GCA_000149335.2.fna \
+--variant final.filtered.withoutNonSNPs.vcf \
+--select-type SNP \
+-O final.SNPs.vcf # Note that 683,199 SNPs remain 
+```
+
+
 
 
 ## Option 2: Use bcftools for variant calling (this one giving issues 

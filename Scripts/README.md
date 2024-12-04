@@ -163,7 +163,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -O results/haplocalled/B0727_Argentina.g.vcf.gz
 ```
 
-##### 10b. Combine GVCF files #####
+### 10b. Combine GVCF files 
 
 *Note, combined all the above files into a single directory 'AllGenomesHaploCalled'. Then, created a list of files in this directory using*
 ```
@@ -183,7 +183,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 
 ```
 
-##### 10c. Joint-genotyping on combined GVCF files #####
+### 10c. Joint-genotyping on combined GVCF files 
 
 Software used: java, gatk 4.5.0.0
 Script name: genotypegvcfs.sh
@@ -206,7 +206,7 @@ grep -v "^#" AllGenomesHaploCalled/final.withoutNonSNPs.vcf | wc -l   # 748,817
 ```
 
 
-##### 10d. Filter variants #####
+### 10d. Filter variants 
 
 Software used: java, gatk 4.5.0.0    
 Script: filtervcfs.sbatch    
@@ -218,14 +218,15 @@ module load java
 java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" VariantFiltration \
 -R ../RefGenome/CocciRef_GCA_000149335.2.fna \
 --variant final.withoutNonSNPs.vcf \
---filter-expression "QD < 2.0 || MQ < 40.0 || FS > 60.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0" \
+--filter-expression "QD < 2.0 || MQ < 40.0 || FS > 60.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0 || AC > 2 || DP < 10" \
 --filter-name "AllFilters" \
 -O final.filtered.withoutNonSNPs.vcf
+
 ```
 
 
 
-##### 103. Select variants #####
+### 103. Select variants 
 
 Software used: java, gatk 4.5.0.0    
 Script: selectsnps.sbatch    

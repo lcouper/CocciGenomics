@@ -35,6 +35,16 @@ module load bio/fastqc/0.12.1-gcc-11.4.0
 fastqc trimmed_fastqc/*.fastq.gz
 ```
 
+### 4. Mask repeats in reference genome 
+
+Software used: repeatmasker/4.1.0  # need to use this and not the newest version
+*note this done on SCG 
+
+```
+module load repeatmasker/4.1.0
+RepeatMasker -pa 16 -lib immitis_repeats.fa --norna CocciRef_GCA_000149335.2.fna
+```
+
 ### 4. Index reference genome  
 
 Note: Using reference genome for Coccidioides immitis RS (GCA_000149335.2)   

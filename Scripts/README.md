@@ -57,7 +57,7 @@ Code snippet:
 
 ```
 module load bio/bwa-mem2/2.2.1
-bwa-mem2 index CocciRef_GCA_000149335.2.fna
+bwa-mem2 index CocciRef_GCA_000149335.2.fna.masked
 ```
 
 ### 5. Align sequences to reference genome    

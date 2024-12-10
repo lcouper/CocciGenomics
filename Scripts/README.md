@@ -242,9 +242,9 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 
 ### 15. Output genotype table 
 
-Software used: java
-Script: genotable.sh
-Code snippet:  
+Software used: java   
+Script: genotable.sh   
+Code snippet:    
 ```
 module load java
 java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" VariantsToTable \

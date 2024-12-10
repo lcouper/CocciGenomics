@@ -164,7 +164,7 @@ Code snippet:
 ```
 module load java
 java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" HaplotypeCaller \
--R ../RefGenome/CocciRef_GCA_000149335.2.fna \
+-R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
 -ploidy 1 \
 -ERC BP_RESOLUTION \
 -I results/bamswithrg/B0727_Argentina.rg.bam \    # Note this code is run on each sample individually (could also do in loop, but does take a while to run for each)
@@ -186,7 +186,7 @@ Script name: combinegvcfs.sh
 module load java
 
 java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" CombineGVCFs \
--R ../RefGenome/CocciRef_GCA_000149335.2.fna \
+-R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
 --variant gvcfs.list \
 -O combined.g.vcf.gz
 
@@ -200,7 +200,7 @@ Script name: genotypegvcfs.sh
 ```
 module load java
 java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" GenotypeGVCFs \
--R ../RefGenome/CocciRef_GCA_000149335.2.fna \
+-R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
 -ploidy 1 \
 # --include-non-variant-sitess \    <- note this is an optional argument for retaining all SNPs, which I did not want/use
 -V combined.g.vcf.gz \
@@ -225,7 +225,7 @@ Code snippet:
 module load java
 
 java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" VariantFiltration \
--R ../RefGenome/CocciRef_GCA_000149335.2.fna \
+-R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
 --variant final.withoutNonSNPs.vcf \
 --filter-expression "QD < 2.0 || MQ < 40.0 || FS > 60.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0 || AC > 2 || DP < 10" \
 --filter-name "AllFilters" \
@@ -259,7 +259,7 @@ module load java
 java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" VariantsToTable \
 -V final.SNPs.vcf \
 -F CHROM -F POS -F REF -F ALT -F ID -GF AD -GF DP \
--O output2.table
+-O geno.table
 ```
 
 

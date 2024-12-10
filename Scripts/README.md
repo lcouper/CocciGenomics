@@ -245,7 +245,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -R ../RefGenome/CocciRef_GCA_000149335.2.fna \
 --variant final.filtered.withoutNonSNPs.vcf \
 --select-type SNP \
--O final.SNPs.vcf # Note that 683,199 SNPs remain 
+-O final.SNPs.vcf # Note that 128,644 SNPs remain 
 ```
 
 

@@ -35,28 +35,26 @@ module load bio/fastqc/0.12.1-gcc-11.4.0
 fastqc trimmed_fastqc/*.fastq.gz
 ```
 
-### 4. Mask repeats in reference genome 
+### 4. Mask repeats in reference genome   
 
-Software used: repeatmasker/4.1.0  # need to use this and not the newest version
-*note this done on SCG 
+Using reference genome for Coccidioides immitis RS (GCA_000149335.2)   
+Downloaded here: https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000149335.2/  
+Using repeat library available here: 
+Software used: repeatmasker/4.1.0   *Note: need to use this and not the newest version*   
+Script: repeastmasker.sh *Note: this step done on SCG instead of Savio*    
+Command:
 
 ```
-module load repeatmasker/4.1.0
 RepeatMasker -pa 16 -lib immitis_repeats.fa --norna CocciRef_GCA_000149335.2.fna
 ```
 
 ### 4. Index reference genome  
 
-Note: Using reference genome for Coccidioides immitis RS (GCA_000149335.2)   
-Downloaded here: https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000149335.2/   
-Saved/uploaded as: CocciRef_GCA_000149335.2.fna  
-
-Software used: bio/bwa-mem2/2.2.1  
-Script name: bwamem_index.sh    
-Code snippet:   
+Software used: bio/bwa-mem2/2.2.1    
+Script name: bwamem_index.sh      
+Command:      
 
 ```
-module load bio/bwa-mem2/2.2.1
 bwa-mem2 index CocciRef_GCA_000149335.2.fna.masked
 ```
 
@@ -64,18 +62,16 @@ bwa-mem2 index CocciRef_GCA_000149335.2.fna.masked
 
 Software used: bio/bwa-mem2/2.2.1   
 Script name: alignreads.sh, alignreads.sra.sh    
-Code snippet:   
+Relevant code snippet:   
 
 ```
-#First unzip trimmed fastq files if not done already
+#First unzip trimmed fastq files if not done already, then align to ref genome
 gunzip trimmed_fastq/*.gz
-
-#Then align to cocci immitis RS ref genome
 
 for infile in trimmed_fastq/*_R1_001.trim.fastq
 do
 base=$(basename ${infile} _R1_001.trim.fastq)
-bwa-mem2 mem -t 12 RefGenome/CocciRef_GCA_000149335.2.fna \
+bwa-mem2 mem -t 12 RefGenome/CocciRef_GCA_000149335.2.masked.fna \
 trimmed_fastq/${base}_R1_001.trim.fastq trimmed_fastq/${base}_R2_001.trim.fastq > results/sam/"${base}.aligned.sam"
 done
 ```
@@ -98,7 +94,7 @@ done
 
 ### 7. Mark and remove duplicates 
 
-Software used: bio/picard/3.0.0-gcc-11.4.0       
+Software used: bio/picard/3.0.0-gcc-11.4.0        
 Script name: markdups.sh, markdups.sra.sh,  
 Code snippet:
 
@@ -114,16 +110,12 @@ picard MarkDuplicates \
 done
 ```
 
-## Option 1: Use GATK for variant calling 
-
 ### 8. Add read groups 
 
-*Followed guidance here: https://gatk.broadinstitute.org/hc/en-us/articles/360035532352-Errors-about-read-group-RG-information
-and issue was diagnosed here: https://gatk.broadinstitute.org/hc/en-us/community/posts/4412745467931-HaplotypeCaller-does-not-work
+*Followed guidance [here](https://gatk.broadinstitute.org/hc/en-us/articles/360035532352-Errors-about-read-group-RG-information)
+and issue was diagnosed [here](https://gatk.broadinstitute.org/hc/en-us/community/posts/4412745467931-HaplotypeCaller-does-not-work)
 
-See this spreadsheet for what read group parameters were added:
-https://docs.google.com/spreadsheets/d/1wrwSLeURp-E7LDD0SKT1wXEnrET5IziknmJWmXCB_7o/edit?gid=1963297784#gid=1963297784
-
+See [this spreadsheet](https://docs.google.com/spreadsheets/d/1wrwSLeURp-E7LDD0SKT1wXEnrET5IziknmJWmXCB_7o/edit?gid=1963297784#gid=1963297784) for what read group parameters were added:
 
 Software used: bio/picard/3.0.0-gcc-11.4.0, java  
 Script name: addrg.sbatch
@@ -145,7 +137,7 @@ RGSM=21
 
 ### 9. Index bam files with read group added
 
-Software used: bio/samtools/1.17-gcc-11.4.0    
+Software used: bio/samtools/1.17-gcc-11.4.0      
 Code snippet:
 
 ```

@@ -155,7 +155,6 @@ done
 
 ### 10. Call variants using GATK HaplotypeCaller 
 
-##### 10a. Call variants #####
 *Note that I downloaded gatk from [here](https://github.com/broadinstitute/gatk/releases) and then uploaded the jar file to savio to the SoilCocciSeqs directory
 Guidance on these steps found here: https://www.biostars.org/p/405702/   
 Software used: java, gatk 4.5.0.0
@@ -173,7 +172,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -O results/haplocalled/B0727_Argentina.g.vcf.gz
 ```
 
-### 10b. Combine GVCF files 
+### 11. Combine GVCF files 
 
 *Note, combined all the above files into a single directory 'AllGenomesHaploCalled'. Then, created a list of files in this directory using*
 ```
@@ -193,7 +192,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 
 ```
 
-### 10c. Joint-genotyping on combined GVCF files 
+### 12. Joint-genotyping on combined GVCF files 
 
 Software used: java, gatk 4.5.0.0
 Script name: genotypegvcfs.sh
@@ -216,7 +215,7 @@ grep -v "^#" AllGenomesHaploCalled/final.withoutNonSNPs.vcf | wc -l   # 748,817
 ```
 
 
-### 10d. Filter variants 
+### 13. Filter variants 
 
 Software used: java, gatk 4.5.0.0    
 Script: filtervcfs.sbatch    
@@ -235,8 +234,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 ```
 
 
-
-### 103. Select variants 
+### 14. Select variants 
 
 Software used: java, gatk 4.5.0.0    
 Script: selectsnps.sbatch    
@@ -249,6 +247,25 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 --select-type SNP \
 -O final.SNPs.vcf # Note that 683,199 SNPs remain 
 ```
+
+
+### 15. Output genotype table 
+
+Software used: java
+Script: genotable.sh
+Code snippet:  
+```
+module load java
+java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" VariantsToTable \
+-V final.SNPs.vcf \
+-F CHROM -F POS -F REF -F ALT -F ID -GF AD -GF DP \
+-O output2.table
+```
+
+
+
+
+
 
 
 

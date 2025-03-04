@@ -270,7 +270,8 @@ cat CocciRef_GCA_000149335.2.fna | awk '$0 ~ ">" {if (NR > 1) {print c;} c=0;pri
 ### 18. Phylogenetic tree
 using IQtree, webserver: iqtree.cibiv.univie.ac.at    
 following tutorial here: https://www.iqtree.org/doc/Web-Server-Tutorial    
-following methods from cocci paper here: https://academic.oup.com/g3journal/article/12/4/jkac031/6523976#447478278
+following methods from cocci paper here: https://academic.oup.com/g3journal/article/12/4/jkac031/6523976#447478278. 
+Namely: " A total of 258,470 SNPs were retrieved and submitted for unrooted phylogenetic analysis via maximum-likelihood method implemented in the IQTREE software v1.6.12 (Nguyen et al. 2015). The best-fit model was set according to Bayesian Information Criterion to TN+F+ASC+R6 and the phylogenetic signal was tested using both Shimodaira–Hasegawa approximate likelihood ratio test (SH-aLRT) and ultrafast bootstrap support (Anisimova and Gascuel 2006; Minh et al. 2013). The phylogenetic tree was visualized using the Figtree software (http://tree.bio.ed.ac.uk/software/figtree/)"
 
 
 

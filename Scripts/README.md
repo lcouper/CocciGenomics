@@ -253,3 +253,9 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -O geno.table
 ```
 
+### 16. Investigate SNP position in genes 
+
+Download .gtf file for cocci reference [here](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000149335.2/).
+
+
+

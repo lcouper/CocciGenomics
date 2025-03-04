@@ -269,7 +269,11 @@ cat CocciRef_GCA_000149335.2.fna | awk '$0 ~ ">" {if (NR > 1) {print c;} c=0;pri
 
 ### 18. Phylogenetic tree
 using IQtree, webserver: iqtree.cibiv.univie.ac.at    
-following tutorial here: https://www.iqtree.org/doc/Web-Server-Tutorial
+following tutorial here: https://www.iqtree.org/doc/Web-Server-Tutorial    
+following methods from cocci paper here: https://academic.oup.com/g3journal/article/12/4/jkac031/6523976#447478278
+
+
+
 
 
 

@@ -1,4 +1,4 @@
-## Steps and scripts used to process _Coccidiodides_ genomes from environmental samples or Sequence Read Archive ### 
+## Steps and scripts used to process _Coccidioides_ genomes from environmental samples or Sequence Read Archive ### 
 
 ### 1. Obtained raw reads from Berkeley QB3 or SRA.  
 

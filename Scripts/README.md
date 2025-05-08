@@ -37,7 +37,8 @@ fastqc trimmed_fastqc/*.fastq.gz
 
 Using reference genome for Coccidioides immitis RS (GCA_000149335.2)   
 Downloaded here: https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000149335.2/  
-Using repeat library available here: 
+Using repeat library available here:   
+Purpose: Repetitive regions can lead to issues with reference alignment and variant calling    
 Software used: repeatmasker/4.1.0   *Note: need to use this and not the newest version*   
 Script: repeastmasker.sh *Note: this step done on SCG instead of Savio*    
 Command:
@@ -48,6 +49,7 @@ RepeatMasker -pa 16 -lib immitis_repeats.fa --norna CocciRef_GCA_000149335.2.fna
 
 ### 4. Index reference genome  
 
+Purpose: Enables quick access to specific locations of the genome (like the index of a book)   
 Software used: bio/bwa-mem2/2.2.1    
 Script name: bwamem_index.sh      
 Command:      
@@ -64,6 +66,7 @@ samtools faidx CocciRef_GCA_000149335.2.masked.fna
 
 ### 5. Align sequences to reference genome    
 
+Purpose: To determine where in the genome a given sequence/read is located    
 Software used: bio/bwa-mem2/2.2.1   
 Script name: alignreads.sh, alignreads.sra.sh    
 Relevant code snippet:   
@@ -98,6 +101,7 @@ done
 
 ### 7. Mark and remove duplicates 
 
+Purpose: Duplicates reflect same sequence fragment being amplified and read multiple times. Keeping duplicates can lead to inflated estimates of coverage and can bias variant-calling steps    
 Software used: bio/picard/3.0.0-gcc-11.4.0        
 Script name: markdups.sh, markdups.sra.sh,  
 Code snippet:
@@ -119,6 +123,7 @@ done
 Followed guidance [here](https://gatk.broadinstitute.org/hc/en-us/articles/360035532352-Errors-about-read-group-RG-information)
 and issue was diagnosed [here](https://gatk.broadinstitute.org/hc/en-us/community/posts/4412745467931-HaplotypeCaller-does-not-work). See [this spreadsheet](https://docs.google.com/spreadsheets/d/1wrwSLeURp-E7LDD0SKT1wXEnrET5IziknmJWmXCB_7o/edit?gid=1963297784#gid=1963297784) for what read group parameters were added:
 
+Purpose: Organize sequence data by library prep batch and sequencing runs parameters   
 Software used: bio/picard/3.0.0-gcc-11.4.0, java  
 Script name: addrg.sbatch   
 Code snippet:

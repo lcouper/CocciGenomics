@@ -120,7 +120,7 @@ Followed guidance [here](https://gatk.broadinstitute.org/hc/en-us/articles/36003
 and issue was diagnosed [here](https://gatk.broadinstitute.org/hc/en-us/community/posts/4412745467931-HaplotypeCaller-does-not-work). See [this spreadsheet](https://docs.google.com/spreadsheets/d/1wrwSLeURp-E7LDD0SKT1wXEnrET5IziknmJWmXCB_7o/edit?gid=1963297784#gid=1963297784) for what read group parameters were added:
 
 Software used: bio/picard/3.0.0-gcc-11.4.0, java  
-Script name: addrg.sbatch
+Script name: addrg.sbatch   
 Code snippet:
 
 ```

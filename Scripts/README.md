@@ -156,7 +156,7 @@ done
 
 Note on GATK installation: downloaded gatk from [here](https://github.com/broadinstitute/gatk/releases) and then uploaded the jar file to savio to working directory. Guidance on these steps found [here](https://www.biostars.org/p/405702/).   
 Software used: java, gatk 4.5.0.0    
-Script name: haplo.sh, haplosra.sh       
+Script name: haplo.sh, haplosra.sh          
 Code snippet:   
 
 ```
@@ -176,8 +176,8 @@ First, combined all the above files into a single directory 'AllGenomesHaploCall
 ```
 ls AllGenomesHaploCalled/*.vcf.gz > gvcfs.list
 ```
-
-Software used: java, gatk 4.5.0.0
+Purpose: Creates a dataset where all variant sites across all samples are considered. This enables variant callers to use information from one sample to infer the most likely genotype in another, improving sensitivity and accuracy in low coverage regions, and reducing false positives   
+Software used: java, gatk 4.5.0.0    
 Script name: combinegvcfs.sh
 
 ```

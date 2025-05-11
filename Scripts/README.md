@@ -208,7 +208,7 @@ Next, unzip final.withoutNonSNPs.vcf.gz file and identify number of variant site
 
 ```
 gunzip final.withoutNonSNPs.vcf.gz
-grep -v "^#" AllGenomesHaploCalled/final.withoutNonSNPs.vcf | wc -l   # 147,040
+grep -v "^#" AllGenomesHaploCalled/final.withoutNonSNPs.vcf | wc -l   # 916,936
 ```
 
 

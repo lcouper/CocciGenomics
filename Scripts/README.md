@@ -272,7 +272,24 @@ cat CocciRef_GCA_000149335.2.fna | awk '$0 ~ ">" {if (NR > 1) {print c;} c=0;pri
 
 ![image](https://github.com/user-attachments/assets/3086e222-c492-4028-8700-0adc5b3c5ded)
 
-### 18. Phylogenetic tree
+### Construct phylogenetic tree using IQ-Tree 
+
+### 1. bgzip vcf file
+
+*Note, this required installing the bgzip binary (/global/home/users/lcouper/htslib-1.19.1)*
+
+1. Compress with bgzip then index
+```
+bgzip AllGenomesHaploCalled/final.SNPs.vcf
+tabix -p vcf final.SNPs.vcf.gz
+```
+2. Convert to combined fasta
+```
+bcftools consensus -f ../RefGenome/CocciRef_GCA_000149335.2.masked.fna final.SNPs.vcf.gz > final.SNPs.fasta
+```
+
+
+
 using IQtree, webserver: iqtree.cibiv.univie.ac.at    
 following tutorial here: https://www.iqtree.org/doc/Web-Server-Tutorial    
 following methods from cocci paper here: https://academic.oup.com/g3journal/article/12/4/jkac031/6523976#447478278. 

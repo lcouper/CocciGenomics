@@ -83,7 +83,47 @@ trimmed_fastq/${base}_R1_001.trim.fastq trimmed_fastq/${base}_R2_001.trim.fastq 
 done
 ```
 
-### 6. Compress sam to bam, sort bam files, and extract mapping stats
+### 6. Sort and convert to bam
+
+Compress sam to bam and sort bam file 
+Software used: gatk
+Script name: SamToBam.sh, SamToBamSRA.sh
+
+```
+module load java
+java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" SortSam \
+-I temp.sam \
+-O temp.bam \
+-SORT_ORDER coordinate
+```
+
+### 6.2 Extract mapping and coverage statistics 
+
+Software used: samtools, java
+Script name: MappingStats.sh, MappingStatsSRA.sh
+
+```
+# Loop through each sorted BAM file
+for bam_file in "$bam_dir"/*.sorted.bam; do
+    sample_id=$(basename "$bam_file" .sorted.bam)
+
+# Mapping stats
+samtools flagstat "$bam_file" > "$stats_dir/${sample_id}_mapping.stats.log"
+
+# Coverage stats
+picard CollectWgsMetrics \
+  I="$bam_file" \
+  O="$stats_dir/${sample_id}_coverage_stats.txt" \
+  R="$ref"
+done
+```
+
+
+
+
+
+### 6b. Original version:
+Compress sam to bam, sort bam files, and extract mapping stats
 
 Software used: bio/samtools/1.17-gcc-11.4.0    
 Script name: sam2bam.sh, sam2bam.sra.sh          
@@ -98,6 +138,7 @@ samtools sort -@ 12 results/bam/${base}.aligned.bam -o "${base}.sorted.bam"
 samtools flagstat results/bam/${base}.aligned.bam > results/bam/"${base}.bam.stats.txt"
 done
 ```
+
 
 ### 7. Mark and remove duplicates 
 

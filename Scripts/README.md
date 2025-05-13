@@ -101,6 +101,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 
 Software used: samtools, java
 Script name: MappingStats.sh, MappingStatsSRA.sh
+Note that the cap for coverage is 250 so there may be a peak in the histograms at this value
 
 ```
 # Loop through each sorted BAM file
@@ -117,6 +118,32 @@ picard CollectWgsMetrics \
   R="$ref"
 done
 ```
+
+### 7. Add or replace read groups 
+
+Followed guidance [here](https://gatk.broadinstitute.org/hc/en-us/articles/360035532352-Errors-about-read-group-RG-information)
+and issue was diagnosed [here](https://gatk.broadinstitute.org/hc/en-us/community/posts/4412745467931-HaplotypeCaller-does-not-work). See [this spreadsheet](https://docs.google.com/spreadsheets/d/1wrwSLeURp-E7LDD0SKT1wXEnrET5IziknmJWmXCB_7o/edit?gid=1963297784#gid=1963297784) for what read group parameters were added:
+
+Purpose: Organize sequence data by library prep batch and sequencing runs parameters   
+Software used: bio/picard/3.0.0-gcc-11.4.0, java  
+Script name: addrg.sbatch   
+Code snippet:
+
+```
+module load java
+module load bio/picard/3.0.0-gcc-11.4.0 
+
+picard AddOrReplaceReadGroups \
+I=results/dedupedbams/PS02PN14-2_S2_L007.deduped.bam \
+O=results/bamswithrg/PS02PN14-2_S2_L007.rg.bam \
+RGID=4 \
+RGLB=lib1 \
+RGPL=ILLUMINA \
+RGPU=unit1 \
+RGSM=PS02PN14-2
+```
+
+*** Note to LC: Drop samples: 24AC3 and 44AC2 ****
 
 
 
@@ -159,29 +186,7 @@ picard MarkDuplicates \
 done
 ```
 
-### 8. Add read groups 
 
-Followed guidance [here](https://gatk.broadinstitute.org/hc/en-us/articles/360035532352-Errors-about-read-group-RG-information)
-and issue was diagnosed [here](https://gatk.broadinstitute.org/hc/en-us/community/posts/4412745467931-HaplotypeCaller-does-not-work). See [this spreadsheet](https://docs.google.com/spreadsheets/d/1wrwSLeURp-E7LDD0SKT1wXEnrET5IziknmJWmXCB_7o/edit?gid=1963297784#gid=1963297784) for what read group parameters were added:
-
-Purpose: Organize sequence data by library prep batch and sequencing runs parameters   
-Software used: bio/picard/3.0.0-gcc-11.4.0, java  
-Script name: addrg.sbatch   
-Code snippet:
-
-```
-module load java
-module load bio/picard/3.0.0-gcc-11.4.0 
-
-picard AddOrReplaceReadGroups \
-I=results/dedupedbams/PS02PN14-2_S2_L007.deduped.bam \
-O=results/bamswithrg/PS02PN14-2_S2_L007.rg.bam \
-RGID=4 \
-RGLB=lib1 \
-RGPL=ILLUMINA \
-RGPU=unit1 \
-RGSM=21
-```
 
 ### 9. Index bam files with read group added
 

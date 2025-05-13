@@ -97,7 +97,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -SORT_ORDER coordinate
 ```
 
-### 6.2 Extract mapping and coverage statistics 
+### 7 Extract mapping and coverage statistics 
 
 Software used: samtools, java
 Script name: MappingStats.sh, MappingStatsSRA.sh
@@ -119,7 +119,7 @@ picard CollectWgsMetrics \
 done
 ```
 
-### 7. Add or replace read groups 
+### 8. Add or replace read groups 
 
 Followed guidance [here](https://gatk.broadinstitute.org/hc/en-us/articles/360035532352-Errors-about-read-group-RG-information)
 and issue was diagnosed [here](https://gatk.broadinstitute.org/hc/en-us/community/posts/4412745467931-HaplotypeCaller-does-not-work). See [this spreadsheet](https://docs.google.com/spreadsheets/d/1wrwSLeURp-E7LDD0SKT1wXEnrET5IziknmJWmXCB_7o/edit?gid=1963297784#gid=1963297784) for what read group parameters were added:
@@ -143,6 +143,10 @@ RGPU=unit1 \
 RGSM=PS02PN14-2
 ```
 
+To verify read groups added correctly:
+```
+samtools view -H results/bam/14B1.rg.bam 
+```
 *** Note to LC: Drop samples: 24AC3 and 44AC2 ****
 
 

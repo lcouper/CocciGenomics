@@ -202,6 +202,18 @@ done
 
 
 
+
+Later: convert vcf to phylipp:   
+Run at command line, very fast
+```
+python3 vcf2phylip.py -i final.SNPs.vcf --phylip
+```
+Next step will be building phylogenetic tree:
+```
+iqtree3 -s final.SNPs.min4.phy -m GTR+G -nt AUTO
+```
+
+
 ### 6b. Original version:
 Compress sam to bam, sort bam files, and extract mapping stats
 

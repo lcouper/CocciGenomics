@@ -142,14 +142,37 @@ RGPL=ILLUMINA \
 RGPU=unit1 \
 RGSM=PS02PN14-2
 ```
+#### 9. Optional: Verify read groups and compute death 
 
 To verify read groups added correctly:
 ```
 samtools view -H results/bam/14B1.rg.bam 
 ```
+
+To compute depth at each position of the genome:   
+Software used: bio/samtools/1.17-gcc-11.4.0   
+Script name: computedepth.sbatch
+```
+module load bio/samtools/1.17-gcc-11.4.0
+
+for infile in *.aligned.sorted.bam
+do
+  echo "working with file $infile"
+  base=$(basename "$infile" .aligned.sorted.bam)
+  samtools depth -a "$infile" > "${base}.depth.txt"
+done
+```
+
+Note: This creates a txt file where the second and third columns are the position and coverage, respectively.
+To calculate the mean depth from this file:
+
+```
+awk 'BEGIN { total = 0; count = 0 } { total += $3; count += 1; } END { avg = total / count; print avg} ' results/bam/58B1.depth.txt
+```
+
+
+
 *** Note to LC: Drop samples: 24AC3 and 44AC2 ****
-
-
 
 
 

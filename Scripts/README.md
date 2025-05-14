@@ -97,7 +97,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -SORT_ORDER coordinate
 ```
 
-### 7 Extract mapping and coverage statistics 
+### 7. Extract mapping and coverage statistics 
 
 Software used: samtools, java
 Script name: MappingStats.sh, MappingStatsSRA.sh
@@ -142,7 +142,7 @@ RGPL=ILLUMINA \
 RGPU=unit1 \
 RGSM=PS02PN14-2
 ```
-#### 9. Optional: Verify read groups and compute death 
+### 9. Optional: Verify read groups and compute death 
 
 To verify read groups added correctly:
 ```
@@ -175,6 +175,32 @@ awk 'BEGIN { total = 0; count = 0 } { total += $3; count += 1; } END { avg = tot
 *** Note to LC: Drop samples: 24AC3 and 44AC2 ****
 
 
+### 10. Mark and remove duplicates 
+
+Purpose: Duplicates reflect same sequence fragment being amplified and read multiple times. Keeping duplicates can lead to inflated estimates of coverage and can bias variant-calling steps    
+Software used: bio/picard/3.0.0-gcc-11.4.0        
+Script name: markdups.sh, markdups.sra.sh,  
+Code snippet:
+
+```
+for infile in results/sortedbams/*.sorted.bam
+do
+base=$(basename ${infile} .sorted.bam)
+picard MarkDuplicates \
+-REMOVE_DUPLICATES TRUE \
+-I results/sortedbams/${base}.sorted.bam \
+-O results/dedupedbams/"${base}.deduped.bam" \
+-M results/dedupedbams/"${base}.dup_metrics.txt"
+done
+```
+
+
+
+
+
+
+
+
 
 ### 6b. Original version:
 Compress sam to bam, sort bam files, and extract mapping stats
@@ -194,24 +220,7 @@ done
 ```
 
 
-### 7. Mark and remove duplicates 
 
-Purpose: Duplicates reflect same sequence fragment being amplified and read multiple times. Keeping duplicates can lead to inflated estimates of coverage and can bias variant-calling steps    
-Software used: bio/picard/3.0.0-gcc-11.4.0        
-Script name: markdups.sh, markdups.sra.sh,  
-Code snippet:
-
-```
-for infile in results/sortedbams/*.sorted.bam
-do
-base=$(basename ${infile} .sorted.bam)
-picard MarkDuplicates \
--REMOVE_DUPLICATES TRUE \
--I results/sortedbams/${base}.sorted.bam \
--O results/dedupedbams/"${base}.deduped.bam" \
--M results/dedupedbams/"${base}.dup_metrics.txt"
-done
-```
 
 
 

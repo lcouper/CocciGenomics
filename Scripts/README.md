@@ -171,10 +171,6 @@ awk 'BEGIN { total = 0; count = 0 } { total += $3; count += 1; } END { avg = tot
 ```
 
 
-
-*** Note to LC: Drop samples: 24AC3 and 44AC2 ****
-
-
 ### 10. Mark and remove duplicates 
 
 Purpose: Duplicates reflect same sequence fragment being amplified and read multiple times. Keeping duplicates can lead to inflated estimates of coverage and can bias variant-calling steps    
@@ -195,7 +191,33 @@ done
 ```
 
 
+### 11. Index bam files with read group added
 
+Software used: bio/samtools/1.17-gcc-11.4.0      
+Code snippet:
+
+```
+samtools index -b results/bam/${base}.deduped.bam
+done
+```
+
+### 12. Call variants using GATK HaplotypeCaller 
+
+Note on GATK installation: downloaded gatk from [here](https://github.com/broadinstitute/gatk/releases) and then uploaded the jar file to savio to working directory. Guidance on these steps found [here](https://www.biostars.org/p/405702/).   
+Software used: java, gatk 4.5.0.0    
+Script name: haplo.sh, haplosra.sh          
+Code snippet:   
+
+```
+module load java
+java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" HaplotypeCaller \
+-R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
+-ploidy 1 \
+-ERC BP_RESOLUTION \
+-I results/bamswithrg/B0727_Argentina.rg.bam \    # Note this code is run on each sample individually (could also do in loop, but does take a while to run for each)
+--output-mode EMIT_ALL_CONFIDENT_SITES \
+-O results/haplocalled/B0727_Argentina.g.vcf.gz
+```
 
 
 
@@ -236,33 +258,7 @@ done
 
 
 
-### 9. Index bam files with read group added
 
-Software used: bio/samtools/1.17-gcc-11.4.0      
-Code snippet:
-
-```
-samtools index -b results/bamswithrg/${base}.rg.bam
-done
-```
-
-### 10. Call variants using GATK HaplotypeCaller 
-
-Note on GATK installation: downloaded gatk from [here](https://github.com/broadinstitute/gatk/releases) and then uploaded the jar file to savio to working directory. Guidance on these steps found [here](https://www.biostars.org/p/405702/).   
-Software used: java, gatk 4.5.0.0    
-Script name: haplo.sh, haplosra.sh          
-Code snippet:   
-
-```
-module load java
-java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" HaplotypeCaller \
--R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
--ploidy 1 \
--ERC BP_RESOLUTION \
--I results/bamswithrg/B0727_Argentina.rg.bam \    # Note this code is run on each sample individually (could also do in loop, but does take a while to run for each)
---output-mode EMIT_ALL_CONFIDENT_SITES \
--O results/haplocalled/B0727_Argentina.g.vcf.gz
-```
 
 ### 11. Combine GVCF files 
 

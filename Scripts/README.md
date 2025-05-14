@@ -193,11 +193,11 @@ done
 
 ### 11. Index bam files with read group added
 
-Software used: bio/samtools/1.17-gcc-11.4.0      
+Software used: bio/samtools/1.17-gcc-11.4.0   
+Script: index_dedupedbams.sbatch, index_dedupedbams.sra.sbatch
 Code snippet:
-
 ```
-samtools index -b results/bam/${base}.deduped.bam
+samtools index results/bam/${base}.deduped.bam
 done
 ```
 
@@ -213,10 +213,10 @@ module load java
 java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" HaplotypeCaller \
 -R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
 -ploidy 1 \
--ERC BP_RESOLUTION \
--I results/bamswithrg/B0727_Argentina.rg.bam \    # Note this code is run on each sample individually (could also do in loop, but does take a while to run for each)
---output-mode EMIT_ALL_CONFIDENT_SITES \
--O results/haplocalled/B0727_Argentina.g.vcf.gz
+-ERC GVCF \  # Note that this option specifies we only want SNPs retained
+-I results/bam/58B1.deduped.bam \
+--output-mode EMIT_VARIANTS_ONLY \
+-O results/haplocalled/58B1.g.vcf.gz
 ```
 
 

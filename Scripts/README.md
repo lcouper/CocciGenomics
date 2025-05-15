@@ -219,7 +219,47 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -O results/haplocalled/58B1.g.vcf.gz
 ```
 
+### 1e. Combine GVCF files 
 
+First, combined all the above files into a single directory 'AllGenomesHaploCalled'. Then, created a list of files in this directory using:
+```
+cd AllGenomesHaploCalled
+ls *.vcf.gz > gvcfs.list
+```
+Purpose: Creates a dataset where all variant sites across all samples are considered. This enables variant callers to use information from one sample to infer the most likely genotype in another, improving sensitivity and accuracy in low coverage regions, and reducing false positives   
+Software used: java, gatk 4.5.0.0    
+Script name: combinegvcfs.sh
+
+```
+module load java
+
+java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" CombineGVCFs \
+-R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
+--variant gvcfs.list \
+-O combined.g.vcf.gz
+
+```
+
+### 12. Joint-genotyping on combined GVCF files 
+
+Software used: java, gatk 4.5.0.0   
+Script name: genotypegvcfs.sh    
+
+```
+module load java
+java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" GenotypeGVCFs \
+-R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
+-ploidy 1 \
+-V combined.g.vcf.gz \
+-O final.withoutNonSNPs.vcf.gz
+```
+
+Next, unzip final.withoutNonSNPs.vcf.gz file and identify number of variant sites:
+
+```
+gunzip final.withoutNonSNPs.vcf.gz
+grep -v "^#" AllGenomesHaploCalled/final.withoutNonSNPs.vcf | wc -l   # 916,936
+```
 
 
 
@@ -260,46 +300,7 @@ done
 
 
 
-### 11. Combine GVCF files 
 
-First, combined all the above files into a single directory 'AllGenomesHaploCalled'. Then, created a list of files in this directory using:
-```
-ls AllGenomesHaploCalled/*.vcf.gz > gvcfs.list
-```
-Purpose: Creates a dataset where all variant sites across all samples are considered. This enables variant callers to use information from one sample to infer the most likely genotype in another, improving sensitivity and accuracy in low coverage regions, and reducing false positives   
-Software used: java, gatk 4.5.0.0    
-Script name: combinegvcfs.sh
-
-```
-module load java
-
-java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" CombineGVCFs \
--R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
---variant gvcfs.list \
--O combined.g.vcf.gz
-
-```
-
-### 12. Joint-genotyping on combined GVCF files 
-
-Software used: java, gatk 4.5.0.0   
-Script name: genotypegvcfs.sh    
-
-```
-module load java
-java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" GenotypeGVCFs \
--R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
--ploidy 1 \
--V combined.g.vcf.gz \
--O final.withoutNonSNPs.vcf.gz
-```
-
-Next, unzip final.withoutNonSNPs.vcf.gz file and identify number of variant sites:
-
-```
-gunzip final.withoutNonSNPs.vcf.gz
-grep -v "^#" AllGenomesHaploCalled/final.withoutNonSNPs.vcf | wc -l   # 916,936
-```
 
 
 ### 13. Filter variants 

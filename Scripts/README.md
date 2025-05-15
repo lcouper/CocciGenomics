@@ -306,7 +306,8 @@ module load iqtree/3.0.0
 iqtree3 -s final.SNPs.min4.phy -m GTR+G -nt AUTO
 ```
 
-
+and visualizing here: 
+https://itol.embl.de/tree/136152214211185591747337347
 
 
 

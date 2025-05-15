@@ -219,7 +219,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -O results/haplocalled/58B1.g.vcf.gz
 ```
 
-### 1e. Combine GVCF files 
+### 13. Combine GVCF files 
 
 First, combined all the above files into a single directory 'AllGenomesHaploCalled'. Then, created a list of files in this directory using:
 ```
@@ -240,7 +240,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 
 ```
 
-### 12. Joint-genotyping on combined GVCF files 
+### 14. Joint-genotyping on combined GVCF files 
 
 Software used: java, gatk 4.5.0.0   
 Script name: genotypegvcfs.sh    
@@ -251,15 +251,63 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
 -ploidy 1 \
 -V combined.g.vcf.gz \
--O final.withoutNonSNPs.vcf.gz
+-O jointvcf.vcf.gz
 ```
 
-Next, unzip final.withoutNonSNPs.vcf.gz file and identify number of variant sites:
+### 15. Flag and remove variants based on quality score, coverage, etc.
+
+Step 1: "Filter" (identify) Variants
+Software used: java, gatk 4.5.0.0     
+Script: filtervcfs.sbatch     
+Code snippet:     
 
 ```
-gunzip final.withoutNonSNPs.vcf.gz
-grep -v "^#" AllGenomesHaploCalled/final.withoutNonSNPs.vcf | wc -l   # 916,936
+module load java
+
+java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" VariantFiltration \
+-R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
+--variant jointvcf.vcf \
+--filter-expression "QD < 2.0 || FS > 60.0 || MQ < 40.0 || DP < 10 || QUAL < 20" \
+--filter-name "BasicAndBiasFilters" \s
+-O joint.vcf.filtered.vcf
 ```
+
+Step 2: "Select" (remove filtered) Variants
+Software used: java, gatk 4.5.0.0     
+Script: selectsnps.sbatch     
+Code snippet:     
+
+```
+java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" SelectVariants \
+-R ../RefGenome/CocciRef_GCA_000149335.2.fna \
+--variant final.filtered.withoutNonSNPs.vcf \
+--restrict-alleles-to BIALLELIC \ # most downstream techniques (GWAS, pop gen analyses) require biallelic SNP data
+--select-type-to-include SNP \
+-O final.SNPs.vcf 
+```
+
+Optional: unzip jointvcf.vcf.gz file and identify number of variant sites:
+
+```
+gunzip final.SNPs.vcf.gz
+grep -v "^#" AllGenomesHaploCalled/final.SNPs.vcf | wc -l   # 134,773
+```
+
+
+
+### 17. Output genotype table [now doing in R] ####
+
+Software used: java   
+Script: genotable.sh   
+Code snippet:    
+```
+module load java
+java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" VariantsToTable \
+-V final.SNPs.vcf \
+-F CHROM -F POS -F REF -F ALT -F ID -GF AD -GF DP \
+-O geno.table
+```
+
 
 
 
@@ -274,6 +322,9 @@ Next step will be building phylogenetic tree:
 ```
 iqtree3 -s final.SNPs.min4.phy -m GTR+G -nt AUTO
 ```
+
+
+
 
 
 ### 6b. Original version:
@@ -303,51 +354,8 @@ done
 
 
 
-### 13. Filter variants 
-
-Software used: java, gatk 4.5.0.0     
-Script: filtervcfs.sbatch     
-Code snippet:     
-
-```
-module load java
-
-java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" VariantFiltration \
--R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
---variant final.withoutNonSNPs.vcf \
---filter-expression "QD < 2.0 || MQ < 40.0 || FS > 60.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0 || AC > 2 || DP < 10" \
---filter-name "AllFilters" \
--O final.filtered.withoutNonSNPs.vcf
-```
 
 
-### 14. Select variants 
-
-Software used: java, gatk 4.5.0.0     
-Script: selectsnps.sbatch     
-Code snippet:     
-
-```
-java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" SelectVariants \
--R ../RefGenome/CocciRef_GCA_000149335.2.fna \
---variant final.filtered.withoutNonSNPs.vcf \
---select-type SNP \
--O final.SNPs.vcf # Note that 779,786 SNPs remain 
-```
-
-
-### 15. Output genotype table 
-
-Software used: java   
-Script: genotable.sh   
-Code snippet:    
-```
-module load java
-java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" VariantsToTable \
--V final.SNPs.vcf \
--F CHROM -F POS -F REF -F ALT -F ID -GF AD -GF DP \
--O geno.table
-```
 
 ## Other steps: 
 

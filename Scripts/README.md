@@ -266,10 +266,10 @@ module load java
 
 java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" VariantFiltration \
 -R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
---variant jointvcf.vcf \
+--variant jointvcf.vcf.gz \
 --filter-expression "QD < 2.0 || FS > 60.0 || MQ < 40.0 || DP < 10 || QUAL < 20" \
 --filter-name "BasicAndBiasFilters" \s
--O joint.vcf.filtered.vcf
+-O joint.filtered.vcf.gz
 ```
 
 Step 2: "Select" (remove filtered) Variants
@@ -280,13 +280,13 @@ Code snippet:
 ```
 java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" SelectVariants \
 -R ../RefGenome/CocciRef_GCA_000149335.2.fna \
---variant final.filtered.withoutNonSNPs.vcf \
+--variant final.filtered.vcf.gz \
 --restrict-alleles-to BIALLELIC \ # most downstream techniques (GWAS, pop gen analyses) require biallelic SNP data
 --select-type-to-include SNP \
 -O final.SNPs.vcf 
 ```
 
-Optional: unzip jointvcf.vcf.gz file and identify number of variant sites:
+Optional: unzip final.SNPs.vcf file and identify number of variant sites:
 
 ```
 gunzip final.SNPs.vcf.gz
@@ -294,6 +294,30 @@ grep -v "^#" AllGenomesHaploCalled/final.SNPs.vcf | wc -l   # 134,773
 ```
 
 
+### 16. convert vcf to phylipp:   
+Run at command line, very fast.  
+Note that the 'vcf2phylip.py' script was downloaded from [here](https://github.com/edgardomortiz/vcf2phylip/blob/master/vcf2phylip.py) and must be in working directory for command to work
+```
+python3 vcf2phylip.py -i final.SNPs.vcf -o CocciSamples
+```
+Next step will be building phylogenetic tree:
+```
+module load iqtree/3.0.0
+iqtree3 -s final.SNPs.min4.phy -m GTR+G -nt AUTO
+```
+
+
+
+
+
+
+
+
+
+
+
+
+# Commands I'm no longer using...
 
 ### 17. Output genotype table [now doing in R] ####
 
@@ -307,24 +331,6 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -F CHROM -F POS -F REF -F ALT -F ID -GF AD -GF DP \
 -O geno.table
 ```
-
-
-
-
-
-
-Later: convert vcf to phylipp:   
-Run at command line, very fast
-```
-python3 vcf2phylip.py -i final.SNPs.vcf --phylip
-```
-Next step will be building phylogenetic tree:
-```
-iqtree3 -s final.SNPs.min4.phy -m GTR+G -nt AUTO
-```
-
-
-
 
 
 ### 6b. Original version:
@@ -343,6 +349,11 @@ samtools sort -@ 12 results/bam/${base}.aligned.bam -o "${base}.sorted.bam"
 samtools flagstat results/bam/${base}.aligned.bam > results/bam/"${base}.bam.stats.txt"
 done
 ```
+
+
+
+
+
 
 
 

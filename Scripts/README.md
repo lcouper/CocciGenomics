@@ -280,10 +280,10 @@ Code snippet:
 ```
 java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" SelectVariants \
 -R ../RefGenome/CocciRef_GCA_000149335.2.fna \
---variant final.filtered.vcf.gz \
+--variant joint.vcf.filtered.vcf.gz \
 --restrict-alleles-to BIALLELIC \ # most downstream techniques (GWAS, pop gen analyses) require biallelic SNP data
 --select-type-to-include SNP \
--O final.SNPs.vcf 
+-O final.SNPs.vcf.gz
 ```
 
 Optional: unzip final.SNPs.vcf file and identify number of variant sites:
@@ -294,19 +294,28 @@ grep -v "^#" AllGenomesHaploCalled/final.SNPs.vcf | wc -l   # 134,773
 ```
 
 
-### 16. convert vcf to phylipp:   
+### 16. Construct phylogenetic tree 
+
+** Note: In order to root the phylogenetic tree, we used the C. posadasii Silveira strain [SRR9644374](https://www.ncbi.nlm.nih.gov/biosample/?term=SRS007089) **
+These fastqs were then taken through the same steps as all other samples above (e.g. starting from step 1)   
+The resulting vcf files were only used for rooting the tree.   
+The vcf file *without* C. posadasii were used in all other analyses 
+
+
+Step 1. Convert vcf to phylipp:   
 Run at command line, very fast.  
 Note that the 'vcf2phylip.py' script was downloaded from [here](https://github.com/edgardomortiz/vcf2phylip/blob/master/vcf2phylip.py) and must be in working directory for command to work
 ```
 python3 vcf2phylip.py -i final.SNPs.vcf -o CocciSamples
 ```
-Next step will be building phylogenetic tree:
+
+Step 2. Build phylogenetic tree 
 ```
 module load iqtree/3.0.0
 iqtree3 -s final.SNPs.min4.phy -m GTR+G -nt AUTO
 ```
 
-and visualizing here: 
+Step 3. Visualizing here: 
 https://itol.embl.de/tree/136152214211185591747337347
 
 
@@ -316,40 +325,6 @@ https://itol.embl.de/tree/136152214211185591747337347
 
 
 
-
-
-# Commands I'm no longer using...
-
-### 17. Output genotype table [now doing in R] ####
-
-Software used: java   
-Script: genotable.sh   
-Code snippet:    
-```
-module load java
-java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" VariantsToTable \
--V final.SNPs.vcf \
--F CHROM -F POS -F REF -F ALT -F ID -GF AD -GF DP \
--O geno.table
-```
-
-
-### 6b. Original version:
-Compress sam to bam, sort bam files, and extract mapping stats
-
-Software used: bio/samtools/1.17-gcc-11.4.0    
-Script name: sam2bam.sh, sam2bam.sra.sh          
-Code snippet:     
-
-```
-for infile in results/sam/*.aligned.sam
-do
-base=$(basename ${infile} .aligned.sam)
-samtools view -@ 12 -b results/sam/${base}.aligned.sam > results/bam/"${base}.aligned.bam"
-samtools sort -@ 12 results/bam/${base}.aligned.bam -o "${base}.sorted.bam"
-samtools flagstat results/bam/${base}.aligned.bam > results/bam/"${base}.bam.stats.txt"
-done
-```
 
 
 
@@ -382,30 +357,6 @@ cat CocciRef_GCA_000149335.2.fna | awk '$0 ~ ">" {if (NR > 1) {print c;} c=0;pri
 ```
 
 ![image](https://github.com/user-attachments/assets/3086e222-c492-4028-8700-0adc5b3c5ded)
-
-### Construct phylogenetic tree using IQ-Tree 
-
-### 1. bgzip vcf file
-
-*Note, this required installing the bgzip binary (/global/home/users/lcouper/htslib-1.19.1)*
-
-1. Compress with bgzip then index
-```
-bgzip AllGenomesHaploCalled/final.SNPs.vcf
-tabix -p vcf final.SNPs.vcf.gz
-```
-2. Convert to combined fasta
-```
-bcftools consensus -f ../RefGenome/CocciRef_GCA_000149335.2.masked.fna final.SNPs.vcf.gz > final.SNPs.fasta
-```
-
-
-
-using IQtree, webserver: iqtree.cibiv.univie.ac.at    
-following tutorial here: https://www.iqtree.org/doc/Web-Server-Tutorial    
-following methods from cocci paper here: https://academic.oup.com/g3journal/article/12/4/jkac031/6523976#447478278. 
-Namely: " A total of 258,470 SNPs were retrieved and submitted for unrooted phylogenetic analysis via maximum-likelihood method implemented in the IQTREE software v1.6.12 (Nguyen et al. 2015). The best-fit model was set according to Bayesian Information Criterion to TN+F+ASC+R6 and the phylogenetic signal was tested using both Shimodaira–Hasegawa approximate likelihood ratio test (SH-aLRT) and ultrafast bootstrap support (Anisimova and Gascuel 2006; Minh et al. 2013). The phylogenetic tree was visualized using the Figtree software (http://tree.bio.ed.ac.uk/software/figtree/)"
-
 
 
 

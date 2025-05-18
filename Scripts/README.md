@@ -313,7 +313,10 @@ Step 2. Build phylogenetic tree
 ```
 module load iqtree/3.0.0
 iqtree3 -s final.SNPs.min4.phy -m GTR+G -nt AUTO
+iqtree3 -s final.SNPs.min4.phy -m GTR+G -nt AUTO -o CpSilv
 ```
+
+
 
 Step 3. Visualizing here: 
 https://itol.embl.de/tree/136152214211185591747337347

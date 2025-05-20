@@ -309,11 +309,21 @@ Note that the 'vcf2phylip.py' script was downloaded from [here](https://github.c
 python3 vcf2phylip.py -i final.SNPs.vcf -o CocciSamples
 ```
 
-Step 2. Build phylogenetic tree 
+Step 2. Build phylogenetic tree    
+Software used: iqtree/3.0.0    
+Script: phylo_tree.sh    
+Code snippet:
 ```
 module load iqtree/3.0.0
-iqtree3 -s final.SNPs.min4.phy -m GTR+G -nt AUTO
-iqtree3 -s final.SNPs.min4.phy -m GTR+G -nt AUTO -o CpSilv
+# iqtree3 -s final.SNPs.min4.phy -m GTR+G -nt AUTO -o CpSilv (# non-bootstrapped, fast version)
+
+iqtree3 -s final.SNPs.min4.phy \
+        -m TEST \ # test different nucleotide substituion models and pick the best one based on BIC
+        -bb 1000 \ #  1,000 bootstraps
+        -alrt 1000 \ # 1,000 replicates of an approximate likelihood ratio test (to assess branch support)
+        -nt AUTO \ # automatically detect and use number of optimal threads
+        -o CpSilv \ # Specify C. posadasii Silveira strain as the outgroup
+        -pre final.SNPs.withCpSilv.min4_1000
 ```
 
 

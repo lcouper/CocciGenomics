@@ -326,46 +326,29 @@ iqtree3 -s final.SNPs.min4.phy \
         -pre final.SNPs.withCpSilv.min4_1000
 ```
 
-
-
-Step 3. Visualizing here: 
+One option for visualizing tree (but note we visualized in R using ggree):   
 https://itol.embl.de/tree/136152214211185591747337347
 
+### 17. Assess population structure 
 
-
-
-See other next steps here: https://journals.asm.org/doi/full/10.1128/mbio.01976-19#sec-4
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Conducted using STRUCTURE v 2.3.4
+Downloaded version for MacOS without front end [here](https://web.stanford.edu/group/pritchardlab/structure_software/release_versions/v2.3.4/html/structure.html): 
+On local computer, created directory 'structure_run' to store package and data files.  
+To run structure analysis (must be in 'structure_run' directory.   
+```
+./structure -m mainparams -K 2 -o output
+```
+Note the parameters listed in mainparams, and the format of the tester.str are very specific. Copy/follow the versions attached here when running this analysis for real.  
 
 
 
 ## Other steps: 
 
-### 16. Investigate SNP position in genes 
+### Investigate SNP position in genes 
 
 Download .gtf file for cocci reference [here](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000149335.2/).
 
-### 17. Identify size of each chromosome
+### Identify size of each chromosome
 
 ```
 cat CocciRef_GCA_000149335.2.fna | awk '$0 ~ ">" {if (NR > 1) {print c;} c=0;printf substr($0,2,100) "\t"; } $0 !~ ">" {c+=length($0);} END { print c; }'

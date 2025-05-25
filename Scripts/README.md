@@ -306,7 +306,7 @@ Step 1. Convert vcf to phylipp:
 Run at command line, very fast.  
 Note that the 'vcf2phylip.py' script was downloaded from [here](https://github.com/edgardomortiz/vcf2phylip/blob/master/vcf2phylip.py) and must be in working directory for command to work
 ```
-python3 vcf2phylip.py -i final.SNPs.vcf -o CocciSamples
+python3 vcf2phylip.py -i final_withCp.vcf -o CocciSamples
 ```
 
 Step 2. Build phylogenetic tree    

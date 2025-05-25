@@ -290,7 +290,7 @@ Optional: unzip final.SNPs.vcf file and identify number of variant sites:
 
 ```
 gunzip final.SNPs.vcf.gz
-grep -v "^#" AllGenomesHaploCalled/final.SNPs.vcf | wc -l   # 504,247. With C. posadasii : 518,201
+grep -v "^#" AllGenomesHaploCalled/final.SNPs.vcf | wc -l   # 504,247. With C. posadasii : 484,074
 ```
 
 

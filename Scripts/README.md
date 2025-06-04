@@ -99,8 +99,8 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 
 ### 7. Extract mapping and coverage statistics 
 
-Software used: samtools, java
-Script name: MappingStats.sh, MappingStatsSRA.sh
+Software used: samtools, java   
+Script name: MappingStats.sh, MappingStatsSRA.sh    
 Note that the cap for coverage is 250 so there may be a peak in the histograms at this value
 
 ```

@@ -198,7 +198,6 @@ Script: index_dedupedbams.sbatch, index_dedupedbams.sra.sbatch
 Code snippet:
 ```
 samtools index results/bam/${base}.deduped.bam
-done
 ```
 
 ### 12. Call variants using GATK HaplotypeCaller 

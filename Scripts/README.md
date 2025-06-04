@@ -85,8 +85,8 @@ done
 
 ### 6. Sort and convert to bam
 
-Compress sam to bam and sort bam file 
-Software used: gatk
+Compress sam to bam and sort bam file     
+Software used: gatk     
 Script name: SamToBam.sh, SamToBamSRA.sh
 
 ```

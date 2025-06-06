@@ -336,9 +336,40 @@ On local computer, created directory 'structure_run' to store package and data f
 To run structure analysis (must be in 'structure_run' directory.   
 ```
 chmod +x structure  # May be necessary to run first if getting permission denied errors
-./structure -m mainparams -K 2 -o output
+./structure -m mainparams2 -K 2 -o output
 ```
-Note the parameters listed in mainparams, and the format of the tester.str are very specific. Copy/follow the versions attached here when running this analysis for real.  
+Note the parameters listed in mainparams, and the format of the tester2.str are very specific. Copy/follow the versions attached here when running this analysis for real.    
+
+Note that I did provide population identifiers, based on population structure observed in the PCA
+
+Some relevant parameters from mainparams2:
+```
+Basic Program Parameters
+
+#define MAXPOPS    2      // (int) number of populations assumed
+#define BURNIN    10000   // (int) length of burnin period
+#define NUMREPS   20000   // (int) number of MCMC reps after burnin
+
+Input/Output files
+
+#define INFILE   tester2.str   // (str) name of input data file
+#define OUTFILE  outfile  //(str) name of output data file
+
+Data file format
+
+#define NUMINDS    76    // (int) number of diploid individuals in data file
+#define NUMLOCI    196269    // (int) number of loci in data file
+#define PLOIDY       1    // (int) ploidy of data
+#define MISSING     -9    // (int) value given to missing genotype data
+#define ONEROWPERIND 1    // (B) store data for individuals in a single line
+
+
+#define LABEL     1     // (B) Input file contains individual labels
+#define POPDATA   1     // (B) Input file contains a population identifier
+#define POPFLAG   0     // (B) Input file contains a flag which says 
+                              whether to use popinfo when USEPOPINFO==1
+#define LOCDATA   0     // (B) Input file contains a location identifier
+```
 
 
 

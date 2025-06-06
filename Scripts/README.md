@@ -335,6 +335,7 @@ Downloaded version for MacOS without front end [here](https://web.stanford.edu/g
 On local computer, created directory 'structure_run' to store package and data files.  
 To run structure analysis (must be in 'structure_run' directory.   
 ```
+chmod +x structure  # May be necessary to run first if getting permission denied errors
 ./structure -m mainparams -K 2 -o output
 ```
 Note the parameters listed in mainparams, and the format of the tester.str are very specific. Copy/follow the versions attached here when running this analysis for real.  

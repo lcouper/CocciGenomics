@@ -391,11 +391,35 @@ cat CocciRef_GCA_000149335.2.fna | awk '$0 ~ ">" {if (NR > 1) {print c;} c=0;pri
 ### Examining mating type distribution
 
 Downloaded MAT idiomorphs from NCBI. Specifically, for MAT1, I used C. immitis; EF472259.1, and for MAT2, I used C. posadasii; EF472258.1.
-Then, indexed each .fna file
 ```
+module load bio/bwa-mem2/2.2.1
+module load bio/samtools/1.17-gcc-11.4.0
+
+# Index each MAT idiomorph file
 bwa-mem2 index EF472259.1.fna  
 bwa-mem2 index EF472258.1.fna 
 
+# Align my isolates to MAT1 (EF472259.1.fna)
+bwa-mem2 mem EF472259.1.fna \
+  Raw/BatchThree/87A1_S103_L008_R1_001.fastq.gz \
+  Raw/BatchThree/87A1_S103_L008_R2_001.fastq.gz \
+  | samtools view -bS - > 87A1_vs_MAT1.bam
 
+# Align my isolates to MAT2 (EF472258.1.fna)
+bwa-mem2 mem EF472258.1.fna \
+  Raw/BatchThree/87A1_S103_L008_R1_001.fastq.gz \
+  Raw/BatchThree/87A1_S103_L008_R2_001.fastq.gz \
+  | samtools view -bS - > 87A1_vs_MAT2.bam
 
+# Sort and index for MAT1
+samtools sort -o 87A1_vs_MAT1.sorted.bam 87A1_vs_MAT1.bam
+samtools index 87A1_vs_MAT1.sorted.bam
+
+# Sort and index for MAT2
+samtools sort -o 87A1_vs_MAT2.sorted.bam 87A1_vs_MAT2.bam
+samtools index 87A1_vs_MAT2.sorted.bam
+
+# Calculate coverage
+samtools depth isolateX_MAT1.bam | awk '{sum += $3} END {print sum/NR}'  # Average coverage for MAT1
+samtools depth isolateX_MAT2.bam | awk '{sum += $3} END {print sum/NR}'  # Average coverage for MAT2
 

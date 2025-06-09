@@ -388,7 +388,13 @@ cat CocciRef_GCA_000149335.2.fna | awk '$0 ~ ">" {if (NR > 1) {print c;} c=0;pri
 ![image](https://github.com/user-attachments/assets/3086e222-c492-4028-8700-0adc5b3c5ded)
 
 
+### Examining mating type distribution
 
+Downloaded MAT idiomorphs from NCBI. Specifically, for MAT1, I used C. immitis; EF472259.1, and for MAT2, I used C. posadasii; EF472258.1.
+Then, indexed each .fna file
+```
+bwa-mem2 index EF472259.1.fna  
+bwa-mem2 index EF472258.1.fna 
 
 
 

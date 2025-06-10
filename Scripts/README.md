@@ -427,8 +427,8 @@ samtools depth 87A1_vs_MAT2.sorted.bam | awk '{sum += $3} END {print sum/NR}'  #
 
 First, created pop1 and pop2 txt files indicating assignment to environmental or clinical 'populations'. Here I focused on only California samples to avoid spurious detection due to demographic processes
 ```
-echo -e "13B1\n14B1\n22AC2\n22BC1\34B2\n58B1\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3" > pop1.txt
-echo -e "SD_1\nSJV_1\nSJV_10\nSJV_11\nSJV_2\nSJV_3\nSJV_4\nSJV_5\nSJV_6\nSJV_7\nSJV_8\nSJV_9\nUCLA293\nUCLA294\nUCLA295" > pop2.txt
+echo -e "13B1\n14B1\n22AC2\n22BC1\34B2\n58B1\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3" > CApop1.txt
+echo -e "SD_1\nSJV_1\nSJV_10\nSJV_11\nSJV_2\nSJV_3\nSJV_4\nSJV_5\nSJV_6\nSJV_7\nSJV_8\nSJV_9\nUCLA293\nUCLA294\nUCLA295" > CApop2.txt
 ```
 Then, I converted my final.vcf file to a pseudo-diploid genotype (as haploid genotypes are not natively supported by vcftools)
 ```
@@ -444,8 +444,8 @@ Lastly, run vcftools to estimate per-site Fst values along the genome
 cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
 module load bio/vcftools/0.1.16-gcc-11.4.0
  vcftools --vcf final_diploid.vcf \
-    --weir-fst-pop pop1.txt \
-    --weir-fst-pop pop2.txt \
+    --weir-fst-pop CApop1.txt \
+    --weir-fst-pop CApop2.txt \
    --out fst_results
 ```
 

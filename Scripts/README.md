@@ -371,13 +371,13 @@ Data file format
 #define LOCDATA   0     // (B) Input file contains a location identifier
 ```
 
-## Additional downstream analysis step 
+## Additional downstream analyses 
 
 ### Scaffolding SNPs into genes 
 
 Download .gtf file for cocci reference [here](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000149335.2/).
 
-## Identify size of each chromosome
+### Identify size of each chromosome
 
 ```
 cat CocciRef_GCA_000149335.2.fna | awk '$0 ~ ">" {if (NR > 1) {print c;} c=0;printf substr($0,2,100) "\t"; } $0 !~ ">" {c+=length($0);} END { print c; }'
@@ -386,7 +386,7 @@ cat CocciRef_GCA_000149335.2.fna | awk '$0 ~ ">" {if (NR > 1) {print c;} c=0;pri
 ![image](https://github.com/user-attachments/assets/3086e222-c492-4028-8700-0adc5b3c5ded)
 
 
-## Examining mating type distribution
+### Examining mating type distribution
 
 Downloaded MAT idiomorphs from NCBI. Specifically, for MAT1, I used C. immitis; EF472259.1, and for MAT2, I used C. posadasii; EF472258.1.
 ```
@@ -422,7 +422,7 @@ samtools depth 87A1_vs_MAT1.sorted.bam | awk '{sum += $3} END {print sum/NR}'  #
 samtools depth 87A1_vs_MAT2.sorted.bam | awk '{sum += $3} END {print sum/NR}'  # Average coverage for MAT2: 379.659
 ```
 
-## Fst differentiation between clinical and environmental isolates
+### Fst differentiation between clinical and environmental isolates
 
 First, created pop1 and pop2 txt files indicating assignment to environmental or clinical 'populations'. Here I focused on only California samples to avoid spurious detection due to demographic processes
 ```

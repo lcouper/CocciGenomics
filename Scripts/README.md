@@ -390,10 +390,10 @@ cat CocciRef_GCA_000149335.2.fna | awk '$0 ~ ">" {if (NR > 1) {print c;} c=0;pri
 ### Examining mating type distribution
 
 Downloaded MAT idiomorphs from NCBI. Specifically, for MAT1, I used C. immitis; EF472259.1, and for MAT2, I used C. posadasii; EF472258.1.
+Software used: bwa-mem2/2.2.1, samtools/1.17-gcc-11.4.0 
+Script: matingtype_loop.sbatch     
+Code snippet for single sample:   
 ```
-module load bio/bwa-mem2/2.2.1
-module load bio/samtools/1.17-gcc-11.4.0
-
 # Index each MAT idiomorph file
 bwa-mem2 index EF472259.1.fna  
 bwa-mem2 index EF472258.1.fna 
@@ -425,7 +425,9 @@ samtools depth 87A1_vs_MAT2.sorted.bam | awk '{sum += $3} END {print sum/NR}'  #
 
 ### Fst differentiation between clinical and environmental isolates
 
-First, created pop1 and pop2 txt files indicating assignment to environmental or clinical 'populations'. Here I focused on only California samples to avoid spurious detection due to demographic processes
+First, created pop1 and pop2 txt files indicating assignment to environmental or clinical 'populations'. I first focused on only California samples to avoid spurious detection due to demographic processes. I then re-ran the analysis using only Washington samples to investigate how the Fst-outlier loci identified for California compared to those identified for Washington. 
+
+California isolates:
 ```
 echo -e "13B1\n14B1\n22AC2\n22BC1\34B2\n58B1\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3" > CApop1.txt
 echo -e "SD_1\nSJV_1\nSJV_10\nSJV_11\nSJV_2\nSJV_3\nSJV_4\nSJV_5\nSJV_6\nSJV_7\nSJV_8\nSJV_9\nUCLA293\nUCLA294\nUCLA295" > CApop2.txt
@@ -446,6 +448,17 @@ module load bio/vcftools/0.1.16-gcc-11.4.0
  vcftools --vcf final_diploid.vcf \
     --weir-fst-pop CApop1.txt \
     --weir-fst-pop CApop2.txt \
-   --out fst_results
+   --out fst_results_CA
+```
+
+Repeat for Washington isolates
+```
+echo -e "A391\nA432\nA501\nA502\nWA_202\nWA_205\nWA_211\nWA_212\nWA_221" > WApop1.txt
+echo -e "WA_1\nB11019\nB11034\nB12398\nB13956\nB15317\nB16692\nB17554" > WApop2.txt
+vcftools --vcf final_diploid.vcf \
+    --weir-fst-pop WApop1.txt \
+    --weir-fst-pop WApop2.txt \
+   --out fst_results_WA
+
 ```
 

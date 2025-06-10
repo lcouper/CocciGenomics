@@ -267,7 +267,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
 --variant jointvcf.vcf.gz \
 --filter-expression "QD < 2.0 || FS > 60.0 || MQ < 40.0 || DP < 10 || QUAL < 20" \
---filter-name "BasicAndBiasFilters" \s
+--filter-name "BasicAndBiasFilters" \
 -O joint.filtered.vcf.gz
 ```
 
@@ -278,11 +278,12 @@ Code snippet:
 
 ```
 java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" SelectVariants \
--R ../RefGenome/CocciRef_GCA_000149335.2.fna \
---variant joint.vcf.filtered.vcf.gz \
---restrict-alleles-to BIALLELIC \ # most downstream techniques (GWAS, pop gen analyses) require biallelic SNP data
+-R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
+--variant jointvcf_filtered.vcf.gz \
+--restrict-alleles-to BIALLELIC \
 --select-type-to-include SNP \
--O final.SNPs.vcf.gz
+--exclude-filtered \
+-O final.vcf.gz
 ```
 
 Optional: unzip final.SNPs.vcf file and identify number of variant sites:

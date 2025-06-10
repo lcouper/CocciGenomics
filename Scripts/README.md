@@ -424,3 +424,17 @@ samtools depth 87A1_vs_MAT1.sorted.bam | awk '{sum += $3} END {print sum/NR}'  #
 samtools depth 87A1_vs_MAT2.sorted.bam | awk '{sum += $3} END {print sum/NR}'  # Average coverage for MAT2: 379.659
 ```
 
+## Investigating differences in clinical vs environmental samples. 
+
+### Approach 1. Calculate Fst per site 
+
+First, created pop1 and pop2 txt files indicating assignment to environmental or clinical 'populations'. Here I focused on only California samples to avoid spurious detection due to demographic processes
+```
+echo -e "13B1\n14B1\n22AC2\n22BC1\34B2\n58B1\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3" > pop1.txt
+echo -e "SD_1\nSJV_1\nSJV_10\nSJV_11\nSJV_2\nSJV_3\nSJV_4\nSJV_5\nSJV_6\nSJV_7\nSJV_8\nSJV_9\nUCLA293\nUCLA294\nUCLA295" > pop2.txt
+```
+Then, use vcftools to calculate Fst using these groupings:
+```
+cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
+module load bio/vcftools/0.1.16-gcc-11.4.0
+

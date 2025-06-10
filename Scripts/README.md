@@ -420,7 +420,7 @@ samtools sort -o 87A1_vs_MAT2.sorted.bam 87A1_vs_MAT2.bam
 samtools index 87A1_vs_MAT2.sorted.bam
 
 # Calculate coverage
-samtools depth isolateX_MAT1.bam | awk '{sum += $3} END {print sum/NR}'  # Average coverage for MAT1
-samtools depth isolateX_MAT2.bam | awk '{sum += $3} END {print sum/NR}'  # Average coverage for MAT2
+samtools depth 87A1_vs_MAT1.sorted.bam | awk '{sum += $3} END {print sum/NR}'  # Average coverage for MAT1: 976.867
+samtools depth 87A1_vs_MAT2.sorted.bam | awk '{sum += $3} END {print sum/NR}'  # Average coverage for MAT2: 379.659
 ```
 

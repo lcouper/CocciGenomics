@@ -389,10 +389,10 @@ cat CocciRef_GCA_000149335.2.fna | awk '$0 ~ ">" {if (NR > 1) {print c;} c=0;pri
 
 ### Examining mating type distribution
 
-Downloaded MAT idiomorphs from NCBI. Specifically, for MAT1, I used C. immitis; EF472259.1, and for MAT2, I used C. posadasii; EF472258.1.
-Software used: bwa-mem2/2.2.1, samtools/1.17-gcc-11.4.0 
-Script: matingtype_loop.sbatch     
-Code snippet for single sample:   
+Downloaded MAT idiomorphs from NCBI. For MAT1, I used C. immitis; EF472259.1. For MAT2, I used C. posadasii; EF472258.1.     
+Software used: bwa-mem2/2.2.1, samtools/1.17-gcc-11.4.0      
+Script: matingtype_loop.sbatch        
+Code snippet for single sample:      
 ```
 # Index each MAT idiomorph file
 bwa-mem2 index EF472259.1.fna  

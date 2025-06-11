@@ -389,7 +389,34 @@ cat CocciRef_GCA_000149335.2.fna | awk '$0 ~ ">" {if (NR > 1) {print c;} c=0;pri
 
 ### Examining mating type distribution
 
-Downloaded MAT idiomorphs from NCBI. For MAT1, I used C. immitis; EF472259.1. For MAT2, I used C. posadasii; EF472258.1.     
+Step 1. Download gtf (and fna) files for each MAT idiomorphs from NCBI.   
+For MAT1-1, I used the [C. immitis RS assemebly](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000149335.2/).
+For MAT1-2, I used the [C. immitis strain H538.4 assembly](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000149815.1/).
+
+Step 2. Identify the genomic positions of the MAT locus for each representative
+```
+grep -i MAT-1 CimmitisRS_MAT1_1_Rep.gff > MAT_coords_mat1_1.gff
+grep -i MAT1 CimmitisH538.4_MAT1_2_Rep.gtf > MAT_coords_mat1_2.gff
+# Note the slightly different naming
+```
+
+Step 3. Index each assembly and extract the MAT loci using the (mRNA) coordinates identified above
+```
+samtools faidx Cimmitis_RS.fna
+samtools faidx Cimmitis_H5384.fna
+samtools faidx Cimmitis_RS.fna DS016985.1:384173-385395 > MAT1-1_RS.fna
+samtools faidx Cimmitis_H5384.fna GG704913.1:1653763-1656710 > MAT1-2_H5384.fna
+# Concatenate for mapping
+cat MAT1-1_RS.fna MAT1-2_H5384.fna > MAT_combined.fna
+
+# Note, for simplicity I fixed headers to: >MAT1_1_RS   >MAT1_2_H5384 (done manually in text editor)
+
+# Index combined file
+bwa-mem2 index MAT_combined.fna
+```
+
+
+EF472259.1. For MAT2, I used C. posadasii; EF472258.1.     
 Software used: bwa-mem2/2.2.1, samtools/1.17-gcc-11.4.0      
 Script: matingtype_loop.sbatch        
 Code snippet for single sample:      

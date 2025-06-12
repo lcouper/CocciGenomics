@@ -415,40 +415,12 @@ cat MAT1-1_RS.fna MAT1-2_H5384.fna > MAT_combined.fna
 bwa-mem2 index MAT_combined.fna
 ```
 
+Step 4. Identify most likely idiomorph for each cocci genome   
+Here, we will align reads from each of the cocci genomes (ours and all others included in the analysis) to the MAT loci. Then we will identify to which idiomorph the coverage on the alignment is higher (indicating higher similarity).    
+Software used: bwa-mem2/2.2.1, samtools/1.17-gcc-11.4.0       
+Script: matingtype_loop.sbatch         
+Note the output (the coverage to MAT1_RS or MAT_2_H5384) was directed to .tsv files (matingtype_coverage).    
 
-EF472259.1. For MAT2, I used C. posadasii; EF472258.1.     
-Software used: bwa-mem2/2.2.1, samtools/1.17-gcc-11.4.0      
-Script: matingtype_loop.sbatch        
-Code snippet for single sample:      
-```
-# Index each MAT idiomorph file
-bwa-mem2 index EF472259.1.fna  
-bwa-mem2 index EF472258.1.fna 
-
-# Align my isolates to MAT1 (EF472259.1.fna)
-bwa-mem2 mem EF472259.1.fna \
-  Raw/BatchThree/87A1_S103_L008_R1_001.fastq.gz \
-  Raw/BatchThree/87A1_S103_L008_R2_001.fastq.gz \
-  | samtools view -bS - > 87A1_vs_MAT1.bam
-
-# Align my isolates to MAT2 (EF472258.1.fna)
-bwa-mem2 mem EF472258.1.fna \
-  Raw/BatchThree/87A1_S103_L008_R1_001.fastq.gz \
-  Raw/BatchThree/87A1_S103_L008_R2_001.fastq.gz \
-  | samtools view -bS - > 87A1_vs_MAT2.bam
-
-# Sort and index for MAT1
-samtools sort -o 87A1_vs_MAT1.sorted.bam 87A1_vs_MAT1.bam
-samtools index 87A1_vs_MAT1.sorted.bam
-
-# Sort and index for MAT2
-samtools sort -o 87A1_vs_MAT2.sorted.bam 87A1_vs_MAT2.bam
-samtools index 87A1_vs_MAT2.sorted.bam
-
-# Calculate coverage
-samtools depth 87A1_vs_MAT1.sorted.bam | awk '{sum += $3} END {print sum/NR}'  # Average coverage for MAT1: 976.867
-samtools depth 87A1_vs_MAT2.sorted.bam | awk '{sum += $3} END {print sum/NR}'  # Average coverage for MAT2: 379.659
-```
 
 ### Fst differentiation between clinical and environmental isolates
 

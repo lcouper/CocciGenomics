@@ -422,7 +422,7 @@ Script: matingtype_loop.sbatch
 Note the output (the coverage to MAT1_RS or MAT_2_H5384) was directed to .tsv files (matingtype_coverage).    
 
 
-Issue: results not matching up with [Engelthaler et al. 2016](https://journals.asm.org/doi/full/10.1128/mbio.00550-16#figS9). Potentially need to correct for mapping to other portions of these assemblies?
+Issue: results not matching up with [Engelthaler et al. 2016](https://journals.asm.org/doi/full/10.1128/mbio.00550-16#figS9). Potentially need to correct for mapping to other portions of these assemblies (eg rpb1)
 
 ### Fst differentiation between clinical and environmental isolates
 

@@ -422,6 +422,8 @@ Script: matingtype_loop.sbatch
 Note the output (the coverage to MAT1_RS or MAT_2_H5384) was directed to .tsv files (matingtype_coverage).    
 
 
+Issue: results not matching up with [Engelthaler et al. 2016](https://journals.asm.org/doi/full/10.1128/mbio.00550-16#figS9). Potentially need to correct for mapping to other portions of these assemblies?
+
 ### Fst differentiation between clinical and environmental isolates
 
 First, created pop1 and pop2 txt files indicating assignment to environmental or clinical 'populations'. I first focused on only California samples to avoid spurious detection due to demographic processes. I then re-ran the analysis using only Washington samples to investigate how the Fst-outlier loci identified for California compared to those identified for Washington. 

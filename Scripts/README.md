@@ -289,8 +289,8 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 Optional: unzip final.SNPs.vcf file and identify number of variant sites:
 
 ```
-gunzip final.SNPs.vcf.gz
-grep -v "^#" AllGenomesHaploCalled/final.SNPs.vcf | wc -l   # 196,269. With C. posadasii : 484,074
+gunzip final.vcf.gz
+grep -v "^#" AllGenomesHaploCalled/final.SNPs.vcf | wc -l   # 100,335. With C. posadasii : 484,074
 ```
 
 

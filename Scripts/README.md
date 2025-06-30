@@ -466,7 +466,7 @@ module load bio/vcftools/0.1.16-gcc-11.4.0
    --out fst_results_CA
 ```
 
-Repeat for Washington isolates
+Repeat for Washington isolates (may not keep as these environmental/clinical isolates are nearly clonal)
 ```
 echo -e "A391\nA432\nA501\nA502\nWA_202\nWA_205\nWA_211\nWA_212\nWA_221" > WApop1.txt
 echo -e "WA_1\nB11019\nB11034\nB12398\nB13956\nB15317\nB16692\nB17554" > WApop2.txt

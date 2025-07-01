@@ -286,7 +286,13 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -O final.vcf.gz
 ```
 
-Lastly, keep only sites with >=90% genotyped samples. Repeat for final_withCp.vcf
+### 16. Keep only sites with >=90% genotyped samples
+
+Software used: vcftools/0.1.16-gcc-11.4.0
+Script: NA (command line. Runs fast)
+Code snippet:     
+Note: Repeat for final_withCp.vcf
+
 ```
 module load bio/vcftools/0.1.16-gcc-11.4.0
 vcftools --gzvcf final.vcf.gz \
@@ -299,7 +305,7 @@ Number of SNPs retained: 64,471. With C. posadasii : 64,767
 
 
 
-### 16. Construct phylogenetic tree 
+### 17. Construct phylogenetic tree 
 
 ** Note: In order to root the phylogenetic tree, we used the C. posadasii Silveira strain [SRR9644374](https://www.ncbi.nlm.nih.gov/biosample/?term=SRS007089) **
 These fastqs were then taken through the same steps as all other samples above (e.g. starting from step 1)   
@@ -334,7 +340,7 @@ iqtree3 -s final_withCp.min4.phy \
 One option for visualizing tree (but note we visualized in R using ggree):   
 https://itol.embl.de/tree/136152214211185591747337347
 
-### 17. Assess population structure 
+### 18. Assess population structure 
 
 Conducted using STRUCTURE v 2.3.4
 Downloaded version for MacOS without front end [here](https://web.stanford.edu/group/pritchardlab/structure_software/release_versions/v2.3.4/html/structure.html): 
@@ -489,7 +495,7 @@ cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
 module load bio/vcftools/0.1.16-gcc-11.4.0
 
 # number of permutations
-nperm=5
+nperm=500
 
 # file with all sample IDs
 samples=all_samples.txt

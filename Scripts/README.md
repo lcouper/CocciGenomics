@@ -476,8 +476,7 @@ module load bio/vcftools/0.1.16-gcc-11.4.0
 vcftools --vcf final_diploid.vcf \
     --weir-fst-pop CApop1.txt \
     --weir-fst-pop CApop2.txt \
-    --fst-window-size 500 \
-    --fst-window-step 100 \
+    --fst-window-size 250 \
    --out fst_sliding_CA
 ```
 
@@ -488,8 +487,7 @@ echo -e "WA_1\nB11019\nB11034\nB12398\nB13956\nB15317\nB16692\nB17554" > WApop2.
 vcftools --vcf final_diploid.vcf \
     --weir-fst-pop WApop1.txt \
     --weir-fst-pop WApop2.txt \
-    --fst-window-size 500 \
-    --fst-window-step 100 \
+    --fst-window-size 250 \
    --out fst_sliding_WA
 ```
 

@@ -459,7 +459,7 @@ echo "* 0 999999999 . 2" > ploidy.txt
 
 # Next, use the bcftools plug-in to correct ploidy across all sites (as specificed in the ploidy.txt file above)
 module load bio/bcftools/1.16-gcc-11.4.0
-bcftools +fixploidy final.vcf -- -p ploidy.txt > final_diploid.vcf
+bcftools +fixploidy final_filtered_maxmissing.recode.vcf -- -p ploidy.txt > final_diploid.vcf
 ```
 Lastly, run vcftools to estimate per-site Fst values along the genome
 ```
@@ -479,6 +479,7 @@ vcftools --vcf final_diploid.vcf \
     --weir-fst-pop WApop1.txt \
     --weir-fst-pop WApop2.txt \
    --out fst_results_WA
-
 ```
+
+
 

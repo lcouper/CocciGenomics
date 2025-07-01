@@ -286,12 +286,17 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -O final.vcf.gz
 ```
 
-Optional: unzip final.SNPs.vcf file and identify number of variant sites:
+Lastly, keep only sites with >=90% genotyped samples. Repeat for final_withCp.vcf
+```
+module load bio/vcftools/0.1.16-gcc-11.4.0
+vcftools --gzvcf final.vcf.gz \
+  --max-missing 0.9 \
+  --recode --recode-INFO-all \
+  --out final_filtered_maxmissing
+```
 
-```
-gunzip final.vcf.gz
-grep -v "^#" AllGenomesHaploCalled/final.SNPs.vcf | wc -l   # 100,335. With C. posadasii : 101,231
-```
+Number of SNPs retained: 64,471. With C. posadasii : 64,767
+
 
 
 ### 16. Construct phylogenetic tree 

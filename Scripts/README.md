@@ -484,5 +484,36 @@ vcftools --vcf final_diploid.vcf \
 To assess statistical significance, randomly re-shuffle 'population' labels, and re-estimate Fst (repeat 500 times).    
 
 ```
+cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
+
+module load bio/vcftools/0.1.16-gcc-11.4.0
+
+# number of permutations
+nperm=5
+
+# file with all sample IDs
+samples=all_samples.txt
+
+# number of samples in group 1 (e.g., environmental)
+group1_n=10
+
+mkdir -p perm_fst
+
+for i in $(seq 1 $nperm); do
+  echo "Permutation $i"
+
+  # Shuffle and split samples
+  shuf $samples > perm_fst/tmp_samples.txt
+  head -n $group1_n perm_fst/tmp_samples.txt > perm_fst/group1.txt
+  tail -n +$((group1_n + 1)) perm_fst/tmp_samples.txt > perm_fst/group2.txt
+
+ # Run Fst
+  vcftools --vcf final_diploid.vcf \
+    --weir-fst-pop perm_fst/group1.txt \
+    --weir-fst-pop perm_fst/group2.txt \
+    --out perm_fst/fst_perm_$i \
+    --stdout | grep -v "^#" | awk -v i=$i '{print $1, $2, $3, i}' >> perm_fst/fst_all_perms.txt
+done
+```
 
 

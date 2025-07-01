@@ -431,7 +431,7 @@ Issue: results not matching up with [Engelthaler et al. 2016](https://journals.a
 
 
 
-## Alternative approach to mating type locus investigation 
+#### Alternative approach to mating type locus investigation 
 
 Using just the protein sequences.
 Downloaded the alpha-box protein sequence for MAT1-1 idiomorph (from C. immitis RS) [EF472259.1](https://www.ncbi.nlm.nih.gov/nuccore/EF472259.1).
@@ -481,5 +481,8 @@ vcftools --vcf final_diploid.vcf \
    --out fst_results_WA
 ```
 
+To assess statistical significance, randomly re-shuffle 'population' labels, and re-estimate Fst (repeat 500 times).    
+
+```
 
 

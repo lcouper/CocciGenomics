@@ -383,7 +383,7 @@ Data file format
 #define LOCDATA   0     // (B) Input file contains a location identifier
 ```
 
-## Additional downstream analyses 
+# Additional downstream analyses 
 
 ### Scaffolding SNPs into genes 
 
@@ -398,7 +398,7 @@ cat CocciRef_GCA_000149335.2.fna | awk '$0 ~ ">" {if (NR > 1) {print c;} c=0;pri
 ![image](https://github.com/user-attachments/assets/3086e222-c492-4028-8700-0adc5b3c5ded)
 
 
-### Examining mating type distribution
+## Examining mating type distribution
 
 Step 1. Download gtf (and fna) files for each MAT idiomorphs from NCBI.   
 For MAT1-1, I used the [C. immitis RS assemebly](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000149335.2/).
@@ -437,7 +437,7 @@ Issue: results not matching up with [Engelthaler et al. 2016](https://journals.a
 
 
 
-#### Alternative approach to mating type locus investigation 
+### Alternative approach to mating type locus investigation 
 
 Using just the protein sequences.
 Downloaded the alpha-box protein sequence for MAT1-1 idiomorph (from C. immitis RS) [EF472259.1](https://www.ncbi.nlm.nih.gov/nuccore/EF472259.1).
@@ -449,7 +449,7 @@ spades.py -1 SJV_9_1.fastq -2 SJV_9_2.fastq -o SJV_9_spades_output
 ```
 
 
-### Fst differentiation between clinical and environmental isolates
+## Fst differentiation between clinical and environmental isolates
 
 First, created pop1 and pop2 txt files indicating assignment to environmental or clinical 'populations'. I first focused on only California samples to avoid spurious detection due to demographic processes. I then re-ran the analysis using only Washington samples to investigate how the Fst-outlier loci identified for California compared to those identified for Washington. 
 
@@ -526,7 +526,7 @@ done
 ```
 
 
-### Tajima's D 
+## Tajima's D 
 
 Tajima's D provides evidence of different types of selection. Its calculation is based on the site frequency spectrum.   
 
@@ -553,7 +553,7 @@ vcftools --vcf final_diploid.vcf \ # Note, requires this 'diploid' version as in
   --out tajimasD_environmental
 ```
 
-### Nucleotide diversity, θπ
+## Nucleotide diversity, θπ
 
 θπ is the average number of pairwise differences *per site* between all sequences in a population.   
 Here, we want to calculate θπ separately for clinical and environmental isolates from CA.    

@@ -528,20 +528,30 @@ done
 
 ### Tajima's D 
 
-Tajima's D provides evidence of different types of selection. Its calculation is based on the site frequency spectrum. Namely, an excess of rare alleles (negative values of Tajima's D) may indiciate purifying/postive selection. An excess of intermediate frequency alleles (positive values of Tajima's D) may indicate balancing selection. Tajiama's D ~ 0 indicates neutral evolution under constant population size.    
-Here, we want to calculate Tajima's D separately for the clinical and environmental samples. It is typically calculcated in moving windows. 
+Tajima's D provides evidence of different types of selection. Its calculation is based on the site frequency spectrum.   
+
+
+
+| Interpretation of Tajima's D | Description |
+|-----------------------------|-------------|
+| **Negative Tajima's D**     | Excess of rare alleles — may indicate purifying or positive selection. |
+| **Positive Tajima's D**     | Excess of intermediate-frequency alleles — may indicate balancing selection. |
+| **Tajima's D ≈ 0**          | Consistent with neutral evolution under constant population size. |   
+
+   
+Here, we want to calculate Tajima's D separately for the clinical and environmental samples. It is typically calculcated in  windows. I tried various window sizes but 100 kb seemed to be best 
 
 Software used: vcftools/0.1.16-gcc-11.4.0
 Code snippet (run at command line, very fast):
 ```
 vcftools --vcf final_diploid.vcf \ # Note, requires this 'diploid' version as input
   --keep CApop2.txt \ # Names of the clinical CA samples stored in this text file
-  --TajimaD 10000 \
+  --TajimaD 100000 \
   --out tajimasD_clinical
 
 vcftools --vcf final_diploid.vcf \ # Note, requires this 'diploid' version as input
   --keep CApop1.txt \ # Names of the environmental CA samples stored in this text file
-  --TajimaD 10000 \
+  --TajimaD 100000 \
   --out tajimasD_environmental
 ```
 

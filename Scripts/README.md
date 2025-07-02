@@ -562,9 +562,25 @@ Here, we want to calculate θπ separately for clinical and environmental isolat
 |-----------------------------|-------------|
 | **High θπ in environmental isolates**     | Large, diverse populations. | 
 | **Low θπ in clinical isolates**     | Selection / adpatation in the host; population bottlenecks. |    
+| **Higher θπ in clinical vs environmental**     | Balancing selection in host |    
 
-Software used:     
-Code snippet (run at command line, very fast):     
+Software used:  vcftools/0.1.16-gcc-11.4.0     
+Code snippet (run at command line, very fast):  
+```
+# For environmental isolates
+vcftools \
+  --vcf final_diploid.vcf \
+  --keep CApop1.txt \
+  --window-pi 100000 \
+  --window-pi-step 100000 \
+  --out pi_environmental
 
-
+# For clinical isolates
+vcftools \
+  --vcf final_diploid.vcf \
+  --keep CApop2.txt \
+  --window-pi 100000 \
+  --window-pi-step 100000 \
+  --out pi_clinical
+```
 

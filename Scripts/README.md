@@ -477,7 +477,8 @@ module load bio/vcftools/0.1.16-gcc-11.4.0
 vcftools --vcf final_diploid.vcf \
     --weir-fst-pop CApop1.txt \
     --weir-fst-pop CApop2.txt \
-   --out fst_results_CA
+    --fst-window-size 100000 \
+    --out fst_100kbp_window_CA
 ```
 
 Repeat for Washington isolates (may not keep as these environmental/clinical isolates are nearly clonal)
@@ -487,7 +488,8 @@ echo -e "WA_1\nB11019\nB11034\nB12398\nB13956\nB15317\nB16692\nB17554" > WApop2.
 vcftools --vcf final_diploid.vcf \
     --weir-fst-pop WApop1.txt \
     --weir-fst-pop WApop2.txt \
-   --out fst_results_WA
+    --fst-window-size 100000 \
+   --out fst_100kbp_window_WA
 ```
 
 To assess statistical significance, randomly re-shuffle 'population' labels, and re-estimate Fst (repeat 500 times).    

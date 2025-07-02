@@ -468,7 +468,7 @@ module load bio/bcftools/1.16-gcc-11.4.0
 bcftools +fixploidy final_filtered_maxmissing.recode.vcf -- -p ploidy.txt > final_diploid.vcf
 ```
 Lastly, run vcftools to estimate Fst along the genome.   
-Here, we estimated Fst in sliding windows (500 SNP window, 100 SNP step size). But, alternatively you could estimate per-site Fst (i.e. by leaving out window specification below).  
+Here, we estimated Fst in 250-SNP tiled windows. But, alternatively you could estimate per-site Fst (i.e. by leaving out window specification below).  
 
 ```
 cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
@@ -477,7 +477,7 @@ vcftools --vcf final_diploid.vcf \
     --weir-fst-pop CApop1.txt \
     --weir-fst-pop CApop2.txt \
     --fst-window-size 250 \
-   --out fst_sliding_CA
+   --out fst_window_CA
 ```
 
 Repeat for Washington isolates (may not keep as these environmental/clinical isolates are nearly clonal)
@@ -488,7 +488,7 @@ vcftools --vcf final_diploid.vcf \
     --weir-fst-pop WApop1.txt \
     --weir-fst-pop WApop2.txt \
     --fst-window-size 250 \
-   --out fst_sliding_WA
+   --out fst_window_WA
 ```
 
 To assess statistical significance, randomly re-shuffle 'population' labels, and re-estimate Fst (repeat 500 times).    

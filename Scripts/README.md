@@ -530,8 +530,6 @@ done
 
 Tajima's D provides evidence of different types of selection. Its calculation is based on the site frequency spectrum.   
 
-
-
 | Interpretation of Tajima's D | Description |
 |-----------------------------|-------------|
 | **Negative Tajima's D**     | Excess of rare alleles — may indicate purifying or positive selection. |
@@ -555,6 +553,18 @@ vcftools --vcf final_diploid.vcf \ # Note, requires this 'diploid' version as in
   --out tajimasD_environmental
 ```
 
+### Nucleotide diversity, θπ
+
+θπ is the average number of pairwise differences *per site* between all sequences in a population.   
+Here, we want to calculate θπ separately for clinical and environmental isolates from CA.    
+
+| Interpretation of θπ | Description |
+|-----------------------------|-------------|
+| **High θπ in environmental isolates**     | Large, diverse populations. | 
+| **Low θπ in clinical isolates**     | Selection / adpatation in the host; population bottlenecks. |    
+
+Software used:     
+Code snippet (run at command line, very fast):     
 
 
 

@@ -468,7 +468,8 @@ module load bio/bcftools/1.16-gcc-11.4.0
 bcftools +fixploidy final_filtered_maxmissing.recode.vcf -- -p ploidy.txt > final_diploid.vcf
 ```
 Lastly, run vcftools to estimate Fst along the genome.   
-Here, we estimated Fst in 250-SNP tiled windows. But, alternatively you could estimate per-site Fst (i.e. by leaving out window specification below).  
+Here, we estimated Fst for each SNP along the genome.   
+Note: I previously tried estimating Fst in tiled windows, then calculating an empirical p-value using the permuted Fst distribution. But the issue was that I had to make the window size really large (>10 kbp) to get any significant hits after FDR correction. Given that, it seemed better to estimate per-SNP, and do a threshold-based comparision (i.e. candidate SNPs are those >99.9% CI from the permuted distribution.
 
 ```
 cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
@@ -476,9 +477,7 @@ module load bio/vcftools/0.1.16-gcc-11.4.0
 vcftools --vcf final_diploid.vcf \
     --weir-fst-pop CApop1.txt \
     --weir-fst-pop CApop2.txt \
-    --fst-window-size 10000 \
-    --fst-window-step 10000 \
-   --out fst_window_CA
+   --out fst_results_CA
 ```
 
 Repeat for Washington isolates (may not keep as these environmental/clinical isolates are nearly clonal)
@@ -488,9 +487,7 @@ echo -e "WA_1\nB11019\nB11034\nB12398\nB13956\nB15317\nB16692\nB17554" > WApop2.
 vcftools --vcf final_diploid.vcf \
     --weir-fst-pop WApop1.txt \
     --weir-fst-pop WApop2.txt \
-    --fst-window-size 10000 \
-    --fst-window-step 10000 \
-   --out fst_window_WA
+   --out fst_results_WA
 ```
 
 To assess statistical significance, randomly re-shuffle 'population' labels, and re-estimate Fst (repeat 500 times).    

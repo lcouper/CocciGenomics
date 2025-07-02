@@ -531,4 +531,20 @@ done
 Tajima's D provides evidence of different types of selection. Its calculation is based on the site frequency spectrum. Namely, an excess of rare alleles (negative values of Tajima's D) may indiciate purifying/postive selection. An excess of intermediate frequency alleles (positive values of Tajima's D) may indicate balancing selection. Tajiama's D ~ 0 indicates neutral evolution under constant population size.    
 Here, we want to calculate Tajima's D separately for the clinical and environmental samples. It is typically calculcated in moving windows. 
 
+Software used: vcftools/0.1.16-gcc-11.4.0
+Code snippet (run at command line, very fast):
+```
+vcftools --vcf final_diploid.vcf \ # Note, requires this 'diploid' version as input
+  --keep CApop2.txt \ # Names of the clinical CA samples stored in this text file
+  --TajimaD 10000 \
+  --out tajimasD_clinical
+
+vcftools --vcf final_diploid.vcf \ # Note, requires this 'diploid' version as input
+  --keep CApop1.txt \ # Names of the environmental CA samples stored in this text file
+  --TajimaD 10000 \
+  --out tajimasD_environmental
+```
+
+
+
 

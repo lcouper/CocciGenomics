@@ -586,3 +586,6 @@ vcftools \
   --out pi_clinical
 ```
 
+Note: We also calculated Fst, and θπ per SNP, rather than in tiled windows. Then we averaged per-SNP values by gene, using the genome annotation file for C. immitis RS (CimmitisRS.gtf). This part was done in R.
+
+

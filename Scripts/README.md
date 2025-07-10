@@ -589,3 +589,91 @@ vcftools \
 Note: We also calculated Fst, and θπ per SNP, rather than in tiled windows. Then we averaged per-SNP values by gene, using the genome annotation file for C. immitis RS (CimmitisRS.gtf). This part was done in R.
 
 
+## pN/pS calculation 
+
+- Requires multi-sample FASTA, reference genome (RefGenome/CocciRef_GCA_000149335.2.fna), and reference genome annotation file (RefGenome/genomic.gff)
+- Note: this calculation is only done *within* a population (e.g. just the environmental isolates from a single population). In the code below, I've specified specific samples on which to run the calculation. Need to update this for the real version.
+
+**Step 1. Extract coding sequence coordinates by gene**   
+This uses the gene annotation file. Note: Make sure to MERGE overlapping intervals by gene (so just one set of coordinates per gene).
+Script used: pnps/extract_and_merge_cds_coords.sh    
+Code snippet:
+```
+#!/bin/bash
+
+# Set input and output paths
+GFF="RefGenome/genomic.gff"
+OUT="cds_coords_merged.bed"
+
+# Step 1: Extract CDS features
+grep -P '\tCDS\t' "$GFF" > cds_features.gff
+
+# Step 2: Convert to BED format (0-based start, 1-based end)
+awk 'BEGIN{OFS="\t"} {
+  split($9, a, /[;=]/);
+  gene_id = "NA";
+  for (i=1; i<=length(a); i++) {
+    if (a[i] ~ /[Gg]ene[Ii][Dd]/) {
+      gene_id = a[i+1];
+      break
+    } else if (a[i] ~ /^Parent$/) {
+      gene_id = a[i+1];
+    }
+  }
+  print $1, $4 - 1, $5, gene_id
+}' cds_features.gff > cds_coords_raw.bed
+
+# Step 3: Sort BED
+sort -k1,1 -k2,2n cds_coords_raw.bed > cds_coords_sorted.bed
+
+# Step 4: Merge overlapping CDS intervals per gene
+bedtools merge -i cds_coords_sorted.bed -c 4 -o distinct > "$OUT"
+
+# Clean up intermediate files (optional)
+rm cds_features.gff cds_coords_raw.bed cds_coords_sorted.bed
+
+echo "Done. Output written to $OUT"
+```
+
+**Step 2. Generate consensus genomes per sample**. 
+For each sample, apply its variants (from a multisample VCF) to the reference genome to generate a personalized FASTA — i.e., the consensus genome.   
+Script used: generate_consensus.sh   
+Code snippet:
+```
+#!/bin/bash
+#SBATCH --job-name=test_consensus
+#SBATCH --account=fc_envids
+#SBATCH --partition=savio3
+#SBATCH --time=10:00:00
+#SBATCH --output=test.out
+
+## commands to run:
+
+cd /global/scratch/users/lcouper/SoilCocciSeqs/
+
+module load bio/bedtools2/2.31.0-gcc-11.4.0
+module load bio/bcftools/1.16-gcc-11.4.0
+
+VCF=FinalOutputs/final_filtered_maxmissing.vcf.gz
+REF=RefGenome/CocciRef_GCA_000149335.2.masked.fna
+SAMPLES=("13B1" "14B1")
+OUTDIR=/global/scratch/users/lcouper/SoilCocciSeqs/pnps/consensus_genomes_test
+
+mkdir -p "$OUTDIR"
+
+for SAMPLE in "${SAMPLES[@]}"; do
+    echo "Generating consensus genome for $SAMPLE..."
+    bcftools view -c1 -s "$SAMPLE" -Oz -o "$OUTDIR/$SAMPLE.vcf.gz" "$VCF"
+    bcftools index "$OUTDIR/$SAMPLE.vcf.gz"
+
+    bcftools consensus -f "$REF" "$OUTDIR/$SAMPLE.vcf.gz" > "$OUTDIR/$SAMPLE.genome.fa"
+done
+
+echo "✅ Step 1 complete: consensus genomes in $OUTDIR"
+```
+
+
+
+
+
+

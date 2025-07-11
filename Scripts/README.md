@@ -683,7 +683,15 @@ Script: generate_per_sample_gene_vcfs.sh
 **Step 3. Merge to generate one CDS per gene (for each sample)**
 
 Software used: biopython
-Script: merge_cds_fragments.py
+Script: merge_cds_fragments.py   
+Run for a single sample as (for example): python merge_cds_fragments.py consensus_cds_test/UCLA295.raw_cds.fa consensus_cds_test/UCLA295.merged_cds.fa  
+Or batch as:
+```
+for f in consensus_cds_test/*.raw_cds.fa; do
+  sample=$(basename "$f" .raw_cds.fa)
+  python merge_cds_fragments.py "$f" "consensus_cds_test/${sample}.merged_cds.fa"
+done
+```
 
 **Step 4. Translate nucleotide sequences to proteins**  
 

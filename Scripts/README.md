@@ -675,42 +675,46 @@ done
 echo "✅ Step 1 complete: consensus genomes in $OUTDIR"
 ```
 
-**Step 3. Extract CDS sequences from each sample's consensus genome**
+**Step 2.5. Extract CDS sequences from each sample's consensus genome**
 
 Software used: bedtools 2.31.0, bcftools 1.16   
 Script: generate_per_sample_gene_vcfs.sh
 
+**Step 3. Merge to generate one CDS per gene (for each sample)**
 
-**Step 3. Translate nucleotide sequences to proteins**  
+Software used: biopython
+Script: merge_cds_fragments.py
+
+**Step 4. Translate nucleotide sequences to proteins**  
 
 Software used: biopython, python   
 Script: fasta_to_protein.py   
 Note: In the current version, individual samples are specified in this script.    
 *Run as: python fasta_to_protein.py*
 
-**Step 4. Remove any problematic genes**   
+**Step 5. Remove any problematic genes**   
 
 Here, problematic genes are those with internal stop codons (likely due to sequencing errors), and/or >5% missing (coded as Xs). We are removing those here as they will cause issues in downstream steps.   
 Python script used: filter_genes.py    
 *Run as: python fasta_to_protein.py*
 
-**Step 5. Align protein sequence per gene across samples**
+**Step 6. Align protein sequence per gene across samples**
 
 Software used: muscle v3.8. Note the latest versions (v5) was giving issues, hence going with an older release. Program (muscle3.8.31_i86linux32.tar) was manually downloaded [here](https://drive5.com/muscle/downloads_v3.htm).   
 Script used: run_muscle_alignments.py 
 *Run as: run_muscle_alignments.py*
 
-**Step 6. Create per-gene CDS FASTA files across samples**    
+**Step 7. Create per-gene CDS FASTA files across samples**    
 I.e. we need the nucleotide sequence of each gene from each sample. This is required input for PAL2NAL.    
 Script used: generate_cds_by_gene.py
 *Run as: generate_cds_by_gene.py*
 
-**Step 7. Create codon-aware nucleotide alignments**     
+**Step 8. Create codon-aware nucleotide alignments**     
 Software used: pal2nal      
 Note I manually downloaded PAL2NAL from [here](https://www.bork.embl.de/pal2nal/#Download). Then uploaded to BRC, unpacked, and added to my path.    
 Script used: run_pal2nal.sh
 
-**Step 8. Estimate pN/pS**
+**Step 9. Estimate pN/pS**
 Software used: egglib3.0.0     
 Downloaded using: python -m pip install egglib==3.0.0 --user   
 Script used: calculate_pnps_egglib3.py   

@@ -704,7 +704,7 @@ Note: In the current version, individual samples are specified in this script.
 
 Here, problematic genes are those with internal stop codons (likely due to sequencing errors), and/or >5% missing (coded as Xs). We are removing those here as they will cause issues in downstream steps.   
 Python script used: filter_genes.py    
-*Run as: python fasta_to_protein.py*
+*Run as: python filter_genes.py*
 
 **Step 6. Align protein sequence per gene across samples**
 

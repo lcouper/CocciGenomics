@@ -672,6 +672,22 @@ done
 echo "✅ Step 1 complete: consensus genomes in $OUTDIR"
 ```
 
+**Step 3. Translate nucleotide sequences to proteins**  
+
+Software used: biopython, python   
+Script saved in : fasta_to_protein.py   
+Note: In the current version, individual samples are specified in this script.    
+*Run as: python fasta_to_protein.py*
+
+**Step 4. Remove any problematic genes**   
+
+Here, problematic genes are those with internal stop codons (likely due to sequencing errors), and/or >5% missing (coded as Xs). We are removing those here as they will cause issues in downstream steps.   
+Script used: filter_genes.py    
+*Run as: python fasta_to_protein.py*
+
+**Step 5. Align sequences using muscle**
+
+Note muscle program (muscle3.8.31_i86linux32.tar) was manually downloaded (here)[https://drive5.com/muscle/downloads_v3.htm].
 
 
 

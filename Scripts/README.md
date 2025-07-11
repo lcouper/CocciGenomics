@@ -592,7 +592,10 @@ Note: We also calculated Fst, and θπ per SNP, rather than in tiled windows. Th
 ## pN/pS calculation 
 
 - Requires multi-sample FASTA, reference genome (RefGenome/CocciRef_GCA_000149335.2.fna), and reference genome annotation file (RefGenome/genomic.gff)
-- Note: this calculation is only done *within* a population (e.g. just the environmental isolates from a single population). In the code below, I've specified specific samples on which to run the calculation. Need to update this for the real version.
+- Note: this calculation is only done *within* a population (e.g. just the environmental isolates from a single population).
+- In the code below, I've specified specific samples on which to run the calculation.
+- This included (clinical isolates from CA):
+- Or (environmental isolates from CA):
 
 **Step 1. Extract coding sequence coordinates by gene**   
 This uses the gene annotation file. Note: Make sure to MERGE overlapping intervals by gene (so just one set of coordinates per gene).
@@ -700,6 +703,15 @@ Script used: generate_cds_by_gene.py
 Software used: pal2nal      
 Note I manually downloaded PAL2NAL from [here](https://www.bork.embl.de/pal2nal/#Download). Then uploaded to BRC, unpacked, and added to my path.    
 Script used: run_pal2nal.sh
+
+**Step 8. Estimate pN/pS**
+Software used: egglib3.0.0     
+Downloaded using: python -m pip install egglib==3.0.0 --user   
+Script used: calculate_pnps_egglib3.py   
+Note this outputs a file: pnps_results.csv with pn/ps estimates for each gene    
+
+
+
 
 
 

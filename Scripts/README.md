@@ -659,7 +659,7 @@ module load bio/bcftools/1.16-gcc-11.4.0
 
 VCF=FinalOutputs/final_filtered_maxmissing.vcf.gz
 REF=RefGenome/CocciRef_GCA_000149335.2.masked.fna
-SAMPLES=("13B1" "14B1")
+SAMPLES=("SD_1" "SJV_10" "SJV_11" "SJV_2" "SJV_3" "SJV_4" "SJV_5" "SJV_6" "SJV_7" "SJV_8" "SJV_9" "SJV_1" "UCLA293" "UCLA294" "UCLA295")
 OUTDIR=/global/scratch/users/lcouper/SoilCocciSeqs/pnps/consensus_genomes_test
 
 mkdir -p "$OUTDIR"

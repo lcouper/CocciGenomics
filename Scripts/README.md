@@ -675,10 +675,16 @@ done
 echo "✅ Step 1 complete: consensus genomes in $OUTDIR"
 ```
 
+**Step 3. Extract CDS sequences from each sample's consensus genome**
+
+Software used: bedtools 2.31.0, bcftools 1.16   
+Script: generate_per_sample_gene_vcfs.sh
+
+
 **Step 3. Translate nucleotide sequences to proteins**  
 
 Software used: biopython, python   
-Script saved in : fasta_to_protein.py   
+Script: fasta_to_protein.py   
 Note: In the current version, individual samples are specified in this script.    
 *Run as: python fasta_to_protein.py*
 

@@ -691,14 +691,14 @@ Software used: muscle v3.8. Note the latest versions (v5) was giving issues, hen
 Script used: run_muscle_alignments.py 
 *Run as: run_muscle_alignments.py*
 
-**Step 6. Create per-gene CDS FASTA files across samples**
+**Step 6. Create per-gene CDS FASTA files across samples**    
 I.e. we need the nucleotide sequence of each gene from each sample. This is required input for PAL2NAL.    
 Script used: generate_cds_by_gene.py
 *Run as: generate_cds_by_gene.py*
 
-**Step 7. Create codon-aware nucleotide alignments**
-Software used: pal2nal
-Note I manually downloaded PAL2NAL from [here](https://www.bork.embl.de/pal2nal/#Download). Then uploaded to BRC, unpacked, and added to my path.  
+**Step 7. Create codon-aware nucleotide alignments**     
+Software used: pal2nal      
+Note I manually downloaded PAL2NAL from [here](https://www.bork.embl.de/pal2nal/#Download). Then uploaded to BRC, unpacked, and added to my path.    
 Script used: run_pal2nal.sh
 
 

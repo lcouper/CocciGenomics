@@ -597,8 +597,8 @@ Note: We also calculated Fst, and θπ per SNP, rather than in tiled windows. Th
 - This included (clinical isolates from CA):
 - Or (environmental isolates from CA):
 
-**Step 1. Extract coding sequence coordinates by gene**   
-This uses the gene annotation file. Note: Make sure to MERGE overlapping intervals by gene (so just one set of coordinates per gene).
+**Step 1. (only need to run once) Extract coding sequence coordinates by gene**     
+This uses the gene annotation file.     Note: Make sure to MERGE overlapping intervals by gene (so just one set of coordinates per gene).   
 Script used: pnps/extract_and_merge_cds_coords.sh    
 Code snippet:
 ```

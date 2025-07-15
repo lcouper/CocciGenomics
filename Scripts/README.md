@@ -572,20 +572,18 @@ Code snippet (run at command line, very fast):
 vcftools \
   --vcf final_diploid.vcf \
   --keep CApop1.txt \
-  --window-pi 100000 \
-  --window-pi-step 100000 \
+  --window-pi 10000 \
+  --window-pi-step 10000 \
   --out pi_environmental
 
 # For clinical isolates
 vcftools \
   --vcf final_diploid.vcf \
   --keep CApop2.txt \
-  --window-pi 100000 \
-  --window-pi-step 100000 \
+  --window-pi 10000 \
+  --window-pi-step 10000 \
   --out pi_clinical
 ```
-
-Note: We also calculated Fst, and θπ per SNP, rather than in tiled windows. Then we averaged per-SNP values by gene, using the genome annotation file for C. immitis RS (CimmitisRS.gtf). This part was done in R.
 
 
 ## pN/pS calculation 

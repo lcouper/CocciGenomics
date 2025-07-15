@@ -352,7 +352,7 @@ chmod +x structure  # May be necessary to run first if getting permission denied
 ```
 Note the parameters listed in mainparams, and the format of the tester2.str are very specific. Copy/follow the versions attached here when running this analysis for real.    
 
-Note that I did provide population identifiers, based on population structure observed in the PCA
+Note that I did provide population identifiers, based on population structure observed in the PCA, BUT I did not use this popinfo to inform the clustering in STRUCTURE (i.e. the clustering was unsupervised) 
 
 Some relevant parameters from mainparams2:
 ```

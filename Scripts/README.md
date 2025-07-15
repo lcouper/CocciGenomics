@@ -468,8 +468,7 @@ module load bio/bcftools/1.16-gcc-11.4.0
 bcftools +fixploidy final_filtered_maxmissing.recode.vcf -- -p ploidy.txt > final_diploid.vcf
 ```
 Lastly, run vcftools to estimate Fst along the genome.   
-Here, we estimated Fst for each SNP along the genome.   
-Note: I previously tried estimating Fst in tiled windows, then calculating an empirical p-value using the permuted Fst distribution. But the issue was that I had to make the window size really large (>10 kbp) to get any significant hits after FDR correction. Given that, it seemed better to estimate per-SNP, and do a threshold-based comparision (i.e. candidate SNPs are those >99.9% CI from the permuted distribution.
+Here, we estimated Fst in 10 kb windows along the genome.   
 
 ```
 cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
@@ -477,7 +476,7 @@ module load bio/vcftools/0.1.16-gcc-11.4.0
 vcftools --vcf final_diploid.vcf \
     --weir-fst-pop CApop1.txt \
     --weir-fst-pop CApop2.txt \
-    --fst-window-size 100000 \
+    --fst-window-size 10000 \
     --out fst_100kbp_window_CA
 ```
 

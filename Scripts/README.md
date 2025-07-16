@@ -468,7 +468,18 @@ module load bio/bcftools/1.16-gcc-11.4.0
 bcftools +fixploidy final_filtered_maxmissing.recode.vcf -- -p ploidy.txt > final_diploid.vcf
 ```
 Lastly, run vcftools to estimate Fst along the genome.   
-Here, we estimated Fst in 10 kb windows along the genome.   
+Here, we estimated Fst per site, then took averages by gene in R
+
+```
+vcftools --vcf final_diploid.vcf \
+    --weir-fst-pop CApop1.txt \
+    --weir-fst-pop CApop2.txt \
+    --out fst_per_site_CA
+```
+
+
+
+[old, window based approach]
 
 ```
 cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
@@ -557,7 +568,13 @@ vcftools --vcf final_diploid.vcf \ # Note, requires this 'diploid' version as in
 ## Nucleotide diversity, θπ
 
 θπ is the average number of pairwise differences *per site* between all sequences in a population.   
-Here, we want to calculate θπ separately for clinical and environmental isolates from CA.    
+Here, we want to calculate θπ separately for clinical and environmental isolates from CA.       
+Note that we are calculating this statistic PER SITE, but we will calculate the average per gene in R.  
+**Key note: Pi is only calculated on variant sites. Thus if you calculate averages per gene, values will be inflated because it assumes non-variant sites were also included. SO, in order to normalize for these non-variant sites, you need to identify the 'callable regions'.  We did this using:   
+extract_callable_regions.py (python script in RefGenonme directory)
+
+
+
 
 | Interpretation of θπ | Description |
 |-----------------------------|-------------|
@@ -569,11 +586,28 @@ Software used:  vcftools/0.1.16-gcc-11.4.0
 Code snippet (run at command line, very fast):  
 ```
 # For environmental isolates
+vcftools --vcf final_diploid.vcf \
+  --keep CApop1.txt \
+  --site-pi \
+  --max-missing 0.9 \
+  --out pi_environmental_sitewise
+
+# For clnical isolates
+vcftools --vcf final_diploid.vcf \
+  --keep CApop2.txt \
+  --site-pi \
+  --max-missing 0.9 \
+  --out pi_clinical_sitewise
+```
+
+[original window-based approach on scg that was not working]
+```
 vcftools \
   --vcf final_diploid.vcf \
   --keep CApop1.txt \
   --window-pi 10000 \
   --window-pi-step 10000 \
+  --max-missing 0.9 \
   --out pi_environmental
 
 # For clinical isolates
@@ -582,6 +616,7 @@ vcftools \
   --keep CApop2.txt \
   --window-pi 10000 \
   --window-pi-step 10000 \
+  --max-missing 0.9 \
   --out pi_clinical
 ```
 

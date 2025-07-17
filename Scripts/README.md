@@ -760,6 +760,10 @@ Downloaded using: python -m pip install egglib==3.0.0 --user
 Script used: calculate_pnps_egglib3.py   
 Note this outputs a file: pnps_results.csv with pn/ps estimates for each gene    
 
+### Investigating gene function and GO terms
+
+Search Gene ID here on NCBI gene search, i.e. here: https://www.ncbi.nlm.nih.gov/gene/?term=Coccidioides+immitis+CIMG_02011 
+
 
 
 

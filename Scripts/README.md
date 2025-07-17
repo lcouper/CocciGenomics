@@ -672,7 +672,8 @@ echo "Done. Output written to $OUT"
 
 **Step 2. Generate consensus genomes per sample**. 
 For each sample, apply its variants (from a multisample VCF) to the reference genome to generate a personalized FASTA — i.e., the consensus genome.   
-Script used: generate_consensus.sh   
+Script used: generate_consensus_clin.sh
+or generate_consensus_envr.sh
 Code snippet:
 ```
 #!/bin/bash
@@ -710,7 +711,7 @@ echo "✅ Step 1 complete: consensus genomes in $OUTDIR"
 **Step 2.5. Extract CDS sequences from each sample's consensus genome**
 
 Software used: bedtools 2.31.0, bcftools 1.16   
-Script: generate_per_sample_gene_vcfs.sh
+Script: generate_per_sample_gene_vcfs.sh or generate_per_sample_gene_vcfs_envr.sh
 
 **Step 3. Merge to generate one CDS per gene (for each sample)**
 
@@ -724,41 +725,48 @@ for f in consensus_cds_test/*.raw_cds.fa; do
   python merge_cds_fragments.py "$f" "consensus_cds_test/${sample}.merged_cds.fa"
 done
 ```
+Or, for environmental samples:
+```
+for f in consensus_cds_envr/*.raw_cds.fa; do
+  sample=$(basename "$f" .raw_cds.fa)
+  python merge_cds_fragments.py "$f" "consensus_cds_envr/${sample}.merged_cds.fa"
+done
+```
 
 **Step 4. Translate nucleotide sequences to proteins**  
 
 Software used: biopython, python   
-Script: fasta_to_protein.py   
+Script: fasta_to_protein.py or fasta_to_protein_envr.py   
 Note: In the current version, individual samples are specified in this script.    
 *Run as: python fasta_to_protein.py*
 
 **Step 5. Remove any problematic genes**   
 
 Here, problematic genes are those with internal stop codons (likely due to sequencing errors), and/or >5% missing (coded as Xs). We are removing those here as they will cause issues in downstream steps.   
-Python script used: filter_genes.py    
+Python script used: filter_genes.py or filter_genes_envr.py
 *Run as: python filter_genes.py*
 
 **Step 6. Align protein sequence per gene across samples**
 
 Software used: muscle v3.8. Note the latest versions (v5) was giving issues, hence going with an older release. Program (muscle3.8.31_i86linux32.tar) was manually downloaded [here](https://drive5.com/muscle/downloads_v3.htm).   
-Script used: run_muscle_alignments.py     
-*Run as: run_muscle_alignments.py*
+Script used: run_muscle_alignments.py or run_muscle_alignments_envr.py     
+*Run as: run_muscle_alignments.py*    Note this one takes ~10 minutes to run
 
 **Step 7. Create per-gene CDS FASTA files across samples**    
 I.e. we need the nucleotide sequence of each gene from each sample. This is required input for PAL2NAL.    
-Script used: generate_cds_by_gene.py    
+Script used: generate_cds_by_gene.py or generate_cds_by_gene_envr.py 
 *Run as: generate_cds_by_gene.py*
 
 **Step 8. Create codon-aware nucleotide alignments**     
 Software used: pal2nal      
 Note I manually downloaded PAL2NAL from [here](https://www.bork.embl.de/pal2nal/#Download). Then uploaded to BRC, unpacked, and added to my path.       
-Script used: run_pal2nal.sh
+Script used: run_pal2nal.sh or run_pal2nal_envr.sh
 
 **Step 9. Estimate pN/pS**
 Software used: egglib3.0.0     
 Downloaded using: python -m pip install egglib==3.0.0 --user   
-Script used: calculate_pnps_egglib3.py   
-Note this outputs a file: pnps_results.csv with pn/ps estimates for each gene    
+Script used: calculate_pnps_egglib3.py or calculate_pnps_egglib3_envr.py 
+Note this outputs a file: pnps_results.csv (or pnps_results_envr.csv) with pn/ps estimates for each gene    
 
 ### Investigating gene function and GO terms
 

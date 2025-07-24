@@ -40,7 +40,7 @@ fastp \
   --html PS02PN14_fastp_report.html --thread 4
 ```
 
-#*NOTE: DOWNSTREAM STEPS NOT YET ADJUSTED GIVEN THIS READ LENGTH NORMALIZATION!!*
+# *NOTE: DOWNSTREAM STEPS NOT YET ADJUSTED GIVEN THIS READ LENGTH NORMALIZATION!!*
 
 
 ### 3. Perform quality check on samples using fastqc

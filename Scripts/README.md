@@ -23,6 +23,26 @@ PS02PN14-1_S1_L007_R2_001.trim.fastq.gz PS02PN14-1_S1_L007_R2_001.untrim.fastq.g
 ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:35 SLIDINGWINDOW:4:15
 ```
 
+### 3. Normalize read lengths to 75 across all genomes 
+
+Note: this is because there is variation in sequenced read lengths across genomes (ours are all 150bp paired end, but prior genomes vary from 75 - 300 bp PE). We want to normalize to the lowest common denominator -- here 75 bp.
+
+Software used: fastp v 1.0.1 (manually installed from [here](https://github.com/OpenGene/fastp). 
+Relevant code snippet:
+```
+fastp \
+  -i PS02PN14-1_S1_L007_R1_001.trim.fastq \
+  -I PS02PN14-1_S1_L007_R2_001.trim.fastq \
+  -o PS02PN14-1_S1_L007_R1_001.len75.trim.fastq \
+  -O PS02PN14-1_S1_L007_R2_001.len75.trim.fastq \
+  --max_len1 75 --max_len2 75 \
+  --length_required 75 \
+  --html PS02PN14_fastp_report.html --thread 4
+```
+
+#*NOTE: DOWNSTREAM STEPS NOT YET ADJUSTED GIVEN THIS READ LENGTH NORMALIZATION!!*
+
+
 ### 3. Perform quality check on samples using fastqc
 
 Software used: bio/fastqc/0.12.1-gcc-11.4.0   

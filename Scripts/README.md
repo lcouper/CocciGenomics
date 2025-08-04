@@ -193,7 +193,7 @@ awk 'BEGIN { total = 0; count = 0 } { total += $3; count += 1; } END { avg = tot
 
 ### 9b. Optional: Calculate % of genome covered at >10x depth
 
-Software used: bio/bedtools2/2.31.0-gcc-11.4.0    
+Software used: bio/bedtools2/2.31.0-gcc-11.4.0, bio/samtools/1.17-gcc-11.4.0    
 Script: depth10x.sbatch    
 Code snippet:    
 ```

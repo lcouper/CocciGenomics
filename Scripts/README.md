@@ -191,6 +191,27 @@ To calculate the mean depth from this file:
 awk 'BEGIN { total = 0; count = 0 } { total += $3; count += 1; } END { avg = total / count; print avg} ' results/bam/58B1.depth.txt
 ```
 
+### 9b. Optional: Calculate % of genome covered at >10x depth
+
+Software used: bio/bedtools2/2.31.0-gcc-11.4.0    
+Script: depth10x.sbatch    
+Code snippet:    
+```
+# 1. Compute depth
+  samtools depth -a "$bam" > "$BAM_DIR/${sample}.depth"
+
+  # 2. Filter for depth >=10
+  awk '$3 >= 10 {print $1, $2-1, $2}' OFS="\t" "$BAM_DIR/${sample}.depth" > "$BAM_DIR/${sample}_covered10x.bed"
+
+  # 3. Intersect with callable positions
+  bedtools intersect -u -a "$CALLABLE_BED" -b "$BAM_DIR/${sample}_covered10x.bed" > "$BAM_DIR/${sample}_covered10x_callabl>
+
+  # 4. Count intersected lines
+  covered_callable=$(wc -l < "$BAM_DIR/${sample}_covered10x_callable.bed")
+
+  # 5. Compute percent covered
+  percent=$(echo "scale=2; $covered_callable / $total_callable * 100" | bc)
+```
 
 ### 10. Mark and remove duplicates 
 
@@ -792,6 +813,7 @@ Note this outputs a file: pnps_results.csv (or pnps_results_envr.csv) with pn/ps
 ### Investigating gene function and GO terms
 
 Search Gene ID here on NCBI gene search, i.e. here: https://www.ncbi.nlm.nih.gov/gene/?term=Coccidioides+immitis+CIMG_02011 
+
 
 
 

@@ -27,8 +27,8 @@ ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:35 SLIDINGWINDOW:
 
 Note: this is because there is variation in sequenced read lengths across genomes (ours are all 150bp paired end, but prior genomes vary from 75 - 300 bp PE). We want to normalize to the lowest common denominator -- here 75 bp.
 
-Software used: fastp v 1.0.1 (manually installed from [here](https://github.com/OpenGene/fastp). 
-Scripts: run_fastp_len75.sbatch, run_fastp_len75_b.sbatch     
+Software used: fastp v 1.0.1 (manually installed from [here](https://github.com/OpenGene/fastp).    
+Scripts: run_fastp_len75.sbatch, run_fastp_len75_b.sbatch       
 Relevant code snippet:
 ```
 fastp \

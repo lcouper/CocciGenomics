@@ -73,7 +73,7 @@ fastp \
   --html PS02PN14_fastp_report.html --thread 4
 ```
 
-### 3. Perform quality check on samples using fastqc
+### 4. Optional: Perform quality check on samples using fastqc
 
 Software used: bio/fastqc/0.12.1-gcc-11.4.0   
 Script: fastqc.sh, fastqc.sra.sh        
@@ -116,7 +116,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -SORT_ORDER coordinate
 ```
 
-### 7. Extract mapping and coverage statistics 
+### 7. Optional: Extract mapping and coverage statistics 
 
 Software used: samtools, java   
 Script name: MappingStats.sh, MappingStatsSRA.sh    

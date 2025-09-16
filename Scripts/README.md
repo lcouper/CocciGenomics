@@ -1,4 +1,4 @@
-# Steps and scripts used to process _Coccidioides_ genomes (both newly sequenced and sequences downloaded from SRA) ### 
+# Steps and scripts used to process _Coccidioides_ sequences (both newly sequenced and those downloaded from SRA) ### 
 
 ## Prepare reference genome (only need to do once) 
 #### 1a Mask repeats in reference genome   

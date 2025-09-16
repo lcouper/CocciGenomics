@@ -1,5 +1,37 @@
-## Steps and scripts used to process _Coccidioides_ genomes from environmental samples or Sequence Read Archive ### 
+# Steps and scripts used to process _Coccidioides_ genomes from environmental samples or Sequence Read Archive ### 
 
+## Prepare reference genome (only need to do once) 
+#### 1a Mask repeats in reference genome   
+
+Using reference genome for Coccidioides immitis RS (GCA_000149335.2)   
+Downloaded here: https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000149335.2/  
+Using repeat library available here:   
+Purpose: Repetitive regions can lead to issues with reference alignment and variant calling    
+Software used: repeatmasker/4.1.0   *Note: need to use this and not the newest version*   
+Script: repeastmasker.sh *Note: this step done on SCG instead of Savio*    
+Command:
+
+```
+RepeatMasker -pa 16 -lib immitis_repeats.fa --norna CocciRef_GCA_000149335.2.fna
+```
+
+#### 1b. Index reference genome  
+
+Purpose: Enables quick access to specific locations of the genome (like the index of a book)   
+Software used: bio/bwa-mem2/2.2.1    
+Script name: bwamem_index.sh      
+Command:      
+
+```
+bwa-mem2 index CocciRef_GCA_000149335.2.fna.masked
+```
+
+Alternatively, 
+Software used: bio/samtools/1.17-gcc-11.4.0  
+```
+samtools faidx CocciRef_GCA_000149335.2.masked.fna
+```
+## Prepare samples
 ### 1. Obtained raw reads from Berkeley QB3 or SRA.  
 
 The fastq.gz files (1 forward, 1 reverse) are stored here on the Remais Group Shared Drive: SPORE/WGS/Sequence data (All)/ 
@@ -41,9 +73,6 @@ fastp \
   --html PS02PN14_fastp_report.html --thread 4
 ```
 
-# *NOTE: DOWNSTREAM STEPS on our environmental genomes have not yet been adjust based on this. Some downstreams steps have been done for clinical genomes *
-
-
 ### 3. Perform quality check on samples using fastqc
 
 Software used: bio/fastqc/0.12.1-gcc-11.4.0   
@@ -52,37 +81,6 @@ Relevant code snippet:
 ```
 module load bio/fastqc/0.12.1-gcc-11.4.0
 fastqc trimmed_fastqc/*.fastq.gz
-```
-
-### 4. Mask repeats in reference genome   
-
-Using reference genome for Coccidioides immitis RS (GCA_000149335.2)   
-Downloaded here: https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000149335.2/  
-Using repeat library available here:   
-Purpose: Repetitive regions can lead to issues with reference alignment and variant calling    
-Software used: repeatmasker/4.1.0   *Note: need to use this and not the newest version*   
-Script: repeastmasker.sh *Note: this step done on SCG instead of Savio*    
-Command:
-
-```
-RepeatMasker -pa 16 -lib immitis_repeats.fa --norna CocciRef_GCA_000149335.2.fna
-```
-
-### 4. Index reference genome  
-
-Purpose: Enables quick access to specific locations of the genome (like the index of a book)   
-Software used: bio/bwa-mem2/2.2.1    
-Script name: bwamem_index.sh      
-Command:      
-
-```
-bwa-mem2 index CocciRef_GCA_000149335.2.fna.masked
-```
-
-Alternatively, 
-Software used: bio/samtools/1.17-gcc-11.4.0  
-```
-samtools faidx CocciRef_GCA_000149335.2.masked.fna
 ```
 
 ### 5. Align sequences to reference genome    

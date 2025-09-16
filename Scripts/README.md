@@ -1,7 +1,7 @@
 # Steps and scripts used to process _Coccidioides_ sequences (both newly sequenced and those downloaded from SRA) ### 
 
 ## Prepare reference genome (only need to do once) 
-#### 1a Mask repeats in reference genome   
+#### 1a. Mask repeats in reference genome   
 
 Using reference genome for Coccidioides immitis RS (GCA_000149335.2)   
 Downloaded here: https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000149335.2/  

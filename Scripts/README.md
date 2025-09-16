@@ -145,8 +145,9 @@ and issue was diagnosed [here](https://gatk.broadinstitute.org/hc/en-us/communit
 
 Purpose: Organize sequence data by library prep batch and sequencing runs parameters   
 Software used: bio/picard/3.0.0-gcc-11.4.0, java  
-Script name: addrg.sbatch   
-Code snippet:
+Script name: addrg_loop.sbatch, addrgsrsa_loop.sbatch   (note to run in loop: upload tsv with read group info for all samples)   
+Otherwise (single sample): addrg.sbatch, addrgsra.sbatch   
+Code snippet for single sample:  
 
 ```
 module load java

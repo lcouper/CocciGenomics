@@ -345,8 +345,84 @@ vcftools --gzvcf final.vcf.gz \
 Number of SNPs retained: 64,471. With C. posadasii : 64,767
 
 
+## Additional downstream analyses 
 
-### 17. Construct phylogenetic tree 
+### Fst differentiation between clinical and environmental isolates
+
+First, created pop1 and pop2 txt files indicating assignment to environmental or clinical 'populations'. I focused on only California samples to avoid spurious detection due to demographic processes. 
+
+California isolates:
+```
+echo -e "13B1\n14B1\n22AC2\n22BC1\34B2\n58B1\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3" > CApop1.txt
+echo -e "SD_1\nSJV_1\nSJV_10\nSJV_11\nSJV_2\nSJV_3\nSJV_4\nSJV_5\nSJV_6\nSJV_7\nSJV_8\nSJV_9\nUCLA293\nUCLA294\nUCLA295" > CApop2.txt
+```
+Then, I converted my final.vcf file to a pseudo-diploid genotype (as haploid genotypes are not natively supported by vcftools)
+```
+# First, create a 'ploidy' file to tell vcftools which part of the chromsome to consider haploid. Here, we are specificying all positions (by using large value of 999999999)
+echo "* 0 999999999 . 2" > ploidy.txt
+
+# Next, use the bcftools plug-in to correct ploidy across all sites (as specificed in the ploidy.txt file above)
+module load bio/bcftools/1.16-gcc-11.4.0
+bcftools +fixploidy final_filtered_maxmissing.recode.vcf -- -p ploidy.txt > final_diploid.vcf
+```
+Lastly, run vcftools to estimate Fst along the genome.   
+Here, we estimated Fst per site, then took averages by gene in R
+
+```
+vcftools --vcf final_diploid.vcf \
+    --weir-fst-pop CApop1.txt \
+    --weir-fst-pop CApop2.txt \
+    --out fst_per_site_CA
+```
+
+[old, window based approach]
+
+```
+cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
+module load bio/vcftools/0.1.16-gcc-11.4.0
+vcftools --vcf final_diploid.vcf \
+    --weir-fst-pop CApop1.txt \
+    --weir-fst-pop CApop2.txt \
+    --fst-window-size 10000 \
+    --out fst_100kbp_window_CA
+```
+
+To assess statistical significance, randomly re-shuffle 'population' labels, and re-estimate Fst (repeat 500 times).    
+
+```
+cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
+
+module load bio/vcftools/0.1.16-gcc-11.4.0
+
+# number of permutations
+nperm=500
+
+# file with all sample IDs
+samples=all_samples.txt
+
+# number of samples in group 1 (e.g., environmental)
+group1_n=10
+
+mkdir -p perm_fst
+
+for i in $(seq 1 $nperm); do
+  echo "Permutation $i"
+
+  # Shuffle and split samples
+  shuf $samples > perm_fst/tmp_samples.txt
+  head -n $group1_n perm_fst/tmp_samples.txt > perm_fst/group1.txt
+  tail -n +$((group1_n + 1)) perm_fst/tmp_samples.txt > perm_fst/group2.txt
+
+ # Run Fst
+  vcftools --vcf final_diploid.vcf \
+    --weir-fst-pop perm_fst/group1.txt \
+    --weir-fst-pop perm_fst/group2.txt \
+    --out perm_fst/fst_perm_$i \
+    --stdout | grep -v "^#" | awk -v i=$i '{print $1, $2, $3, i}' >> perm_fst/fst_all_perms.txt
+done
+```
+
+### Construct phylogenetic tree 
 
 ** Note: In order to root the phylogenetic tree, we used the C. posadasii Silveira strain [SRR9644374](https://www.ncbi.nlm.nih.gov/biosample/?term=SRS007089) **
 These fastqs were then taken through the same steps as all other samples above (e.g. starting from step 1)   
@@ -381,7 +457,7 @@ iqtree3 -s final_withCp.min4.phy \
 One option for visualizing tree (but note we visualized in R using ggree):   
 https://itol.embl.de/tree/136152214211185591747337347
 
-### 18. Assess population structure 
+### Assess population structure 
 
 Conducted using STRUCTURE v 2.3.4
 Downloaded version for MacOS without front end [here](https://web.stanford.edu/group/pritchardlab/structure_software/release_versions/v2.3.4/html/structure.html): 
@@ -424,7 +500,6 @@ Data file format
 #define LOCDATA   0     // (B) Input file contains a location identifier
 ```
 
-# Additional downstream analyses 
 
 ### Scaffolding SNPs into genes 
 
@@ -489,97 +564,7 @@ module load spades/4.1.0 # Note that spades requires a more recent version of py
 spades.py -1 SJV_9_1.fastq -2 SJV_9_2.fastq -o SJV_9_spades_output
 ```
 
-
-## Fst differentiation between clinical and environmental isolates
-
-First, created pop1 and pop2 txt files indicating assignment to environmental or clinical 'populations'. I first focused on only California samples to avoid spurious detection due to demographic processes. I then re-ran the analysis using only Washington samples to investigate how the Fst-outlier loci identified for California compared to those identified for Washington. 
-
-California isolates:
-```
-echo -e "13B1\n14B1\n22AC2\n22BC1\34B2\n58B1\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3" > CApop1.txt
-echo -e "SD_1\nSJV_1\nSJV_10\nSJV_11\nSJV_2\nSJV_3\nSJV_4\nSJV_5\nSJV_6\nSJV_7\nSJV_8\nSJV_9\nUCLA293\nUCLA294\nUCLA295" > CApop2.txt
-```
-Then, I converted my final.vcf file to a pseudo-diploid genotype (as haploid genotypes are not natively supported by vcftools)
-```
-# First, create a 'ploidy' file to tell vcftools which part of the chromsome to consider haploid. Here, we are specificying all positions (by using large value of 999999999)
-echo "* 0 999999999 . 2" > ploidy.txt
-
-# Next, use the bcftools plug-in to correct ploidy across all sites (as specificed in the ploidy.txt file above)
-module load bio/bcftools/1.16-gcc-11.4.0
-bcftools +fixploidy final_filtered_maxmissing.recode.vcf -- -p ploidy.txt > final_diploid.vcf
-```
-Lastly, run vcftools to estimate Fst along the genome.   
-Here, we estimated Fst per site, then took averages by gene in R
-
-```
-vcftools --vcf final_diploid.vcf \
-    --weir-fst-pop CApop1.txt \
-    --weir-fst-pop CApop2.txt \
-    --out fst_per_site_CA
-```
-
-
-
-[old, window based approach]
-
-```
-cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
-module load bio/vcftools/0.1.16-gcc-11.4.0
-vcftools --vcf final_diploid.vcf \
-    --weir-fst-pop CApop1.txt \
-    --weir-fst-pop CApop2.txt \
-    --fst-window-size 10000 \
-    --out fst_100kbp_window_CA
-```
-
-Repeat for Washington isolates (may not keep as these environmental/clinical isolates are nearly clonal)
-```
-echo -e "A391\nA432\nA501\nA502\nWA_202\nWA_205\nWA_211\nWA_212\nWA_221" > WApop1.txt
-echo -e "WA_1\nB11019\nB11034\nB12398\nB13956\nB15317\nB16692\nB17554" > WApop2.txt
-vcftools --vcf final_diploid.vcf \
-    --weir-fst-pop WApop1.txt \
-    --weir-fst-pop WApop2.txt \
-    --fst-window-size 100000 \
-   --out fst_100kbp_window_WA
-```
-
-To assess statistical significance, randomly re-shuffle 'population' labels, and re-estimate Fst (repeat 500 times).    
-
-```
-cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
-
-module load bio/vcftools/0.1.16-gcc-11.4.0
-
-# number of permutations
-nperm=500
-
-# file with all sample IDs
-samples=all_samples.txt
-
-# number of samples in group 1 (e.g., environmental)
-group1_n=10
-
-mkdir -p perm_fst
-
-for i in $(seq 1 $nperm); do
-  echo "Permutation $i"
-
-  # Shuffle and split samples
-  shuf $samples > perm_fst/tmp_samples.txt
-  head -n $group1_n perm_fst/tmp_samples.txt > perm_fst/group1.txt
-  tail -n +$((group1_n + 1)) perm_fst/tmp_samples.txt > perm_fst/group2.txt
-
- # Run Fst
-  vcftools --vcf final_diploid.vcf \
-    --weir-fst-pop perm_fst/group1.txt \
-    --weir-fst-pop perm_fst/group2.txt \
-    --out perm_fst/fst_perm_$i \
-    --stdout | grep -v "^#" | awk -v i=$i '{print $1, $2, $3, i}' >> perm_fst/fst_all_perms.txt
-done
-```
-
-
-## Tajima's D 
+### Tajima's D 
 
 Tajima's D provides evidence of different types of selection. Its calculation is based on the site frequency spectrum.   
 
@@ -606,15 +591,13 @@ vcftools --vcf final_diploid.vcf \ # Note, requires this 'diploid' version as in
   --out tajimasD_environmental
 ```
 
-## Nucleotide diversity, θπ
+### Nucleotide diversity, θπ
 
 θπ is the average number of pairwise differences *per site* between all sequences in a population.   
 Here, we want to calculate θπ separately for clinical and environmental isolates from CA.       
 Note that we are calculating this statistic PER SITE, but we will calculate the average per gene in R.  
 **Key note: Pi is only calculated on variant sites. Thus if you calculate averages per gene, values will be inflated because it assumes non-variant sites were also included. SO, in order to normalize for these non-variant sites, you need to identify the 'callable regions'.  We did this using:   
 extract_callable_regions.py (python script in RefGenonme directory)
-
-
 
 
 | Interpretation of θπ | Description |

@@ -327,7 +327,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -O final.vcf.gz
 ```
 
-### 16. Keep only sites with >=90% genotyped samples
+### 16. Keep only sites with >=90% samples genotyped 
 
 Software used: vcftools/0.1.16-gcc-11.4.0
 Script: NA (command line. Runs fast)

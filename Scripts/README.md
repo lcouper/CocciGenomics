@@ -342,7 +342,7 @@ vcftools --gzvcf final.vcf.gz \
   --out final_filtered_maxmissing
 ```
 
-Number of SNPs retained: 64,471. With C. posadasii : 64,767
+Number of SNPs retained: 56,944. With C. posadasii: 57,601
 
 
 ## Additional downstream analyses 

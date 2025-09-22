@@ -193,23 +193,26 @@ awk 'BEGIN { total = 0; count = 0 } { total += $3; count += 1; } END { avg = tot
 ### 9b. Optional: Calculate % of genome covered at >10x depth
 
 Software used: bio/bedtools2/2.31.0-gcc-11.4.0, bio/samtools/1.17-gcc-11.4.0    
-Script: depth10x.sbatch    
+Script: depth10x.sbatch, depth10x_sra.sbatch    
 Code snippet:    
 ```
-# 1. Compute depth
-  samtools depth -a "$bam" > "$BAM_DIR/${sample}.depth"
+# Note, we are only considering 'callable' bases in our count here
+# i.e., excluding masked bases
 
-  # 2. Filter for depth >=10
-  awk '$3 >= 10 {print $1, $2-1, $2}' OFS="\t" "$BAM_DIR/${sample}.depth" > "$BAM_DIR/${sample}_covered10x.bed"
+for bam in "$BAM_DIR"/*.deduped.bam; do
+  sample=$(basename "$bam" .deduped.bam)
+  echo "Processing $sample..."
 
-  # 3. Intersect with callable positions
-  bedtools intersect -u -a "$CALLABLE_BED" -b "$BAM_DIR/${sample}_covered10x.bed" > "$BAM_DIR/${sample}_covered10x_callabl>
+  # ensure BAM is indexed (skip if .bai exists)
+  [[ -f "${bam}.bai" || -f "${bam%.bam}.bai" ]] || samtools index -@ 8 "$bam"
 
-  # 4. Count intersected lines
-  covered_callable=$(wc -l < "$BAM_DIR/${sample}_covered10x_callable.bed")
+  # stream depths only within callable regions; count total callable bases and ≥10×
+  percent=$(samtools depth -a -@ 8 -b "$CALLABLE_BED" "$bam" \
+    | awk 'BEGIN{tot=0; ge10=0} {tot++; if($3>=10) ge10++} END{if(tot>0) printf("%.2f", 100*ge10/tot); else print "NA"}')
 
-  # 5. Compute percent covered
-  percent=$(echo "scale=2; $covered_callable / $total_callable * 100" | bc)
+  echo -e "${sample}\t${percent}" >> "$OUTFILE"
+done
+
 ```
 
 ### 10. Mark and remove duplicates 

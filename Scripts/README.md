@@ -375,33 +375,18 @@ vcftools --vcf final_diploid.vcf \
     --out fst_per_site_CA
 ```
 
-[old, window based approach]
-
+To assess statistical significance, randomly re-shuffle 'population' labels, and re-estimate Fst (repeat 500 times).     
+Script: fst_perm.sbatch   
+Code snippet:
 ```
-cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
-module load bio/vcftools/0.1.16-gcc-11.4.0
-vcftools --vcf final_diploid.vcf \
-    --weir-fst-pop CApop1.txt \
-    --weir-fst-pop CApop2.txt \
-    --fst-window-size 10000 \
-    --out fst_100kbp_window_CA
-```
-
-To assess statistical significance, randomly re-shuffle 'population' labels, and re-estimate Fst (repeat 500 times).    
-
-```
-cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
-
-module load bio/vcftools/0.1.16-gcc-11.4.0
-
 # number of permutations
-nperm=500
+nperm=5000
 
 # file with all sample IDs
 samples=all_samples.txt
 
 # number of samples in group 1 (e.g., environmental)
-group1_n=10
+group1_n=15
 
 mkdir -p perm_fst
 

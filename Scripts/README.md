@@ -102,6 +102,10 @@ trimmed_fastq/${base}_R1_001.trim.fastq trimmed_fastq/${base}_R2_001.trim.fastq 
 done
 ```
 
+
+
+** NOTE : NEED TO REMOVE SAMPLE 44A2 if not done already **
+
 ### 6. Sort and convert to bam
 
 Compress sam to bam and sort bam file     

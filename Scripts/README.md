@@ -171,7 +171,7 @@ samtools view -H results/bam/14B1.rg.bam
 
 To compute depth at each position of the genome:   
 Software used: bio/samtools/1.17-gcc-11.4.0   
-Script name: computedepth.sbatch
+Script name: computedepth.sbatch, computedepth_sra.sbatch  
 ```
 module load bio/samtools/1.17-gcc-11.4.0
 

@@ -453,6 +453,7 @@ On local computer, created directory 'structure_run' to store package and data f
 To run structure analysis (must be in 'structure_run' directory.   
 ```
 chmod +x structure  # May be necessary to run first if getting permission denied errors
+cd ~/Dropbox/CurrentProjects/SPORE/structure_run
 ./structure -m mainparams2 -K 2 -o output
 ```
 Note the parameters listed in mainparams, and the format of the tester2.str are very specific. Copy/follow the versions attached here when running this analysis for real.    

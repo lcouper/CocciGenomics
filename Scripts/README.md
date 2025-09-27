@@ -478,7 +478,6 @@ Data file format
 #define LOCDATA   0     // (B) Input file contains a location identifier
 ```
 
-
 ### Scaffolding SNPs into genes 
 
 Download .gtf file for cocci reference [here](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000149335.2/).
@@ -488,7 +487,6 @@ Download .gtf file for cocci reference [here](https://www.ncbi.nlm.nih.gov/datas
 ```
 cat CocciRef_GCA_000149335.2.fna | awk '$0 ~ ">" {if (NR > 1) {print c;} c=0;printf substr($0,2,100) "\t"; } $0 !~ ">" {c+=length($0);} END { print c; }'
 ```
-
 ![image](https://github.com/user-attachments/assets/3086e222-c492-4028-8700-0adc5b3c5ded)
 
 

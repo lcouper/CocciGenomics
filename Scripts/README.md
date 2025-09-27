@@ -306,8 +306,6 @@ Code snippet:
 ```
 # Step 1: "Filter" (identify) Variants
 
-module load java
-
 java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" VariantFiltration \
 -R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
 --variant jointvcf.vcf.gz \
@@ -317,7 +315,6 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 
 
 # Step 2: "Select" (remove filtered) Variants
-
 
 java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" SelectVariants \
 -R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \

@@ -1,5 +1,23 @@
 # Steps and scripts used to process _Coccidioides_ sequences (both newly sequenced and those downloaded from SRA) ### 
 
+<details>
+<summary><strong>Table of contents</strong></summary>
+
+- [Prepare reference genome (only need to do once)](#prepare-reference-genome-only-need-to-do-once)
+  - [1a. Mask repeats in reference genome](#1a-mask-repeats-in-reference-genome)
+  - [1b. Index reference genome](#1b-index-reference-genome)
+- [Prepare samples](#prepare-samples)
+  - [1. Obtained raw reads from Berkeley QB3 or SRA.](#1-obtained-raw-reads-from-berkeley-qb3-or-sra)
+  - [2. Filter poor quality reads and trim poor quality bases](#2-filter-poor-quality-reads-and-trim-poor-quality-bases)
+  - [3. Normalize read lengths to 75 across all genomes](#3-normalize-read-lengths-to-75-across-all-genomes)
+  - [4. Optional: Perform quality check on samples using fastqc](#4-optional-perform-quality-check-on-samples-using-fastqc)
+  - [5. Align sequences to reference genome](#5-align-sequences-to-reference-genome)
+
+</details>
+
+
+
+
 ## Prepare reference genome (only need to do once) 
 #### 1a. Mask repeats in reference genome   
 

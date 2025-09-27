@@ -1,7 +1,6 @@
 # Steps and scripts used to process _Coccidioides_ sequences (both newly sequenced and those downloaded from SRA) ### 
 
-<details>
-<summary><strong>Table of contents</strong></summary>
+## Table of contents
 
 - [Prepare reference genome (only need to do once)](#prepare-reference-genome-only-need-to-do-once)
   - [1a. Mask repeats in reference genome](#1a-mask-repeats-in-reference-genome)
@@ -12,9 +11,30 @@
   - [3. Normalize read lengths to 75 across all genomes](#3-normalize-read-lengths-to-75-across-all-genomes)
   - [4. Optional: Perform quality check on samples using fastqc](#4-optional-perform-quality-check-on-samples-using-fastqc)
   - [5. Align sequences to reference genome](#5-align-sequences-to-reference-genome)
-
-</details>
-
+  - [6. Sort and convert to bam](#6-sort-and-convert-to-bam)
+  - [7. Optional: Extract mapping and coverage statistics](#7-optional-extract-mapping-and-coverage-statistics)
+  - [8. Add or replace read groups](#8-add-or-replace-read-groups)
+  - [9. Optional: Verify read groups and compute death](#9-optional-verify-read-groups-and-compute-death)
+  - [9b. Optional: Calculate % of genome covered at >10x depth](#9b-optional-calculate--of-genome-covered-at-10x-depth)
+  - [10. Mark and remove duplicates](#10-mark-and-remove-duplicates)
+  - [11. Index bam files with read group added](#11-index-bam-files-with-read-group-added)
+  - [12. Call variants using GATK HaplotypeCaller](#12-call-variants-using-gatk-haplotypecaller)
+  - [13. Combine GVCF files](#13-combine-gvcf-files)
+  - [14. Joint-genotyping on combined GVCF files](#14-joint-genotyping-on-combined-gvcf-files)
+  - [15. Flag and remove variants based on quality score, coverage, missingness etc.](#15-flag-and-remove-variants-based-on-quality-score-coverage-missingness-etc)
+- [Additional downstream analyses](#additional-downstream-analyses)
+  - [Fst differentiation between clinical and environmental isolates](#fst-differentiation-between-clinical-and-environmental-isolates)
+  - [Assess population structure](#assess-population-structure)
+  - [Scaffolding SNPs into genes](#scaffolding-snps-into-genes)
+  - [Identify size of each chromosome](#identify-size-of-each-chromosome)
+- [Examining mating type distribution](#examining-mating-type-distribution)
+  - [Alternative approach to mating type locus investigation](#alternative-approach-to-mating-type-locus-investigation)
+- [Tajima's D](#tajimas-d)
+- [Nucleotide diversity, θπ](#nucleotide-diversity-θπ)
+- [pN/pS calculation](#pnps-calculation)
+  - [Investigating gene function and GO terms](#investigating-gene-function-and-go-terms)
+- [Get amino acid sequence for significantly differentiated genes](#get-amino-acid-sequence-for-significantly-differentiated-genes)
+- [Construct phylogenetic tree](#construct-phylogenetic-tree)
 
 
 

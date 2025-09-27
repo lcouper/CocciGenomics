@@ -492,7 +492,7 @@ cat CocciRef_GCA_000149335.2.fna | awk '$0 ~ ">" {if (NR > 1) {print c;} c=0;pri
 ![image](https://github.com/user-attachments/assets/3086e222-c492-4028-8700-0adc5b3c5ded)
 
 
-## Examining mating type distribution
+### Examining mating type distribution
 
 Step 1. Download gtf (and fna) files for each MAT idiomorphs from NCBI.   
 For MAT1-1, I used the [C. immitis RS assemebly](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000149335.2/).
@@ -531,7 +531,7 @@ Issue: results not matching up with [Engelthaler et al. 2016](https://journals.a
 
 
 
-### Alternative approach to mating type locus investigation 
+#### Alternative approach to mating type locus investigation 
 
 Using just the protein sequences.
 Downloaded the alpha-box protein sequence for MAT1-1 idiomorph (from C. immitis RS) [EF472259.1](https://www.ncbi.nlm.nih.gov/nuccore/EF472259.1).
@@ -623,7 +623,7 @@ vcftools \
 ```
 
 
-## pN/pS calculation 
+### pN/pS calculation 
 
 - Requires multi-sample FASTA, reference genome (RefGenome/CocciRef_GCA_000149335.2.fna), and reference genome annotation file (RefGenome/genomic.gff)
 - Note: this calculation is only done *within* a population (e.g. just the environmental isolates from a single population).
@@ -774,7 +774,7 @@ Note this outputs a file: pnps_results.csv (or pnps_results_envr.csv) with pn/ps
 
 Search Gene ID here on NCBI gene search, i.e. here: https://www.ncbi.nlm.nih.gov/gene/?term=Coccidioides+immitis+CIMG_02011 
 
-## Get amino acid sequence for significantly differentiated genes
+### Get amino acid sequence for significantly differentiated genes
 
 Purpose: Genes identified as significant on the basis of Fst could be the result of neutral or selective processes. Identifying whether there is corresponding amino acid changes at these genes can help resolve this.   
 Script: aminoacid_pull.sbatch   # But note this only includes clinical samples -- need to add in environmental into the BAM call   

@@ -69,7 +69,7 @@ Software used: bio/samtools/1.17-gcc-11.4.0
 ```
 samtools faidx CocciRef_GCA_000149335.2.masked.fna
 ```
-## Prepare samples
+## Process samples through VCF generation
 ### 1. Obtained raw reads from Berkeley QB3 or SRA.  
 
 The fastq.gz files (1 forward, 1 reverse) are stored here on the Remais Group Shared Drive: SPORE/WGS/Sequence data (All)/ 

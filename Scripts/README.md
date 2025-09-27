@@ -409,42 +409,6 @@ for i in $(seq 1 $nperm); do
     --stdout | grep -v "^#" | awk -v i=$i '{print $1, $2, $3, i}' >> perm_fst/fst_all_perms.txt
 done
 ```
-
-### Construct phylogenetic tree 
-
-** Note: In order to root the phylogenetic tree, we used the C. posadasii Silveira strain [SRR9644374](https://www.ncbi.nlm.nih.gov/biosample/?term=SRS007089) **
-These fastqs were then taken through the same steps as all other samples above (e.g. starting from step 1)   
-The resulting vcf files were only used for rooting the tree.   
-The vcf file *without* C. posadasii were used in all other analyses 
-
-
-Step 1. Convert vcf to phylipp:   
-Run at command line, very fast.  
-Note that the 'vcf2phylip.py' script was downloaded from [here](https://github.com/edgardomortiz/vcf2phylip/blob/master/vcf2phylip.py) and must be in working directory for command to work
-```
-python3 vcf2phylip.py -i final_withCp.vcf -o CocciSamples
-```
-
-Step 2. Build phylogenetic tree    
-Software used: iqtree/3.0.0    
-Script: phylo_tree.sh    
-Code snippet:
-```
-module load iqtree/3.0.0
-# iqtree3 -s final.SNPs.min4.phy -m GTR+G -nt AUTO -o CpSilv (# non-bootstrapped, fast version)
-
-iqtree3 -s final_withCp.min4.phy \
-        -m TEST \ # test different nucleotide substituion models and pick the best one based on BIC
-        -bb 1000 \ #  1,000 bootstraps
-        -alrt 1000 \ # 1,000 replicates of an approximate likelihood ratio test (to assess branch support)
-        -nt AUTO \ # automatically detect and use number of optimal threads
-        -o CpSilv \ # Specify C. posadasii Silveira strain as the outgroup
-        -pre final_withCpSilv.min4_1000
-```
-
-One option for visualizing tree (but note we visualized in R using ggree):   
-https://itol.embl.de/tree/136152214211185591747337347
-
 ### Assess population structure 
 
 Conducted using STRUCTURE v 2.3.4
@@ -785,6 +749,46 @@ Note this outputs a file: pnps_results.csv (or pnps_results_envr.csv) with pn/ps
 
 Search Gene ID here on NCBI gene search, i.e. here: https://www.ncbi.nlm.nih.gov/gene/?term=Coccidioides+immitis+CIMG_02011 
 
+## Get amino acid sequence for significantly differentiated genes
+
+Purpose: Genes identified as significant on the basis of Fst could be the result of neutral or selective processes. Identifying whether there is corresponding amino acid changes at these genes can help resolve this.   
+Script: aminoacid_pull.sbatch   # But note this only includes clinical samples -- need to add in environmental into the BAM call   
+
+
+### Construct phylogenetic tree 
+
+** Note: In order to root the phylogenetic tree, we used the C. posadasii Silveira strain [SRR9644374](https://www.ncbi.nlm.nih.gov/biosample/?term=SRS007089) **
+These fastqs were then taken through the same steps as all other samples above (e.g. starting from step 1)   
+The resulting vcf files were only used for rooting the tree.   
+The vcf file *without* C. posadasii were used in all other analyses 
+
+
+Step 1. Convert vcf to phylipp:   
+Run at command line, very fast.  
+Note that the 'vcf2phylip.py' script was downloaded from [here](https://github.com/edgardomortiz/vcf2phylip/blob/master/vcf2phylip.py) and must be in working directory for command to work
+```
+python3 vcf2phylip.py -i final_withCp.vcf -o CocciSamples
+```
+
+Step 2. Build phylogenetic tree    
+Software used: iqtree/3.0.0    
+Script: phylo_tree.sh    
+Code snippet:
+```
+module load iqtree/3.0.0
+# iqtree3 -s final.SNPs.min4.phy -m GTR+G -nt AUTO -o CpSilv (# non-bootstrapped, fast version)
+
+iqtree3 -s final_withCp.min4.phy \
+        -m TEST \ # test different nucleotide substituion models and pick the best one based on BIC
+        -bb 1000 \ #  1,000 bootstraps
+        -alrt 1000 \ # 1,000 replicates of an approximate likelihood ratio test (to assess branch support)
+        -nt AUTO \ # automatically detect and use number of optimal threads
+        -o CpSilv \ # Specify C. posadasii Silveira strain as the outgroup
+        -pre final_withCpSilv.min4_1000
+```
+
+One option for visualizing tree (but note we visualized in R using ggree):   
+https://itol.embl.de/tree/136152214211185591747337347
 
 
 

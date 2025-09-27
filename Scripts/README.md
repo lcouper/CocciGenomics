@@ -297,14 +297,15 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -O jointvcf.vcf.gz
 ```
 
-### 15. Flag and remove variants based on quality score, coverage, etc.
+### 15. Flag and remove variants based on quality score, coverage, missingness etc.
 
-Step 1: "Filter" (identify) Variants
-Software used: java, gatk 4.5.0.0     
 Script: filtervcfs.sbatch     
+Software used: java, gatk 4.5.0.0, vcftools/0.1.16-gcc-11.4.0   
 Code snippet:     
 
 ```
+# Step 1: "Filter" (identify) Variants
+
 module load java
 
 java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" VariantFiltration \
@@ -313,14 +314,11 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 --filter-expression "QD < 2.0 || FS > 60.0 || MQ < 40.0 || DP < 10 || QUAL < 20" \
 --filter-name "BasicAndBiasFilters" \
 -O joint.filtered.vcf.gz
-```
 
-Step 2: "Select" (remove filtered) Variants
-Software used: java, gatk 4.5.0.0     
-Script: selectsnps.sbatch     
-Code snippet:     
 
-```
+# Step 2: "Select" (remove filtered) Variants
+
+
 java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" SelectVariants \
 -R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
 --variant jointvcf_filtered.vcf.gz \
@@ -328,17 +326,9 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 --select-type-to-include SNP \
 --exclude-filtered \
 -O final.vcf.gz
-```
 
-### 16. Keep only sites with >=90% samples genotyped 
+# Step 3: Keep only sites with >=90% samples genotyped 
 
-Software used: vcftools/0.1.16-gcc-11.4.0
-Script: NA (command line. Runs fast)
-Code snippet:     
-Note: Repeat for final_withCp.vcf
-
-```
-module load bio/vcftools/0.1.16-gcc-11.4.0
 vcftools --gzvcf final.vcf.gz \
   --max-missing 0.9 \
   --recode --recode-INFO-all \

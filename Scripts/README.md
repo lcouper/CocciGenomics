@@ -652,7 +652,7 @@ rm cds_features.gff cds_coords_raw.bed cds_coords_sorted.bed
 echo "Done. Output written to $OUT"
 ```
 
-**Step 2. Generate consensus genomes per sample**. 
+**Step 2. Generate consensus genomes per sample** 
 For each sample, apply its variants (from a multisample VCF) to the reference genome to generate a personalized FASTA — i.e., the consensus genome.   
 Script used: generate_consensus_genomes.sbatch
 Code snippet:
@@ -687,7 +687,7 @@ for SAMPLE in "${SAMPLES[@]}"; do
 done
 
 echo "[$(date)] ✅ Step 2 complete: consensus genomes in $OUTDIR"
-
+```
 
 **Step 2.5. Extract CDS sequences from each sample's consensus genome**
 
@@ -726,21 +726,15 @@ echo "✅ Step 2.5 complete: raw CDS sequences in $OUTDIR"
 
 Software used: biopython
 Script: merge_cds_fragments.py   
-Run for a single sample as (for example): python merge_cds_fragments.py consensus_cds_test/UCLA295.raw_cds.fa consensus_cds_test/UCLA295.merged_cds.fa  
+Run for a single sample as (for example): python merge_cds_fragments.py consensus_cds_allsamples/UCLA295.raw_cds.fa consensus_cds_test/UCLA295.merged_cds.fa  
 Or batch as:
 ```
-for f in consensus_cds_test/*.raw_cds.fa; do
+for f in consensus_cds_genomes/*.raw_cds.fa; do
   sample=$(basename "$f" .raw_cds.fa)
-  python merge_cds_fragments.py "$f" "consensus_cds_test/${sample}.merged_cds.fa"
+  python merge_cds_fragments.py "$f" "consensus_cds_allsamples/${sample}.merged_cds.fa"
 done
 ```
-Or, for environmental samples:
-```
-for f in consensus_cds_envr/*.raw_cds.fa; do
-  sample=$(basename "$f" .raw_cds.fa)
-  python merge_cds_fragments.py "$f" "consensus_cds_envr/${sample}.merged_cds.fa"
-done
-```
+
 
 **Step 4. Translate nucleotide sequences to proteins**  
 

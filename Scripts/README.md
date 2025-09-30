@@ -490,45 +490,41 @@ cat CocciRef_GCA_000149335.2.fna | awk '$0 ~ ">" {if (NR > 1) {print c;} c=0;pri
 ![image](https://github.com/user-attachments/assets/3086e222-c492-4028-8700-0adc5b3c5ded)
 
 
-### Examining mating type distribution
+### Mating type locus assignment 
 
-Step 1. Download gtf (and fna) files for each MAT idiomorphs from NCBI.   
-For MAT1-1, I used the [C. immitis RS assemebly](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000149335.2/).
-For MAT1-2, I used the [C. immitis strain H538.4 assembly](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000149815.1/).
+Each isolate of *Coccidioides* has a mating type locus with one or two idiomorphs, MAT1-1 or MAT1-2, and sexual reproduction can only occur between distinct idiomorphs. Identifying the mating type locus for each individual and population can therefore provide clues about sexual reproduction and recombination. 
 
-Step 2. Identify the genomic positions of the MAT locus for each representative
+Step 1. Download MAT domain proteins from NCBI (Note: downloaded on local computer, then uploaded to Savio)
 ```
-grep -i MAT-1 CimmitisRS_MAT1_1_Rep.gff > MAT_coords_mat1_1.gff
-grep -i MAT1 CimmitisH538.4_MAT1_2_Rep.gtf > MAT_coords_mat1_2.gff
-# Note the slightly different naming
-```
+# α-box domain (MAT1-1-1), C. immitis 
+curl -L "https://rest.uniprot.org/uniprotkb/stream?format=fasta&query=(gene:MAT1-1-1)%20AND%20(organism:%22Coccidioides%20immitis%22%20OR%20organism:%22Coccidioides%20posadasii%22)" \
+  -o "${MAT_DIR}/MAT1-1-1_alpha_box.faa"
 
-Step 3. Index each assembly and extract the MAT loci using the (mRNA) coordinates identified above
-```
-samtools faidx Cimmitis_RS.fna
-samtools faidx Cimmitis_H5384.fna
-samtools faidx Cimmitis_RS.fna DS016985.1:384173-385395 > MAT1-1_RS.fna
-samtools faidx Cimmitis_H5384.fna GG704913.1:1653763-1656710 > MAT1-2_H5384.fna
-# Concatenate for mapping
-cat MAT1-1_RS.fna MAT1-2_H5384.fna > MAT_combined.fna
-
-# Note, for simplicity I fixed headers to: >MAT1_1_RS   >MAT1_2_H5384 (done manually in text editor)
-
-# Index combined file
-bwa-mem2 index MAT_combined.fna
+# HMG domain (MAT1-2-1) from C. posadasii 
+curl -L "https://rest.uniprot.org/uniprotkb/stream?format=fasta&query=(gene:MAT1-2-1)%20AND%20(organism:%22Coccidioides%20immitis%22%20OR%20organism:%22Coccidioides%20posadasii%22)" \
+  -o "${MAT_DIR}/MAT1-2-1_HMG.faa"
 ```
 
-Step 4. Identify most likely idiomorph for each cocci genome   
-Here, we will align reads from each of the cocci genomes (ours and all others included in the analysis) to the MAT loci. Then we will identify to which idiomorph the coverage on the alignment is higher (indicating higher similarity).    
-Software used: bwa-mem2/2.2.1, samtools/1.17-gcc-11.4.0       
-Script: matingtype_loop.sbatch         
-Note the output (the coverage to MAT1_RS or MAT_2_H5384) was directed to .tsv files (matingtype_coverage).    
+Note that previously I was using the full genomes from [C. immitis RS assemebly](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000149335.2/) for MAT1-1 and [C. immitis strain H538.4 assembly](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000149815.1/) for MAT1-2. But this was causing errors. 
 
 
-Issue: results not matching up with [Engelthaler et al. 2016](https://journals.asm.org/doi/full/10.1128/mbio.00550-16#figS9). Potentially need to correct for mapping to other portions of these assemblies (eg rpb1)
+Step 2. Query protein sequences from other cocci genomes against these α-box and HMG domain protein sequences.    
+Software used:  bio/bwa-mem2/2.2.1, bio/samtools/1.17-gcc-11.4.0, bio/blast-plus/2.13.0-gcc-11.4.0, python/3.10.12-gcc-11.4.0, spades/4.1.0  
+Script: matingtype_loop.sbatch, matingtype_loop_envr.sbatch (for clinical and environmental samples, respectively).
+Note, output was directed to: MatingTypeLoci_Files/MAT_idiomorph_summary.OtherCocciGenomes.tsv and MatingTypeLoci_Files/MAT_idiomorph_summary.OurSoilSamples.tsv for clinical and environmental samples, respectively.  
+Code snippet:   
+```
+  # tBLASTn (PRIMARY decision, domain proteins)
+  RES11P=$(best_tbl "$SAMPLE" "$MAT11_PROT")
+  RES12P=$(best_tbl "$SAMPLE" "$MAT12_PROT")
+
+  P11P=$(field_or "$RES11P" 3); L11P=$(field_or "$RES11P" 4); C11P=$(field_or "$RES11P" 5); E11P=$(field_or "$RES11P" 6); B11P=$(field_or "$RES11P" 7)
+  P12P=$(field_or "$RES12P" 3); L12P=$(field_or "$RES12P" 4); C12P=$(field_or "$RES12P" 5); E12P=$(field_or "$RES12P" 6); B12P=$(field_or "$RES12P" 7)
+```
 
 
 
+Compare reuslts with [Engelthaler et al. 2016](https://journals.asm.org/doi/full/10.1128/mbio.00550-16#figS9)
 #### Alternative approach to mating type locus investigation 
 
 Using just the protein sequences.

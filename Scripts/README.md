@@ -654,46 +654,73 @@ echo "Done. Output written to $OUT"
 
 **Step 2. Generate consensus genomes per sample**. 
 For each sample, apply its variants (from a multisample VCF) to the reference genome to generate a personalized FASTA — i.e., the consensus genome.   
-Script used: generate_consensus_clin.sh
-or generate_consensus_envr.sh
+Script used: generate_consensus_genomes.sbatch
 Code snippet:
 ```
-#!/bin/bash
-#SBATCH --job-name=test_consensus
-#SBATCH --account=fc_envids
-#SBATCH --partition=savio3
-#SBATCH --time=10:00:00
-#SBATCH --output=test.out
-
-## commands to run:
-
-cd /global/scratch/users/lcouper/SoilCocciSeqs/
-
-module load bio/bedtools2/2.31.0-gcc-11.4.0
-module load bio/bcftools/1.16-gcc-11.4.0
-
-VCF=FinalOutputs/final_filtered_maxmissing.vcf.gz
-REF=RefGenome/CocciRef_GCA_000149335.2.masked.fna
-SAMPLES=("SD_1" "SJV_10" "SJV_11" "SJV_2" "SJV_3" "SJV_4" "SJV_5" "SJV_6" "SJV_7" "SJV_8" "SJV_9" "SJV_1" "UCLA293" "UCLA294" "UCLA295")
-OUTDIR=/global/scratch/users/lcouper/SoilCocciSeqs/pnps/consensus_genomes_test
-
+VCF="/global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs/final_filtered_maxmissing.recode.vcf"
+REF="/global/scratch/users/lcouper/SoilCocciSeqs/RefGenome/CocciRef_GCA_000149335.2.masked.fna"
+OUTDIR="/global/scratch/users/lcouper/SoilCocciSeqs/pnps/consensus_genomes_allsamples"
 mkdir -p "$OUTDIR"
+echo "OUTDIR=$OUTDIR"
+
+SAMPLES=(San_Diego SJV_10 SJV_11 SJV_2 SJV_3 SJV_4 SJV_5 SJV_6 SJV_7 SJV_8 SJV_9 SJV_1 UCLA_Isolate293 UCLA_Isolate294 UCLA_Isolate295 13B1 14B1 22AC2 22BC1 34B2 58B1 PS02PN14-1 PS02PN14-2 PS02PN14-3)
+
+[ -s "$VCF" ] || { echo "Missing VCF: $VCF" >&2; exit 1; }
+[ -s "$REF" ] || { echo "Missing REF: $REF" >&2; exit 1; }
+[ -s "${REF}.fai" ] || { echo "Indexing REF..."; samtools faidx "$REF"; }
+
+echo "Listing VCF samples..."
+bcftools query -l "$VCF" > "$OUTDIR/.vcf_samples.txt"
+echo "Found $(wc -l < "$OUTDIR/.vcf_samples.txt") samples in VCF"
 
 for SAMPLE in "${SAMPLES[@]}"; do
-    echo "Generating consensus genome for $SAMPLE..."
-    bcftools view -c1 -s "$SAMPLE" -Oz -o "$OUTDIR/$SAMPLE.vcf.gz" "$VCF"
-    bcftools index "$OUTDIR/$SAMPLE.vcf.gz"
+  if ! grep -qx "$SAMPLE" "$OUTDIR/.vcf_samples.txt"; then
+    echo "Skipping $SAMPLE (not in VCF)" >&2
+    continue
+  fi
+  echo "[$(date)] → $SAMPLE : subset + index"
+  bcftools view -s "$SAMPLE" -Oz -o "$OUTDIR/$SAMPLE.vcf.gz" "$VCF"
+  bcftools index -f "$OUTDIR/$SAMPLE.vcf.gz"
 
-    bcftools consensus -f "$REF" "$OUTDIR/$SAMPLE.vcf.gz" > "$OUTDIR/$SAMPLE.genome.fa"
+  echo "[$(date)] → $SAMPLE : consensus"
+  bcftools consensus -f "$REF" "$OUTDIR/$SAMPLE.vcf.gz" > "$OUTDIR/$SAMPLE.genome.fa"
 done
 
-echo "✅ Step 1 complete: consensus genomes in $OUTDIR"
-```
+echo "[$(date)] ✅ Step 2 complete: consensus genomes in $OUTDIR"
+
 
 **Step 2.5. Extract CDS sequences from each sample's consensus genome**
 
 Software used: bedtools 2.31.0, bcftools 1.16   
-Script: generate_per_sample_gene_vcfs.sh or generate_per_sample_gene_vcfs_envr.sh
+Script: generate_per_sample_gene_vcfs.sh
+Code snippet:
+```
+# Inputs
+BED=/global/scratch/users/lcouper/SoilCocciSeqs/pnps/cds_coords_merged.bed
+CONSENSUS_DIR=/global/scratch/users/lcouper/SoilCocciSeqs/pnps/consensus_genomes_allsamples
+SAMPLES=("San_Diego" "SJV_10" "SJV_11" "SJV_2" "SJV_3" "SJV_4" "SJV_5" "SJV_6" "SJV_7" "SJV_8" "SJV_9" "SJV_1" "UCLA_Isolate293" "UCLA_Isolate294" "UCLA_Isolate295" "13B1" "14B1" "22AC2" "22BC1" "34B2" "58B1" "PS02PN14-1" "PS02PN14-2" "PS02PN14-3")
+OUTDIR=/global/scratch/users/lcouper/SoilCocciSeqs/pnps/consensus_cds_allsamples
+
+mkdir -p "$OUTDIR"
+
+# First, make sure all samples are indexed
+for fa in "$CONSENSUS_DIR"/*.genome.fa; do
+  [ -s "${fa}.fai" ] || samtools faidx "$fa"
+done
+
+# Then, extract CDS for each sample
+for SAMPLE in "${SAMPLES[@]}"; do
+    echo "Extracting CDS for $SAMPLE..."
+
+    bedtools getfasta -fi "$CONSENSUS_DIR/$SAMPLE.genome.fa" \
+                      -bed "$BED" \
+                      -name \
+                      -s \
+                      -fo "$OUTDIR/$SAMPLE.raw_cds.fa"
+done
+
+echo "✅ Step 2.5 complete: raw CDS sequences in $OUTDIR"
+```
 
 **Step 3. Merge to generate one CDS per gene (for each sample)**
 
@@ -749,6 +776,16 @@ Software used: egglib3.0.0
 Downloaded using: python -m pip install egglib==3.0.0 --user   
 Script used: calculate_pnps_egglib3.py or calculate_pnps_egglib3_envr.py 
 Note this outputs a file: pnps_results.csv (or pnps_results_envr.csv) with pn/ps estimates for each gene    
+
+**Step 10. Define groupings for samples**
+```
+echo -e "13B1\n14B1\n22AC2\n22BC1\34B2\n58B1\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3" > pnps/lists/environmental_ids.txt
+echo -e "SD_1\nSJV_1\nSJV_10\nSJV_11\nSJV_2\nSJV_3\nSJV_4\nSJV_5\nSJV_6\nSJV_7\nSJV_8\nSJV_9\nUCLA293\nUCLA294\nUCLA295" > pnps/lists/clinical_ids.txt
+```
+**Step 11. [Optional but potentially important for bias correction] Check how many genes have only clinical or only environmental samples represented
+
+
+
 
 ### Investigating gene function and GO terms
 

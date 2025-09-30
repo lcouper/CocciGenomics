@@ -521,20 +521,7 @@ Code snippet:
   P11P=$(field_or "$RES11P" 3); L11P=$(field_or "$RES11P" 4); C11P=$(field_or "$RES11P" 5); E11P=$(field_or "$RES11P" 6); B11P=$(field_or "$RES11P" 7)
   P12P=$(field_or "$RES12P" 3); L12P=$(field_or "$RES12P" 4); C12P=$(field_or "$RES12P" 5); E12P=$(field_or "$RES12P" 6); B12P=$(field_or "$RES12P" 7)
 ```
-
-
-
-Compare reuslts with [Engelthaler et al. 2016](https://journals.asm.org/doi/full/10.1128/mbio.00550-16#figS9)
-#### Alternative approach to mating type locus investigation 
-
-Using just the protein sequences.
-Downloaded the alpha-box protein sequence for MAT1-1 idiomorph (from C. immitis RS) [EF472259.1](https://www.ncbi.nlm.nih.gov/nuccore/EF472259.1).
-and for MAT1-2 idiomorph (from C. posadasii) [EF472258.1](https://www.ncbi.nlm.nih.gov/nuccore/EF472258.1).
-```
-module load python/3.10.12-gcc-11.4.0 
-module load spades/4.1.0 # Note that spades requires a more recent version of python
-spades.py -1 SJV_9_1.fastq -2 SJV_9_2.fastq -o SJV_9_spades_output
-```
+Optionally, compare reuslts with [Engelthaler et al. 2016](https://journals.asm.org/doi/full/10.1128/mbio.00550-16#figS9)
 
 ### Tajima's D 
 

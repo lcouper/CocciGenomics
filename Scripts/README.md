@@ -27,14 +27,13 @@
   - [Assess population structure](#assess-population-structure)
   - [Scaffolding SNPs into genes](#scaffolding-snps-into-genes)
   - [Identify size of each chromosome](#identify-size-of-each-chromosome)
-- [Examining mating type distribution](#examining-mating-type-distribution)
-  - [Alternative approach to mating type locus investigation](#alternative-approach-to-mating-type-locus-investigation)
-- [Tajima's D](#tajimas-d)
-- [Nucleotide diversity, θπ](#nucleotide-diversity-θπ)
-- [pN/pS calculation](#pnps-calculation)
+  - [Examining mating type distribution](#examining-mating-type-distribution)
+  - [Tajima's D](#tajimas-d)
+  - [Nucleotide diversity, θπ](#nucleotide-diversity-θπ)
+  - [pN/pS calculation](#pnps-calculation)
   - [Investigating gene function and GO terms](#investigating-gene-function-and-go-terms)
-- [Get amino acid sequence for significantly differentiated genes](#get-amino-acid-sequence-for-significantly-differentiated-genes)
-- [Construct phylogenetic tree](#construct-phylogenetic-tree)
+  - [Get amino acid sequence for significantly differentiated genes](#get-amino-acid-sequence-for-significantly-differentiated-genes)
+  - [Construct phylogenetic tree](#construct-phylogenetic-tree)
 
 
 

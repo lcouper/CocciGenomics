@@ -747,7 +747,7 @@ Note: In the current version, individual samples are specified in this script.
 
 Here, problematic genes are those with internal stop codons (likely due to sequencing errors) or >10% missing (coded as Xs) or not present in at least 75% of each group. We are removing those here as they will cause issues in downstream steps and/or introduce biases in our analyses.   
 Note this first requires making a file that indicates to which group each sample belongs, called 'sample_to_group.tsv'  
-Python script used: filter_genes.py  
+Python script used: filter_genes.py or (without the 75% rule): filter_genes_no75rule.py  
 *Run as: python filter_genes.py*
 
 **Step 6. Align protein sequence per gene across samples**

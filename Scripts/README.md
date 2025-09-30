@@ -724,7 +724,7 @@ echo "✅ Step 2.5 complete: raw CDS sequences in $OUTDIR"
 
 **Step 3. Merge to generate one CDS per gene (for each sample)**
 
-Software used: biopython, 
+Software used: python/3.10.12-gcc-11.4.0
 Script: merge_cds_fragments.py   
 Run for a single sample as (for example): python merge_cds_fragments.py consensus_cds_allsamples/UCLA295.raw_cds.fa consensus_cds_test/UCLA295.merged_cds.fa  
 Or batch as:

@@ -691,8 +691,8 @@ echo "[$(date)] ✅ Step 2 complete: consensus genomes in $OUTDIR"
 
 **Step 2.5. Extract CDS sequences from each sample's consensus genome**
 
-Software used: bedtools 2.31.0, bcftools 1.16   
-Script: generate_per_sample_gene_vcfs.sh
+Software used: bedtools 2.31.0, bcftools 1.16     
+Script: generate_per_sample_gene_vcfs.sh    
 Code snippet:
 ```
 # Inputs
@@ -724,8 +724,8 @@ echo "✅ Step 2.5 complete: raw CDS sequences in $OUTDIR"
 
 **Step 3. Merge to generate one CDS per gene (for each sample)**
 
-Software used: python/3.10.12-gcc-11.4.0
-Script: merge_cds_fragments.py   
+Software used: python/3.10.12-gcc-11.4.0   
+Script: merge_cds_fragments.py      
 Run for a single sample as (for example): python merge_cds_fragments.py consensus_cds_allsamples/UCLA295.raw_cds.fa consensus_cds_test/UCLA295.merged_cds.fa  
 Or batch as:
 ```
@@ -737,16 +737,17 @@ done
 
 
 **Step 4. Translate nucleotide sequences to proteins**  
-
-Software used: biopython, python   
+ 
+Software used: biopython, python     
 Script: fasta_to_protein.py or fasta_to_protein_envr.py   
 Note: In the current version, individual samples are specified in this script.    
 *Run as: python fasta_to_protein.py*
 
 **Step 5. Remove any problematic genes**   
 
-Here, problematic genes are those with internal stop codons (likely due to sequencing errors), and/or >5% missing (coded as Xs). We are removing those here as they will cause issues in downstream steps.   
-Python script used: filter_genes.py or filter_genes_envr.py
+Here, problematic genes are those with internal stop codons (likely due to sequencing errors) or >10% missing (coded as Xs) or not present in at least 75% of each group. We are removing those here as they will cause issues in downstream steps and/or introduce biases in our analyses.   
+Note this first requires making a file that indicates to which group each sample belongs, called 'sample_to_group.tsv'  
+Python script used: filter_genes.py  
 *Run as: python filter_genes.py*
 
 **Step 6. Align protein sequence per gene across samples**

@@ -611,48 +611,32 @@ vcftools \
 - This included (clinical isolates from CA):
 - Or (environmental isolates from CA):
 
-**Step 1. (only need to run once) Extract coding sequence coordinates by gene**     
+**Step 1. (only need to run once) Extract coding sequence coordinates by gene from the reference**     
 This uses the gene annotation file.     
 Script used: pnps/extract_cds_bed12.sh. Original version: pnps/extract_and_merge_cds_coords.sh    
 To run:
 ```
 bash pnps/extract_cds_bed12.sh RefGenome/genomic.gff pnps/cds_coords_merged.bed12
 ```
-
 **Step 2. Generate consensus genomes per sample** 
 For each sample, apply its variants (from a multisample VCF) to the reference genome to generate a personalized FASTA — i.e., the consensus genome.   
-Script used: generate_consensus_genomes.sbatch
+Script used: generate_consensus_genomes.sh
 
-**Step 2.5. Extract CDS sequences from each sample's consensus genome**
+**Step 3. Extract CDS sequences from each sample's consensus genome**
 
 Software used: bedtools 2.31.0, bcftools 1.16     
-Script: generate_per_sample_gene_vcfs.sh. Original version: generate_per_sample_gene_vcfs_og.sh    
-
-
-**Step 3. Merge to generate one CDS per gene (for each sample)**
-
-Software used: python/3.10.12-gcc-11.4.0   
-Script: merge_cds_fragments.py      
-Run for a single sample as (for example): python merge_cds_fragments.py consensus_cds_allsamples/UCLA295.raw_cds.fa consensus_cds_test/UCLA295.merged_cds.fa  
-Or batch as:
-```
-for f in consensus_cds_allsamples/*.raw_cds.fa; do
-  sample=$(basename "$f" .raw_cds.fa)
-  python merge_cds_fragments.py "$f" "consensus_cds_allsamples/${sample}.merged_cds.fa"
-done
-```
-
+Script: extract_sample_cds_from_consensus.sh. (Prior version: generate_per_sample_gene_vcfs_og.sh).   
+Note that ~2% ambiguity is expected due to earlier repeat masking, and will be excluded in downstream analyses.   
 
 **Step 4. Translate nucleotide sequences to proteins**  
- 
+
 Software used: biopython, python     
-Script: fasta_to_protein.py or fasta_to_protein_envr.py   
-Note: In the current version, individual samples are specified in this script.    
-*Run as: python fasta_to_protein.py*
+Script: translate_all_cds.py  (old version: fasta_to_protein.py)
+*Run as: python translate_all_cds.py*
 
-**Step 5. Remove any problematic genes**   
+**Step 5. Filter problematic genes**   
 
-Here, problematic genes are those with internal stop codons (likely due to sequencing errors) or >10% missing (coded as Xs) or not present in at least 75% of each group. We are removing those here as they will cause issues in downstream steps and/or introduce biases in our analyses.   
+Here, we are removing CDS with any of the following: internal stop codons (likely due to sequencing errors), >10% missing (coded as Xs), or lack of representation in >=75% of each group (clinical or environmental). We are removing those here as they will cause issues in downstream steps and/or introduce biases in our analyses. The output is one FASTA per gene containing only the passing samples.    
 Note this first requires making a file that indicates to which group each sample belongs, called 'sample_to_group.tsv'  
 Python script used: filter_genes.py or (without the 75% rule): filter_genes_no75rule.py  
 *Run as: python filter_genes.py*
@@ -661,7 +645,7 @@ Python script used: filter_genes.py or (without the 75% rule): filter_genes_no75
 
 Software used: muscle v3.8. Note the latest versions (v5) was giving issues, hence going with an older release. Program (muscle3.8.31_i86linux32.tar) was manually downloaded [here](https://drive5.com/muscle/downloads_v3.htm).   
 Script used: run_muscle_alignments.py      
-*Run as: run_muscle_alignments.py*    Note this one takes ~10 minutes to run
+*Run as: run_muscle_alignments.py*    Note this may take ~30 minutes to run
 
 **Step 7. Create per-gene CDS FASTA files across samples**    
 I.e. we need the nucleotide sequence of each gene from each sample. This is required input for PAL2NAL.    

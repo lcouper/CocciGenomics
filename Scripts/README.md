@@ -603,13 +603,10 @@ vcftools \
 ```
 
 
-### pN/pS calculation 
+### MK Test
 
 - Requires multi-sample FASTA, reference genome (RefGenome/CocciRef_GCA_000149335.2.fna), and reference genome annotation file (RefGenome/genomic.gff)
-- Note: this calculation is only done *within* a population (e.g. just the environmental isolates from a single population).
-- In the code below, I've specified specific samples on which to run the calculation.
-- This included (clinical isolates from CA):
-- Or (environmental isolates from CA):
+- Note: this calculation was done for only California genomes to minimize confounding by demography
 
 **Step 1. (only need to run once) Extract coding sequence coordinates by gene from the reference**     
 This uses the gene annotation file.     
@@ -656,20 +653,20 @@ Note there is a 'non-strict' version: generate_cds_by_gene.py that may hold on t
 **Step 8. Create codon-aware nucleotide alignments**     
 Software used: pal2nal      
 Note I manually downloaded PAL2NAL from [here](https://www.bork.embl.de/pal2nal/#Download). Then uploaded to BRC, unpacked, and added to my path.       
-Script used: run_pal2nal.sh or run_pal2nal_envr.sh
+Script used: run_pal2nal.sh   
 
-**Step 9. Estimate pN/pS**
-Software used: egglib3.0.0     
-Downloaded using: python -m pip install egglib==3.0.0 --user   
-Script used: calculate_pnps_egglib3.py or calculate_pnps_egglib3_envr.py 
-Note this outputs a file: pnps_results.csv (or pnps_results_envr.csv) with pn/ps estimates for each gene    
+**Step 9. Build codon level group consensuses (i.e. clinical vs environmental)**
+Software used: python/3.10.12-gcc-11.4.0
+Note this uses the 'sample_to_group.tsv' previously created, which lists samples and group assignments
+Script uesd: build_group_consensus.py
 
-**Step 10. Define groupings for samples**
-```
-echo -e "13B1\n14B1\n22AC2\n22BC1\34B2\n58B1\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3" > pnps/lists/environmental_ids.txt
-echo -e "SD_1\nSJV_1\nSJV_10\nSJV_11\nSJV_2\nSJV_3\nSJV_4\nSJV_5\nSJV_6\nSJV_7\nSJV_8\nSJV_9\nUCLA293\nUCLA294\nUCLA295" > pnps/lists/clinical_ids.txt
-```
-**Step 11. [Optional but potentially important for bias correction] Check how many genes have only clinical or only environmental samples represented
+**Step 10. Count within-group polymorphisms (pS/pS)**
+Software used: python/3.10.12-gcc-11.4.0, egglib v3
+Script used:  compute_pnps_by_group.py 
+
+**Step 11. Count between group "divergences" (dN/dS)**
+Software used: python/3.10.12-gcc-11.4.0
+Script used:  
 
 
 

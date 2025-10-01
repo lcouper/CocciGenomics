@@ -30,7 +30,7 @@
   - [Examining mating type distribution](#examining-mating-type-distribution)
   - [Tajima's D](#tajimas-d)
   - [Nucleotide diversity, θπ](#nucleotide-diversity-θπ)
-  - [pN/pS calculation](#pnps-calculation)
+  - [MK Test](#MK-test)
   - [Investigating gene function and GO terms](#investigating-gene-function-and-go-terms)
   - [Get amino acid sequence for significantly differentiated genes](#get-amino-acid-sequence-for-significantly-differentiated-genes)
   - [Construct phylogenetic tree](#construct-phylogenetic-tree)

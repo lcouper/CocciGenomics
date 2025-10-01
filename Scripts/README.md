@@ -612,115 +612,22 @@ vcftools \
 - Or (environmental isolates from CA):
 
 **Step 1. (only need to run once) Extract coding sequence coordinates by gene**     
-This uses the gene annotation file.     Note: Make sure to MERGE overlapping intervals by gene (so just one set of coordinates per gene).   
-Script used: pnps/extract_and_merge_cds_coords.sh    
-Code snippet:
+This uses the gene annotation file.     
+Script used: pnps/extract_cds_bed12.sh. Original version: pnps/extract_and_merge_cds_coords.sh    
+To run:
 ```
-#!/bin/bash
-
-# Set input and output paths
-GFF="RefGenome/genomic.gff"
-OUT="cds_coords_merged.bed"
-
-# Step 1: Extract CDS features
-grep -P '\tCDS\t' "$GFF" > cds_features.gff
-
-# Step 2: Convert to BED format (0-based start, 1-based end)
-awk 'BEGIN{OFS="\t"} {
-  split($9, a, /[;=]/);
-  gene_id = "NA";
-  for (i=1; i<=length(a); i++) {
-    if (a[i] ~ /[Gg]ene[Ii][Dd]/) {
-      gene_id = a[i+1];
-      break
-    } else if (a[i] ~ /^Parent$/) {
-      gene_id = a[i+1];
-    }
-  }
-  print $1, $4 - 1, $5, gene_id
-}' cds_features.gff > cds_coords_raw.bed
-
-# Step 3: Sort BED
-sort -k1,1 -k2,2n cds_coords_raw.bed > cds_coords_sorted.bed
-
-# Step 4: Merge overlapping CDS intervals per gene
-bedtools merge -i cds_coords_sorted.bed -c 4 -o distinct > "$OUT"
-
-# Clean up intermediate files (optional)
-rm cds_features.gff cds_coords_raw.bed cds_coords_sorted.bed
-
-echo "Done. Output written to $OUT"
+bash pnps/extract_cds_bed12.sh RefGenome/genomic.gff pnps/cds_coords_merged.bed12
 ```
 
 **Step 2. Generate consensus genomes per sample** 
 For each sample, apply its variants (from a multisample VCF) to the reference genome to generate a personalized FASTA — i.e., the consensus genome.   
 Script used: generate_consensus_genomes.sbatch
-Code snippet:
-```
-VCF="/global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs/final_filtered_maxmissing.recode.vcf"
-REF="/global/scratch/users/lcouper/SoilCocciSeqs/RefGenome/CocciRef_GCA_000149335.2.masked.fna"
-OUTDIR="/global/scratch/users/lcouper/SoilCocciSeqs/pnps/consensus_genomes_allsamples"
-mkdir -p "$OUTDIR"
-echo "OUTDIR=$OUTDIR"
-
-SAMPLES=(San_Diego SJV_10 SJV_11 SJV_2 SJV_3 SJV_4 SJV_5 SJV_6 SJV_7 SJV_8 SJV_9 SJV_1 UCLA_Isolate293 UCLA_Isolate294 UCLA_Isolate295 13B1 14B1 22AC2 22BC1 34B2 58B1 PS02PN14-1 PS02PN14-2 PS02PN14-3)
-
-[ -s "$VCF" ] || { echo "Missing VCF: $VCF" >&2; exit 1; }
-[ -s "$REF" ] || { echo "Missing REF: $REF" >&2; exit 1; }
-[ -s "${REF}.fai" ] || { echo "Indexing REF..."; samtools faidx "$REF"; }
-
-echo "Listing VCF samples..."
-bcftools query -l "$VCF" > "$OUTDIR/.vcf_samples.txt"
-echo "Found $(wc -l < "$OUTDIR/.vcf_samples.txt") samples in VCF"
-
-for SAMPLE in "${SAMPLES[@]}"; do
-  if ! grep -qx "$SAMPLE" "$OUTDIR/.vcf_samples.txt"; then
-    echo "Skipping $SAMPLE (not in VCF)" >&2
-    continue
-  fi
-  echo "[$(date)] → $SAMPLE : subset + index"
-  bcftools view -s "$SAMPLE" -Oz -o "$OUTDIR/$SAMPLE.vcf.gz" "$VCF"
-  bcftools index -f "$OUTDIR/$SAMPLE.vcf.gz"
-
-  echo "[$(date)] → $SAMPLE : consensus"
-  bcftools consensus -f "$REF" "$OUTDIR/$SAMPLE.vcf.gz" > "$OUTDIR/$SAMPLE.genome.fa"
-done
-
-echo "[$(date)] ✅ Step 2 complete: consensus genomes in $OUTDIR"
-```
 
 **Step 2.5. Extract CDS sequences from each sample's consensus genome**
 
 Software used: bedtools 2.31.0, bcftools 1.16     
-Script: generate_per_sample_gene_vcfs.sh    
-Code snippet:
-```
-# Inputs
-BED=/global/scratch/users/lcouper/SoilCocciSeqs/pnps/cds_coords_merged.bed
-CONSENSUS_DIR=/global/scratch/users/lcouper/SoilCocciSeqs/pnps/consensus_genomes_allsamples
-SAMPLES=("San_Diego" "SJV_10" "SJV_11" "SJV_2" "SJV_3" "SJV_4" "SJV_5" "SJV_6" "SJV_7" "SJV_8" "SJV_9" "SJV_1" "UCLA_Isolate293" "UCLA_Isolate294" "UCLA_Isolate295" "13B1" "14B1" "22AC2" "22BC1" "34B2" "58B1" "PS02PN14-1" "PS02PN14-2" "PS02PN14-3")
-OUTDIR=/global/scratch/users/lcouper/SoilCocciSeqs/pnps/consensus_cds_allsamples
+Script: generate_per_sample_gene_vcfs.sh. Original version: generate_per_sample_gene_vcfs_og.sh    
 
-mkdir -p "$OUTDIR"
-
-# First, make sure all samples are indexed
-for fa in "$CONSENSUS_DIR"/*.genome.fa; do
-  [ -s "${fa}.fai" ] || samtools faidx "$fa"
-done
-
-# Then, extract CDS for each sample
-for SAMPLE in "${SAMPLES[@]}"; do
-    echo "Extracting CDS for $SAMPLE..."
-
-    bedtools getfasta -fi "$CONSENSUS_DIR/$SAMPLE.genome.fa" \
-                      -bed "$BED" \
-                      -name \
-                      -s \
-                      -fo "$OUTDIR/$SAMPLE.raw_cds.fa"
-done
-
-echo "✅ Step 2.5 complete: raw CDS sequences in $OUTDIR"
-```
 
 **Step 3. Merge to generate one CDS per gene (for each sample)**
 

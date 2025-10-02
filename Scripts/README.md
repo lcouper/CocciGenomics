@@ -663,10 +663,15 @@ Script uesd: build_group_consensus.py
 **Step 10. Count within-group polymorphisms (pS/pS)**
 Software used: python/3.10.12-gcc-11.4.0, egglib v3
 Script used:  compute_pnps_by_group.py 
+Note: may take ~10 minutes to run
 
 **Step 11. Count between group "divergences" (dN/dS)**
 Software used: python/3.10.12-gcc-11.4.0
-Script used:  
+Script used: compute_dnds_between_groups.py   
+
+**Step 12. Conduct MK test from pN/pS and dN/dS counts**
+Software used: python/3.10.12-gcc-11.4.0
+Script used: mk_test_from_counts.py
 
 
 

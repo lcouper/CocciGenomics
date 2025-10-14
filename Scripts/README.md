@@ -308,7 +308,9 @@ ls *.vcf.gz > gvcfs.list
 ```
 Purpose: Creates a dataset where all variant sites across all samples are considered. This enables variant callers to use information from one sample to infer the most likely genotype in another, improving sensitivity and accuracy in low coverage regions, and reducing false positives   
 Software used: java, gatk 4.5.0.0    
-Script name: combinegvcfs.sh
+Script name: combinegvcfs.sbatch    
+Note that this is done in batches of sample because otherwise the memory is exhausted. The original, not batched version of the script is: combinegvcfs_og.sbatch   
+Code snippet:  
 
 ```
 module load java
@@ -369,7 +371,7 @@ vcftools --gzvcf final.vcf.gz \
   --out final_filtered_maxmissing
 ```
 
-Number of SNPs retained: 56,944. With C. posadasii: 57,601
+Number of SNPs retained: 49,911
 
 
 ## Additional downstream analyses 

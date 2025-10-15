@@ -337,7 +337,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -O jointvcf.vcf.gz
 ```
 
-### 15. Filter variants to create an analysis-specific VCF file 
+### 15. Filter variants to create project-specific VCF file 
 I.e. flag and remove variants based on quality score, coverage, missingness etc. for just the samples included in a given analysis
 
 Script: filtervcfs.sbatch     

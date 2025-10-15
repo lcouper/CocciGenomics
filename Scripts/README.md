@@ -20,8 +20,8 @@
   - [11. Index bam files with read group added](#11-index-bam-files-with-read-group-added)
   - [12. Call variants using GATK HaplotypeCaller](#12-call-variants-using-gatk-haplotypecaller)
   - [13. Combine GVCF files](#13-combine-gvcf-files)
-  - [14. Joint-genotyping on combined GVCF files](#14-joint-genotyping-on-combined-gvcf-files)
-  - [15. Flag and remove variants based on quality score, coverage, missingness etc.](#15-flag-and-remove-variants-based-on-quality-score-coverage-missingness-etc)
+  - [14. Create metaVCF by joint genotyping on combined GVCF files](#14-joint-genotyping-on-combined-gvcf-files)
+  - [15. Filter variants to create project-specific VCF](#15-flag-and-remove-variants-based-on-quality-score-coverage-missingness-etc)
 - [Additional downstream analyses](#additional-downstream-analyses)
   - [Fst differentiation between clinical and environmental isolates](#fst-differentiation-between-clinical-and-environmental-isolates)
   - [Assess population structure](#assess-population-structure)
@@ -306,7 +306,8 @@ First, combined all the above files into a single directory 'AllGenomesHaploCall
 cd AllGenomesHaploCalled
 ls *.vcf.gz > gvcfs.list
 ```
-Purpose: Creates a dataset where all variant sites across all samples are considered. This enables variant callers to use information from one sample to infer the most likely genotype in another, improving sensitivity and accuracy in low coverage regions, and reducing false positives   
+Purpose: Creates a dataset where all variant sites across all samples are considered. This enables variant callers to use information from one sample to infer the most likely genotype in another, improving sensitivity and accuracy in low coverage regions, and reducing false positives.
+Here, all samples are included in the 'gvcfs.list'. We will filter the metaVCF later (step 15) for analyses using specific subsets of samples.  
 Software used: java, gatk 4.5.0.0    
 Script name: combinegvcfs.sbatch    
 Note that this is done in batches of sample because otherwise the memory is exhausted. The original, not batched version of the script is: combinegvcfs_og.sbatch   
@@ -322,7 +323,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 
 ```
 
-### 14. Joint-genotyping on combined GVCF files 
+### 14. Create meta VCF for all analyses by joint-genotyping on combined GVCF files 
 
 Software used: java, gatk 4.5.0.0   
 Script name: genotypegvcfs.sh    
@@ -336,7 +337,8 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -O jointvcf.vcf.gz
 ```
 
-### 15. Flag and remove variants based on quality score, coverage, missingness etc.
+### 15. Filter variants to create an analysis-specific VCF file 
+I.e. flag and remove variants based on quality score, coverage, missingness etc. for just the samples included in a given analysis
 
 Script: filtervcfs.sbatch     
 Software used: java, gatk 4.5.0.0, vcftools/0.1.16-gcc-11.4.0   

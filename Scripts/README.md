@@ -331,10 +331,10 @@ Script name: genotypegvcfs.sh
 ```
 module load java
 java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" GenotypeGVCFs \
--R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
+-R "/global/scratch/users/lcouper/SoilCocciSeqs/RefGenome/CocciRef_GCA_000149335.2.masked.fna" \
 -ploidy 1 \
 -V combined.g.vcf.gz \
--O jointvcf.vcf.gz
+-O metavcf.gz
 ```
 
 ### 15. Filter variants to create project-specific VCF file 

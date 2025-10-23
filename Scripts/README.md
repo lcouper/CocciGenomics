@@ -338,9 +338,16 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 ```
 
 ### 15. Filter variants to create project-specific VCF file 
-I.e. flag and remove variants based on quality score, coverage, missingness etc. for just the samples included in a given analysis
+Here, we subset the vcf to the samples included in a particular analyses. Then, flag and remove variants based on quality score, coverage, missingness etc. for just those samples.
 
-Script: filtervcfs.sbatch     
+CAsamples_envrclin.txt contains the names for all clinical and environmental samples from CA   
+CAsamples_envr.txt contains the names for all environmental samples    
+
+Scripts: 
+- filtervcfs_CAclinenvr.sbatch (all clinical and environmental samples from CA)
+- filtervcfs_CAenvr.sbatch (only environmental samples from CA)
+- filtervcfs.sbatch (no subsetting. Use all samples)
+  
 Software used: java, gatk 4.5.0.0, vcftools/0.1.16-gcc-11.4.0   
 Code snippet:     
 

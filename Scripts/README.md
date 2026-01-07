@@ -305,6 +305,8 @@ First, combined all the above files into a single directory 'AllGenomesHaploCall
 ```
 cd AllGenomesHaploCalled
 ls *.vcf.gz > gvcfs.list
+ls *.vcf.gz > gvcfs_withCp.list # repeat with CpSilv (outgroup for trees)
+
 ```
 Purpose: Creates a dataset where all variant sites across all samples are considered. This enables variant callers to use information from one sample to infer the most likely genotype in another, improving sensitivity and accuracy in low coverage regions, and reducing false positives.
 Here, all samples are included in the 'gvcfs.list'. We will filter the metaVCF later (step 15) for analyses using specific subsets of samples.  

@@ -382,7 +382,11 @@ vcftools --gzvcf final.vcf.gz \
   --out final_filtered_maxmissing
 ```
 
-Number of SNPs retained: 49,911
+Check how many SNPs retained:
+```
+bcftools view -H CAsamples_envrclin.final.recode.vcf | wc -l
+```
+For CAsamples_envrclin.final.recode.vcf: 49,911
 
 
 ## Additional downstream analyses 

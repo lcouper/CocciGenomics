@@ -386,7 +386,7 @@ Check how many SNPs retained:
 ```
 bcftools view -H CAsamples_envrclin.final.recode.vcf | wc -l
 ```
-For CAsamples_envrclin.final.recode.vcf: 49,911
+For CAsamples_envrclin.final.recode.vcf: 57,169
 
 
 ## Additional downstream analyses 

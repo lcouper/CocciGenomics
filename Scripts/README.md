@@ -87,7 +87,7 @@ Population genomics analyses
 
 ## Reference Genome Preparation
 #### 1.1 Mask repeats in reference genome   
-
+*Only need to do once*
 Using reference genome for Coccidioides immitis RS (GCA_000149335.2)   
 Downloaded [here](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000149335.2/).  
 Using repeat library available here:   
@@ -101,7 +101,7 @@ RepeatMasker -pa 16 -lib immitis_repeats.fa --norna CocciRef_GCA_000149335.2.fna
 ```
 
 #### 1.2 Index reference genome  
-
+*Only need to do once*
 Purpose: Enables quick access to specific locations of the genome (like the index of a book)   
 Software used: bio/bwa-mem2/2.2.1    
 Script name: bwamem_index.sh      

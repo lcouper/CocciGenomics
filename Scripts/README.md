@@ -1,39 +1,82 @@
-# Steps and scripts used to process _Coccidioides_ sequences 
-## Table of contents
+# Processing *Coccidioides* Whole-Genome Sequences
 
-- [Prepare reference genome (only need to do once)](#prepare-reference-genome-only-need-to-do-once)
-  - [1a. Mask repeats in reference genome](#1a-mask-repeats-in-reference-genome)
-  - [1b. Index reference genome](#1b-index-reference-genome)
-- [Prepare samples](#prepare-samples)
-  - [1. Obtained raw reads from Berkeley QB3 or SRA.](#1-obtained-raw-reads-from-berkeley-qb3-or-sra)
-  - [2. Filter poor quality reads and trim poor quality bases](#2-filter-poor-quality-reads-and-trim-poor-quality-bases)
-  - [3. Normalize read lengths to 75 across all genomes](#3-normalize-read-lengths-to-75-across-all-genomes)
-  - [4. Optional: Perform quality check on samples using fastqc](#4-optional-perform-quality-check-on-samples-using-fastqc)
-  - [5. Align sequences to reference genome](#5-align-sequences-to-reference-genome)
-  - [6. Sort and convert to bam](#6-sort-and-convert-to-bam)
-  - [7. Optional: Extract mapping and coverage statistics](#7-optional-extract-mapping-and-coverage-statistics)
-  - [8. Add or replace read groups](#8-add-or-replace-read-groups)
-  - [9. Optional: Verify read groups and compute death](#9-optional-verify-read-groups-and-compute-death)
-  - [9b. Optional: Calculate % of genome covered at >10x depth](#9b-optional-calculate--of-genome-covered-at-10x-depth)
-  - [10. Mark and remove duplicates](#10-mark-and-remove-duplicates)
-  - [11. Index bam files with read group added](#11-index-bam-files-with-read-group-added)
-  - [12. Call variants using GATK HaplotypeCaller](#12-call-variants-using-gatk-haplotypecaller)
-  - [13. Combine GVCF files](#13-combine-gvcf-files)
-  - [14. Create metaVCF by joint genotyping on combined GVCF files](#14-joint-genotyping-on-combined-gvcf-files)
-  - [15. Filter variants to create project-specific VCF](#15-flag-and-remove-variants-based-on-quality-score-coverage-missingness-etc)
-- [Additional downstream analyses](#additional-downstream-analyses)
-  - [Fst differentiation between clinical and environmental isolates](#fst-differentiation-between-clinical-and-environmental-isolates)
-  - [Assess population structure](#assess-population-structure)
-  - [Scaffolding SNPs into genes](#scaffolding-snps-into-genes)
-  - [Identify size of each chromosome](#identify-size-of-each-chromosome)
-  - [Examining mating type distribution](#examining-mating-type-distribution)
-  - [Tajima's D](#tajimas-d)
-  - [Nucleotide diversity, θπ](#nucleotide-diversity-θπ)
-  - [MK Test](#MK-test)
-  - [Investigating gene function and GO terms](#investigating-gene-function-and-go-terms)
-  - [Get amino acid sequence for significantly differentiated genes](#get-amino-acid-sequence-for-significantly-differentiated-genes)
-  - [Construct phylogenetic tree](#construct-phylogenetic-tree)
+This repository documents the scripts and steps used to process *Coccidioides* sequencing data from raw reads through downstream genomic analyses.
 
+---
+
+# Pipeline Overview
+
+Raw reads  
+↓  
+Quality filtering and trimming  
+↓  
+Alignment to reference genome  
+↓  
+BAM processing and duplicate removal  
+↓  
+Variant calling (GATK)  
+↓  
+Joint genotyping  
+↓  
+Variant filtering  
+↓  
+Population genomics analyses
+
+---
+
+# Table of Contents
+
+## 1. Reference Genome Preparation (run once)
+
+- [1.1 Mask repeats in reference genome](#11-mask-repeats-in-reference-genome)  
+- [1.2 Index reference genome](#12-index-reference-genome)  
+
+---
+
+## 2. Sample Processing
+
+### Raw Data Preparation
+
+- [2.1 Obtain raw reads (QB3 or SRA)](#21-obtain-raw-reads-qb3-or-sra)  
+- [2.2 Filter low-quality reads and trim bases](#22-filter-low-quality-reads-and-trim-bases)  
+- [2.3 Normalize read length to 75 bp](#23-normalize-read-length-to-75-bp)  
+- [2.4 Optional: Quality control with FastQC](#24-optional-quality-control-with-fastqc)  
+
+### Alignment and BAM Processing
+
+- [2.5 Align reads to reference genome](#25-align-reads-to-reference-genome)  
+- [2.6 Sort alignments and convert to BAM](#26-sort-alignments-and-convert-to-bam)  
+- [2.7 Optional: Extract mapping and coverage statistics](#27-optional-extract-mapping-and-coverage-statistics)  
+- [2.8 Add or replace read groups](#28-add-or-replace-read-groups)  
+- [2.9 Optional: Verify read groups and compute depth](#29-optional-verify-read-groups-and-compute-depth)  
+- [2.9b Optional: Calculate genome coverage at >10× depth](#29b-optional-calculate-genome-coverage-at-10-depth)  
+
+### Variant Calling
+
+- [2.10 Mark and remove duplicates](#210-mark-and-remove-duplicates)  
+- [2.11 Index BAM files](#211-index-bam-files)  
+- [2.12 Call variants using GATK HaplotypeCaller](#212-call-variants-using-gatk-haplotypecaller)  
+- [2.13 Combine GVCF files](#213-combine-gvcf-files)  
+- [2.14 Joint genotyping to produce metaVCF](#214-joint-genotyping-to-produce-metavcf)  
+- [2.15 Filter variants to produce project-specific VCF](#215-filter-variants-to-produce-project-specific-vcf)  
+
+---
+
+## 3. Downstream Genomic Analyses
+
+- [FST differentiation between clinical and environmental isolates](#fst-differentiation-between-clinical-and-environmental-isolates)  
+- [Population structure analysis](#assess-population-structure)  
+- [Map SNPs to genes](#scaffolding-snps-into-genes)  
+- [Determine chromosome sizes](#identify-size-of-each-chromosome)  
+- [Mating type analysis](#examining-mating-type-distribution)  
+- [Tajima’s D](#tajimas-d)  
+- [Nucleotide diversity (θπ)](#nucleotide-diversity-θπ)  
+- [McDonald–Kreitman test](#mk-test)  
+- [Gene function and GO term analysis](#investigating-gene-function-and-go-terms)  
+- [Extract amino acid sequences for differentiated genes](#get-amino-acid-sequence-for-significantly-differentiated-genes)  
+- [Construct phylogenetic tree](#construct-phylogenetic-tree)
+
+---
 
 
 ## Prepare reference genome (only need to do once) 

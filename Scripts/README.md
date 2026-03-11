@@ -9,27 +9,7 @@ This repository documents the scripts and steps used to process *Coccidioides* s
 
 ---
 
-## 🔬 Pipeline Overview
-
-Raw reads  
-↓  
-Quality filtering and trimming  
-↓  
-Alignment to reference genome  
-↓  
-BAM processing and duplicate removal  
-↓  
-Variant calling (GATK)  
-↓  
-Joint genotyping  
-↓  
-Variant filtering  
-↓  
-Population genomics analyses
-
----
-
-# Table of Contents
+## 🔬 Table of Contents
 
 ## 1. Reference Genome Preparation (run once)
 

@@ -1,7 +1,15 @@
-# Processing *Coccidioides* Whole-Genome Sequences
+# 🧬 Processing *Coccidioides* Whole-Genome Sequences
+
+![Pipeline](https://img.shields.io/badge/Pipeline-WGS-blue)
+![Platform](https://img.shields.io/badge/Platform-HPC-green)
+![Language](https://img.shields.io/badge/Scripts-Bash%20%7C%20R-orange)
+![Tools](https://img.shields.io/badge/Tools-GATK%20%7C%20BWA%20%7C%20Samtools-purple)
 
 This repository documents the scripts and steps used to process *Coccidioides* sequencing data from raw reads through downstream genomic analyses.
 
+---
+
+## 🔬 Pipeline Overview
 ---
 
 # Pipeline Overview

@@ -48,12 +48,12 @@ Population genomics analyses
 
 ### Alignment and BAM Processing
 
-- [2.5 Align reads to reference genome](#25-align-reads-to-reference-genome)  
-- [2.6 Sort alignments and convert to BAM](#26-sort-alignments-and-convert-to-bam)  
-- [2.7 Optional: Extract mapping and coverage statistics](#27-optional-extract-mapping-and-coverage-statistics)  
-- [2.8 Add or replace read groups](#28-add-or-replace-read-groups)  
-- [2.9 Optional: Verify read groups and compute depth](#29-optional-verify-read-groups-and-compute-depth)  
-- [2.9b Optional: Calculate genome coverage at >10× depth](#29b-optional-calculate-genome-coverage-at-10-depth)  
+- [3.1 Align reads to reference genome](#25-align-reads-to-reference-genome)  
+- [3.2 Sort alignments and convert to BAM](#26-sort-alignments-and-convert-to-bam)  
+- [3.3 Optional: Extract mapping and coverage statistics](#27-optional-extract-mapping-and-coverage-statistics)  
+- [3.4 Add or replace read groups](#28-add-or-replace-read-groups)  
+- [3.5 Optional: Verify read groups and compute depth](#29-optional-verify-read-groups-and-compute-depth)  
+- [3.6 Optional: Calculate genome coverage at >10× depth](#29b-optional-calculate-genome-coverage-at-10-depth)  
 
 ### Variant Calling
 
@@ -115,7 +115,7 @@ samtools faidx CocciRef_GCA_000149335.2.masked.fna
 ```
 
 ## Raw data preparation 
-### 2.1 Obtain raw reads from Berkeley QB3
+#### 2.1 Obtain raw reads from Berkeley QB3
 
 The fastq.gz files (1 forward, 1 reverse) are stored here on the Remais Group Shared Drive:
 SPORE/WGS/Sequence data (All)/
@@ -123,7 +123,7 @@ SPORE/WGS/Sequence data (All)/
 and Berkeley's HPC BRC at:
 `/global/scratch/users/lcouper/SoilCocciSeqs`
 
-### 2.2 Download published sequences from NCBI SRA
+#### 2.2 Download published sequences from NCBI SRA
 
 Prior Coccidioides sequences were downloaded from NCBI using the SRA toolkit.
 
@@ -131,7 +131,7 @@ Additional notes [here](https://docs.google.com/document/d/1gkM7m6TjQAOO1pwxe4X2
 Tracker for downloaded sequences and metadata [here](https://docs.google.com/spreadsheets/d/1wrwSLeURp-E7LDD0SKT1wXEnrET5IziknmJWmXCB_7o/edit).
 
 
-### 2.3 Filter low-quality reads and trim bases
+#### 2.3 Filter low-quality reads and trim bases
 
 Note that Illumina adapters [available and downloaded from here](https://github.com/usadellab/Trimmomatic/blob/main/adapters/TruSeq3-PE.fa). Ensure this adapter sequence file is in the same folder as your fastq files.   
 Software used: Trimmomatic V 0.39 (Bolger et al. 2014)      
@@ -145,7 +145,7 @@ PS02PN14-1_S1_L007_R2_001.trim.fastq.gz PS02PN14-1_S1_L007_R2_001.untrim.fastq.g
 ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:35 SLIDINGWINDOW:4:15
 ```
 
-### 2.4 Normalize read lengths to 75 bp 
+#### 2.4 Normalize read lengths to 75 bp 
 
 Note: this is because there is variation in sequenced read lengths across genomes (ours are all 150bp paired end, but prior genomes vary from 75 - 300 bp PE). We want to normalize to the lowest common denominator -- here 75 bp.
 
@@ -163,7 +163,7 @@ fastp \
   --html PS02PN14_fastp_report.html --thread 4
 ```
 
-### 2.5 Optional: Quality control with FastQC
+#### 2.5 Optional: Quality control with FastQC
 
 Software used: bio/fastqc/0.12.1-gcc-11.4.0   
 Script: fastqc.sh, fastqc.sra.sh        
@@ -173,7 +173,8 @@ module load bio/fastqc/0.12.1-gcc-11.4.0
 fastqc trimmed_fastqc/*.fastq.gz
 ```
 
-### 5. Align sequences to reference genome    
+### Alignment and BAM processing
+#### 3.1 Align reads to reference genome
 
 Purpose: To determine where in the genome a given sequence/read is located    
 Software used: bio/bwa-mem2/2.2.1   

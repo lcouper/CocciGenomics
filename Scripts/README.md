@@ -54,18 +54,18 @@ Population genomics analyses
 - [3.4 Add or replace read groups](#28-add-or-replace-read-groups)  
 - [3.5 Optional: Verify read groups and compute depth](#29-optional-verify-read-groups-and-compute-depth)  
 - [3.6 Optional: Calculate genome coverage at >10× depth](#29b-optional-calculate-genome-coverage-at-10-depth)  
+- [3.7 Mark and remove duplicates](#210-mark-and-remove-duplicates)  
+- [3.8 Index BAM files](#211-index-bam-files)
 
 ### Variant Calling
 
-- [2.10 Mark and remove duplicates](#210-mark-and-remove-duplicates)  
-- [2.11 Index BAM files](#211-index-bam-files)  
-- [2.12 Call variants using GATK HaplotypeCaller](#212-call-variants-using-gatk-haplotypecaller)  
-- [2.13 Combine GVCF files](#213-combine-gvcf-files)  
-- [2.14 Joint genotyping to produce metaVCF](#214-joint-genotyping-to-produce-metavcf)  
-- [2.15 Filter variants to produce project-specific VCF](#215-filter-variants-to-produce-project-specific-vcf)  
+- [4.1 Call variants using GATK HaplotypeCaller](#212-call-variants-using-gatk-haplotypecaller)  
+- [4.2 Combine GVCF files](#213-combine-gvcf-files)  
+- [4.3 Joint genotyping to produce metaVCF](#214-joint-genotyping-to-produce-metavcf)  
+- [4.4 Filter variants to produce project-specific VCF](#215-filter-variants-to-produce-project-specific-vcf)  
 
 
-## 3. Downstream Genomic Analyses
+### Downstream Genomic Analyses
 
 - [FST differentiation between clinical and environmental isolates](#fst-differentiation-between-clinical-and-environmental-isolates)  
 - [Population structure analysis](#assess-population-structure)  
@@ -173,7 +173,7 @@ module load bio/fastqc/0.12.1-gcc-11.4.0
 fastqc trimmed_fastqc/*.fastq.gz
 ```
 
-### Alignment and BAM processing
+## Alignment and BAM processing
 #### 3.1 Align reads to reference genome
 
 Purpose: To determine where in the genome a given sequence/read is located    
@@ -193,7 +193,7 @@ trimmed_fastq/${base}_R1_001.trim.fastq trimmed_fastq/${base}_R2_001.trim.fastq 
 done
 ```
 
-### 6. Sort and convert to bam
+#### 3.2 Sort alignments and convert to BAM
 
 Compress sam to bam and sort bam file     
 Software used: gatk     
@@ -207,7 +207,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -SORT_ORDER coordinate
 ```
 
-### 7. Optional: Extract mapping and coverage statistics 
+#### 3.3 Optional: Extract mapping and coverage statistics
 
 Software used: samtools, java   
 Script name: MappingStats.sh, MappingStatsSRA.sh    
@@ -229,7 +229,7 @@ picard CollectWgsMetrics \
 done
 ```
 
-### 8. Add or replace read groups 
+#### 3.4 Add or replace read groups
 
 Followed guidance [here](https://gatk.broadinstitute.org/hc/en-us/articles/360035532352-Errors-about-read-group-RG-information)
 and issue was diagnosed [here](https://gatk.broadinstitute.org/hc/en-us/community/posts/4412745467931-HaplotypeCaller-does-not-work). See [this spreadsheet](https://docs.google.com/spreadsheets/d/1wrwSLeURp-E7LDD0SKT1wXEnrET5IziknmJWmXCB_7o/edit?gid=1963297784#gid=1963297784) for what read group parameters were added:
@@ -253,7 +253,8 @@ RGPL=ILLUMINA \
 RGPU=unit1 \
 RGSM=PS02PN14-2
 ```
-### 9. Optional: Verify read groups and compute death 
+
+#### 3.5 Optional: Verify read groups and compute depth
 
 To verify read groups added correctly:
 ```
@@ -281,7 +282,7 @@ To calculate the mean depth from this file:
 awk 'BEGIN { total = 0; count = 0 } { total += $3; count += 1; } END { avg = total / count; print avg} ' results/bam/58B1.depth.txt
 ```
 
-### 9b. Optional: Calculate % of genome covered at >10x depth
+#### 3.6 Optional: Calculate genome coverage at >10× depth
 
 Software used: bio/bedtools2/2.31.0-gcc-11.4.0, bio/samtools/1.17-gcc-11.4.0    
 Script: depth10x.sbatch, depth10x_sra.sbatch    
@@ -306,7 +307,7 @@ done
 
 ```
 
-### 10. Mark and remove duplicates 
+#### 3.7 Mark and remove duplicates
 
 Purpose: Duplicates reflect same sequence fragment being amplified and read multiple times. Keeping duplicates can lead to inflated estimates of coverage and can bias variant-calling steps    
 Software used: bio/picard/3.0.0-gcc-11.4.0        
@@ -326,8 +327,7 @@ done
 ```
 
 
-### 11. Index bam files with read group added
-
+#### 3.8 Index BAM files
 Software used: bio/samtools/1.17-gcc-11.4.0   
 Script: index_dedupedbams.sbatch, index_dedupedbams.sra.sbatch
 Code snippet:
@@ -335,7 +335,9 @@ Code snippet:
 samtools index results/bam/${base}.deduped.bam
 ```
 
-### 12. Call variants using GATK HaplotypeCaller 
+### Variant Calling
+
+#### 4.1 Call variants using GATK HaplotypeCaller
 
 Note on GATK installation: downloaded gatk from [here](https://github.com/broadinstitute/gatk/releases) and then uploaded the jar file to savio to working directory. Guidance on these steps found [here](https://www.biostars.org/p/405702/).   
 Software used: java, gatk 4.5.0.0    
@@ -353,7 +355,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -O results/haplocalled/58B1.g.vcf.gz
 ```
 
-### 13. Combine GVCF files 
+#### 4.2 Combine GVCF files 
 
 First, combined all the above files into a single directory 'AllGenomesHaploCalled'. Then, created a list of files in this directory using:
 ```
@@ -379,7 +381,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 
 ```
 
-### 14. Create meta VCF for all analyses by joint-genotyping on combined GVCF files 
+#### 4.3 Joint genotyping to produce metaVCF
 
 Software used: java, gatk 4.5.0.0   
 Script name: genotypegvcfs.sh    
@@ -393,7 +395,8 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -O metavcf.gz
 ```
 
-### 15. Filter variants to create project-specific VCF file 
+#### 4.4 Filter variants to produce project-specific VCF
+
 Here, we subset the vcf to the samples included in a particular analyses. Then, flag and remove variants based on quality score, coverage, missingness etc. for just those samples.
 
 CAsamples_envrclin.txt contains the names for all clinical and environmental samples from CA   

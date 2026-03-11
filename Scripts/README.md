@@ -37,10 +37,11 @@ Population genomics analyses
 
 ### Raw Data Preparation
 
-- [2.1 Obtain raw reads (QB3 or SRA)](#21-obtain-raw-reads-qb3-or-sra)  
-- [2.2 Filter low-quality reads and trim bases](#22-filter-low-quality-reads-and-trim-bases)  
-- [2.3 Normalize read length to 75 bp](#23-normalize-read-length-to-75-bp)  
-- [2.4 Optional: Quality control with FastQC](#24-optional-quality-control-with-fastqc)  
+- [2.1 Obtain raw reads from Berkeley QB3](#21-obtain-raw-reads-from-berkeley-qb3)  
+- [2.2 Download published sequences from NCBI SRA](#22-download-published-sequences-from-ncbi-sra)  
+- [2.3 Filter low-quality reads and trim bases](#23-filter-low-quality-reads-and-trim-bases)  
+- [2.4 Normalize read length to 75 bp](#24-normalize-read-length-to-75-bp)  
+- [2.5 Optional: Quality control with FastQC](#25-optional-quality-control-with-fastqc)  
 
 ### Alignment and BAM Processing
 
@@ -119,6 +120,26 @@ and Berkeley's HPC BRC at: /global/scratch/users/lcouper/SoilCocciSeqs
 Prior cocci sequences were downloaded from NCBI using the SRA toolkit.   
 Additional notes [here](https://docs.google.com/document/d/1gkM7m6TjQAOO1pwxe4X2DrIuMPuA3uGd6UalImpb-h4/edit?tab=t.0).   
 Tracker for sequences downloaded and metadata [here](https://docs.google.com/spreadsheets/d/1wrwSLeURp-E7LDD0SKT1wXEnrET5IziknmJWmXCB_7o/edit?gid=1963297784#gid=1963297784). 
+
+
+### 2.1 Obtain raw reads from Berkeley QB3
+
+The fastq.gz files (1 forward, 1 reverse) are stored here on the Remais Group Shared Drive:
+SPORE/WGS/Sequence data (All)/
+
+and Berkeley's HPC BRC at:
+`/global/scratch/users/lcouper/SoilCocciSeqs`
+
+### 2.2 Download published sequences from NCBI SRA
+
+Prior Coccidioides sequences were downloaded from NCBI using the SRA toolkit.
+
+Additional notes:
+https://docs.google.com/document/d/1gkM7m6TjQAOO1pwxe4X2DrIuMPuA3uGd6UalImpb-h4/edit
+
+Tracker for downloaded sequences and metadata:
+https://docs.google.com/spreadsheets/d/1wrwSLeURp-E7LDD0SKT1wXEnrET5IziknmJWmXCB_7o/edit
+
 
 ### 2. Filter poor quality reads and trim poor quality bases 
 

@@ -111,17 +111,8 @@ Software used: bio/samtools/1.17-gcc-11.4.0
 ```
 samtools faidx CocciRef_GCA_000149335.2.masked.fna
 ```
-## Process samples through VCF generation
-### 1. Obtained raw reads from Berkeley QB3 or SRA.  
 
-The fastq.gz files (1 forward, 1 reverse) are stored here on the Remais Group Shared Drive: SPORE/WGS/Sequence data (All)/ 
-and Berkeley's HPC BRC at: /global/scratch/users/lcouper/SoilCocciSeqs
-
-Prior cocci sequences were downloaded from NCBI using the SRA toolkit.   
-Additional notes [here](https://docs.google.com/document/d/1gkM7m6TjQAOO1pwxe4X2DrIuMPuA3uGd6UalImpb-h4/edit?tab=t.0).   
-Tracker for sequences downloaded and metadata [here](https://docs.google.com/spreadsheets/d/1wrwSLeURp-E7LDD0SKT1wXEnrET5IziknmJWmXCB_7o/edit?gid=1963297784#gid=1963297784). 
-
-
+## Raw data preparation 
 ### 2.1 Obtain raw reads from Berkeley QB3
 
 The fastq.gz files (1 forward, 1 reverse) are stored here on the Remais Group Shared Drive:
@@ -134,11 +125,8 @@ and Berkeley's HPC BRC at:
 
 Prior Coccidioides sequences were downloaded from NCBI using the SRA toolkit.
 
-Additional notes:
-https://docs.google.com/document/d/1gkM7m6TjQAOO1pwxe4X2DrIuMPuA3uGd6UalImpb-h4/edit
-
-Tracker for downloaded sequences and metadata:
-https://docs.google.com/spreadsheets/d/1wrwSLeURp-E7LDD0SKT1wXEnrET5IziknmJWmXCB_7o/edit
+Additional notes [here](https://docs.google.com/document/d/1gkM7m6TjQAOO1pwxe4X2DrIuMPuA3uGd6UalImpb-h4/edit).
+Tracker for downloaded sequences and metadata [here](https://docs.google.com/spreadsheets/d/1wrwSLeURp-E7LDD0SKT1wXEnrET5IziknmJWmXCB_7o/edit).
 
 
 ### 2. Filter poor quality reads and trim poor quality bases 

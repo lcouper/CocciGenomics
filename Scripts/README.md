@@ -36,9 +36,7 @@ Population genomics analyses
 - [1.1 Mask repeats in reference genome](#11-mask-repeats-in-reference-genome)  
 - [1.2 Index reference genome](#12-index-reference-genome)  
 
-## 2. Sample Processing
-
-### Raw Data Preparation
+## 2. Raw Data Preparation
 
 - [2.1 Obtain raw reads from Berkeley QB3](#21-obtain-raw-reads-from-berkeley-qb3)  
 - [2.2 Download published sequences from NCBI SRA](#22-download-published-sequences-from-ncbi-sra)  
@@ -114,7 +112,7 @@ Software used: bio/samtools/1.17-gcc-11.4.0
 samtools faidx CocciRef_GCA_000149335.2.masked.fna
 ```
 
-## Raw data preparation 
+## Raw data processing
 #### 2.1 Obtain raw reads from Berkeley QB3
 
 The fastq.gz files (1 forward, 1 reverse) are stored here on the Remais Group Shared Drive:

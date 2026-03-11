@@ -529,6 +529,15 @@ Data file format
 #define LOCDATA   0     // (B) Input file contains a location identifier
 ```
 
+To test which level of K is most appropriate: 
+```
+for K in 2 3 4 5; do
+  for rep in {1..5}; do
+    ./structure -m mainparams2 -K $K -D $RANDOM -o output_K${K}_rep${rep}
+  done
+done
+```
+
 ### Scaffolding SNPs into genes 
 
 Download .gtf file for cocci reference [here](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000149335.2/).

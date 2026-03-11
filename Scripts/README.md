@@ -36,8 +36,6 @@ Population genomics analyses
 - [1.1 Mask repeats in reference genome](#11-mask-repeats-in-reference-genome)  
 - [1.2 Index reference genome](#12-index-reference-genome)  
 
----
-
 ## 2. Sample Processing
 
 ### Raw Data Preparation
@@ -66,7 +64,6 @@ Population genomics analyses
 - [2.14 Joint genotyping to produce metaVCF](#214-joint-genotyping-to-produce-metavcf)  
 - [2.15 Filter variants to produce project-specific VCF](#215-filter-variants-to-produce-project-specific-vcf)  
 
----
 
 ## 3. Downstream Genomic Analyses
 
@@ -134,7 +131,7 @@ Additional notes [here](https://docs.google.com/document/d/1gkM7m6TjQAOO1pwxe4X2
 Tracker for downloaded sequences and metadata [here](https://docs.google.com/spreadsheets/d/1wrwSLeURp-E7LDD0SKT1wXEnrET5IziknmJWmXCB_7o/edit).
 
 
-### 2. Filter poor quality reads and trim poor quality bases 
+### 2.3 Filter low-quality reads and trim bases
 
 Note that Illumina adapters [available and downloaded from here](https://github.com/usadellab/Trimmomatic/blob/main/adapters/TruSeq3-PE.fa). Ensure this adapter sequence file is in the same folder as your fastq files.   
 Software used: Trimmomatic V 0.39 (Bolger et al. 2014)      
@@ -148,7 +145,7 @@ PS02PN14-1_S1_L007_R2_001.trim.fastq.gz PS02PN14-1_S1_L007_R2_001.untrim.fastq.g
 ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:35 SLIDINGWINDOW:4:15
 ```
 
-### 3. Normalize read lengths to 75 across all genomes 
+### 2.4 Normalize read lengths to 75 bp 
 
 Note: this is because there is variation in sequenced read lengths across genomes (ours are all 150bp paired end, but prior genomes vary from 75 - 300 bp PE). We want to normalize to the lowest common denominator -- here 75 bp.
 
@@ -166,7 +163,7 @@ fastp \
   --html PS02PN14_fastp_report.html --thread 4
 ```
 
-### 4. Optional: Perform quality check on samples using fastqc
+### 2.5 Optional: Perform quality check on samples using fastqc
 
 Software used: bio/fastqc/0.12.1-gcc-11.4.0   
 Script: fastqc.sh, fastqc.sra.sh        

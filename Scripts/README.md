@@ -163,7 +163,7 @@ fastp \
   --html PS02PN14_fastp_report.html --thread 4
 ```
 
-### 2.5 Optional: Perform quality check on samples using fastqc
+### 2.5 Optional: Quality control with FastQC
 
 Software used: bio/fastqc/0.12.1-gcc-11.4.0   
 Script: fastqc.sh, fastqc.sra.sh        

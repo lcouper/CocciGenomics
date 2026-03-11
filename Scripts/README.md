@@ -11,16 +11,6 @@ This repository documents the scripts and steps used to process *Coccidioides* s
 
 ## 🔬 Pipeline Overview
 
-```mermaid
-flowchart TD
-    A[Raw reads FASTQ] --> B[Quality filtering & trimming]
-    B --> C[Alignment to reference genome]
-    C --> D[BAM processing & duplicate removal]
-    D --> E[Variant calling (GATK)]
-    E --> F[Joint genotyping]
-    F --> G[Variant filtering]
-    G --> H[Population genomics analyses]
-
 Raw reads  
 ↓  
 Quality filtering and trimming  

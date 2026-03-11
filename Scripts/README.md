@@ -1,5 +1,4 @@
-# Steps and scripts used to process _Coccidioides_ sequences (both newly sequenced and those downloaded from SRA) ### 
-
+# Steps and scripts used to process _Coccidioides_ sequences 
 ## Table of contents
 
 - [Prepare reference genome (only need to do once)](#prepare-reference-genome-only-need-to-do-once)

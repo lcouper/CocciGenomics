@@ -46,7 +46,7 @@ Population genomics analyses
 - [2.4 Normalize read length to 75 bp](#24-normalize-read-length-to-75-bp)  
 - [2.5 Optional: Quality control with FastQC](#25-optional-quality-control-with-fastqc)  
 
-### Alignment and BAM Processing
+### 3. Alignment and BAM Processing
 
 - [3.1 Align reads to reference genome](#25-align-reads-to-reference-genome)  
 - [3.2 Sort alignments and convert to BAM](#26-sort-alignments-and-convert-to-bam)  
@@ -57,7 +57,7 @@ Population genomics analyses
 - [3.7 Mark and remove duplicates](#210-mark-and-remove-duplicates)  
 - [3.8 Index BAM files](#211-index-bam-files)
 
-### Variant Calling
+### 4. Variant Calling
 
 - [4.1 Call variants using GATK HaplotypeCaller](#212-call-variants-using-gatk-haplotypecaller)  
 - [4.2 Combine GVCF files](#213-combine-gvcf-files)  

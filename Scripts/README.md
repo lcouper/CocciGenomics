@@ -31,8 +31,8 @@ This repository documents the scripts and steps used to process *Coccidioides* s
 - [3.3 Optional: Extract mapping and coverage statistics](#27-optional-extract-mapping-and-coverage-statistics)  
 - [3.4 Add or replace read groups](#28-add-or-replace-read-groups)  
 - [3.5 Optional: Verify read groups and compute depth](#29-optional-verify-read-groups-and-compute-depth)  
-- [3.6 Optional: Calculate genome coverage at >10× depth](#29b-optional-calculate-genome-coverage-at-10-depth)  
-- [3.7 Mark and remove duplicates](#210-mark-and-remove-duplicates)  
+- [3.6 Mark and remove duplicates](#210-mark-and-remove-duplicates)
+- [3.7 Optional: Calculate genome coverage at >10× depth](#29b-optional-calculate-genome-coverage-at-10-depth)  
 - [3.8 Index BAM files](#211-index-bam-files)
 
 ### 4. Variant Calling
@@ -260,7 +260,26 @@ To calculate the mean depth from this file:
 awk 'BEGIN { total = 0; count = 0 } { total += $3; count += 1; } END { avg = total / count; print avg} ' results/bam/58B1.depth.txt
 ```
 
-#### 3.6 Optional: Calculate genome coverage at >10× depth
+#### 3.6 Mark and remove duplicates
+
+Purpose: Duplicates reflect same sequence fragment being amplified and read multiple times. Keeping duplicates can lead to inflated estimates of coverage and can bias variant-calling steps    
+Software used: bio/picard/3.0.0-gcc-11.4.0        
+Script name: markdups.sh, markdups.sra.sh,  
+Code snippet:
+
+```
+for infile in results/sortedbams/*.sorted.bam
+do
+base=$(basename ${infile} .sorted.bam)
+picard MarkDuplicates \
+-REMOVE_DUPLICATES TRUE \
+-I results/sortedbams/${base}.sorted.bam \
+-O results/dedupedbams/"${base}.deduped.bam" \
+-M results/dedupedbams/"${base}.dup_metrics.txt"
+done
+```
+
+#### 3.7 Optional: Calculate genome coverage at >10× depth
 
 Software used: bio/bedtools2/2.31.0-gcc-11.4.0, bio/samtools/1.17-gcc-11.4.0    
 Script: depth10x.sbatch, depth10x_sra.sbatch    
@@ -283,25 +302,6 @@ for bam in "$BAM_DIR"/*.deduped.bam; do
   echo -e "${sample}\t${percent}" >> "$OUTFILE"
 done
 
-```
-
-#### 3.7 Mark and remove duplicates
-
-Purpose: Duplicates reflect same sequence fragment being amplified and read multiple times. Keeping duplicates can lead to inflated estimates of coverage and can bias variant-calling steps    
-Software used: bio/picard/3.0.0-gcc-11.4.0        
-Script name: markdups.sh, markdups.sra.sh,  
-Code snippet:
-
-```
-for infile in results/sortedbams/*.sorted.bam
-do
-base=$(basename ${infile} .sorted.bam)
-picard MarkDuplicates \
--REMOVE_DUPLICATES TRUE \
--I results/sortedbams/${base}.sorted.bam \
--O results/dedupedbams/"${base}.deduped.bam" \
--M results/dedupedbams/"${base}.dup_metrics.txt"
-done
 ```
 
 

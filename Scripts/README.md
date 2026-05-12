@@ -304,6 +304,7 @@ done
 
 ```
 
+*Note that any samples with <90% of their genome covered at >10x were then removed from downstream analysis. This is to avoid missing genotypes distorting population structure
 
 #### 3.8 Index BAM files
 Software used: bio/samtools/1.17-gcc-11.4.0   

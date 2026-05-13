@@ -424,8 +424,8 @@ Check how many SNPs retained:
 # example:
 bcftools view -H Subset_envrclin.final.recode.vcf | wc -l
 ```
-Subset_envr.final.recode.vcf: 63,375
-Subset_envrclin.final.recode.vcf: 60,763
+Subset_envr.final.recode.vcf: 63,375   
+Subset_envrclin.final.recode.vcf: 60,763     
 allsamples.final.recode.vcf: 57,617
 
 

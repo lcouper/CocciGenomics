@@ -427,10 +427,10 @@ Check how many SNPs retained:
 bcftools view -H Subset_envrclin.final.recode.vcf | wc -l
 ```
 metavcf: 263,266 
-Subset_envr.final.recode.vcf: 62,845   
-Subset_envr_withrepreps.final.recode.vcf: 63,375      
+Subset_envr.final.recode.vcf: 62,847   
+Subset_envr_withrepreps.final.recode.vcf: 63,377      
 Subset_envrclin.final.recode.vcf: 56,791         
-allsamples.final.recode.vcf: 56,167    
+allsamples.final.recode.vcf: 56,201    
 
 
 #### 4.5 Convert final vcf file to a pseudo-diploid genotype 

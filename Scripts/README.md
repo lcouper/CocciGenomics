@@ -438,8 +438,10 @@ echo "* 0 999999999 . 2" > ploidy.txt
 
 # Next, use the bcftools plug-in to correct ploidy across all sites (as specificed in the ploidy.txt file above)
 module load bio/bcftools/1.16-gcc-11.4.0
-# example:
-bcftools +fixploidy final_filtered_maxmissing.recode.vcf -- -p ploidy.txt > final_diploid.vcf
+# run:
+bcftools +fixploidy allsamples.final.recode.vcf -- -p ploidy.txt > allsamples.final.diploid.vcf
+bcftools +fixploidy Subset_envr.final.recode.vcf -- -p ploidy.txt > Subset_envr.final.diploid.vcf
+bcftools +fixploidy Subset_envrclin.final.recode.vcf -- -p ploidy.txt > Subset_envrclin.final.diploid.vcf
 ```
 
 

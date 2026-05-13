@@ -40,8 +40,8 @@ This repository documents the scripts and steps used to process *Coccidioides* s
 - [4.1 Call variants using GATK HaplotypeCaller](#212-call-variants-using-gatk-haplotypecaller)  
 - [4.2 Combine GVCF files](#213-combine-gvcf-files)  
 - [4.3 Joint genotyping to produce metaVCF](#214-joint-genotyping-to-produce-metavcf)  
-- [4.4 Filter variants to produce project-specific VCF](#215-filter-variants-to-produce-project-specific-vcf)  
-
+- [4.4 Filter variants to produce project-specific VCF](#215-filter-variants-to-produce-project-specific-vcf)
+- [4.5 Convert final vcf file to a pseudo-diploid genotype](#216-convert-final-vcf-file-to-a-pseudo-diploid-genotype)
 
 ### Downstream Genomic Analyses
 
@@ -421,9 +421,26 @@ vcftools --gzvcf final.vcf.gz \
 
 Check how many SNPs retained:
 ```
-bcftools view -H CAsamples_envrclin.final.recode.vcf | wc -l
+# example:
+bcftools view -H Subset_envrclin.final.recode.vcf | wc -l
 ```
-For CAsamples_envrclin.final.recode.vcf: 57,169
+Subset_envr.final.recode.vcf: 63,375
+Subset_envrclin.final.recode.vcf: 60,763
+allsamples.final.recode.vcf: 57,617
+
+
+#### 4.5 Convert final vcf file to a pseudo-diploid genotype 
+Purpose: haploid genotypes are not natively supported by vcftools and other packages
+
+```
+# First, create a 'ploidy' file to tell vcftools which part of the chromsome to consider haploid. Here, we are specificying all positions (by using large value of 999999999)
+echo "* 0 999999999 . 2" > ploidy.txt
+
+# Next, use the bcftools plug-in to correct ploidy across all sites (as specificed in the ploidy.txt file above)
+module load bio/bcftools/1.16-gcc-11.4.0
+# example:
+bcftools +fixploidy final_filtered_maxmissing.recode.vcf -- -p ploidy.txt > final_diploid.vcf
+```
 
 
 ## Additional downstream analyses 
@@ -437,15 +454,7 @@ California isolates:
 echo -e "13B1\n14B1\n22AC2\n22BC1\34B2\n58B1\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3" > CApop1.txt
 echo -e "SD_1\nSJV_1\nSJV_10\nSJV_11\nSJV_2\nSJV_3\nSJV_4\nSJV_5\nSJV_6\nSJV_7\nSJV_8\nSJV_9\nUCLA293\nUCLA294\nUCLA295" > CApop2.txt
 ```
-Then, I converted my final.vcf file to a pseudo-diploid genotype (as haploid genotypes are not natively supported by vcftools)
-```
-# First, create a 'ploidy' file to tell vcftools which part of the chromsome to consider haploid. Here, we are specificying all positions (by using large value of 999999999)
-echo "* 0 999999999 . 2" > ploidy.txt
 
-# Next, use the bcftools plug-in to correct ploidy across all sites (as specificed in the ploidy.txt file above)
-module load bio/bcftools/1.16-gcc-11.4.0
-bcftools +fixploidy final_filtered_maxmissing.recode.vcf -- -p ploidy.txt > final_diploid.vcf
-```
 Lastly, run vcftools to estimate Fst along the genome.   
 Here, we estimated Fst per site, then took averages by gene in R
 

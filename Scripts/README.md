@@ -26,22 +26,22 @@ This repository documents the scripts and steps used to process *Coccidioides* s
 
 ### 3. Alignment and BAM Processing
 
-- [3.1 Align reads to reference genome](#25-align-reads-to-reference-genome)  
-- [3.2 Sort alignments and convert to BAM](#26-sort-alignments-and-convert-to-bam)  
-- [3.3 Optional: Extract mapping and coverage statistics](#27-optional-extract-mapping-and-coverage-statistics)  
-- [3.4 Add or replace read groups](#28-add-or-replace-read-groups)  
-- [3.5 Optional: Verify read groups and compute depth](#29-optional-verify-read-groups-and-compute-depth)  
-- [3.6 Mark and remove duplicates](#210-mark-and-remove-duplicates)
-- [3.7 Optional: Calculate genome coverage at >10× depth](#29b-optional-calculate-genome-coverage-at-10-depth)  
-- [3.8 Index BAM files](#211-index-bam-files)
+- [3.1 Align reads to reference genome](#31-align-reads-to-reference-genome)  
+- [3.2 Sort alignments and convert to BAM](#32-sort-alignments-and-convert-to-bam)  
+- [3.3 Optional: Extract mapping and coverage statistics](#33-optional-extract-mapping-and-coverage-statistics)  
+- [3.4 Add or replace read groups](#34-add-or-replace-read-groups)  
+- [3.5 Optional: Verify read groups and compute depth](#35-optional-verify-read-groups-and-compute-depth)  
+- [3.6 Mark and remove duplicates](#36-mark-and-remove-duplicates)
+- [3.7 Optional: Calculate genome coverage at >10× depth](#37-optional-calculate-genome-coverage-at-10-depth)  
+- [3.8 Index BAM files](#38-index-bam-files)
 
 ### 4. Variant Calling
 
-- [4.1 Call variants using GATK HaplotypeCaller](#212-call-variants-using-gatk-haplotypecaller)  
-- [4.2 Combine GVCF files](#213-combine-gvcf-files)  
-- [4.3 Joint genotyping to produce metaVCF](#214-joint-genotyping-to-produce-metavcf)  
-- [4.4 Filter variants to produce project-specific VCF](#215-filter-variants-to-produce-project-specific-vcf)
-- [4.5 Convert final vcf file to a pseudo-diploid genotype](#216-convert-final-vcf-file-to-a-pseudo-diploid-genotype)
+- [4.1 Call variants using GATK HaplotypeCaller](#41-call-variants-using-gatk-haplotypecaller)  
+- [4.2 Combine GVCF files](#42-combine-gvcf-files)  
+- [4.3 Joint genotyping to produce metaVCF](#43-joint-genotyping-to-produce-metavcf)  
+- [4.4 Filter variants to produce project-specific VCF](#44-filter-variants-to-produce-project-specific-vcf)
+- [4.5 Convert final vcf file to a pseudo-diploid genotype](#45-convert-final-vcf-file-to-a-pseudo-diploid-genotype)
 
 ### Downstream Genomic Analyses
 

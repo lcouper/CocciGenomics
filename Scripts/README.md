@@ -507,15 +507,16 @@ done
 ### Assess population structure 
 
 Conducted using STRUCTURE v 2.3.4
-Downloaded version for MacOS without front end [here](https://web.stanford.edu/group/pritchardlab/structure_software/release_versions/v2.3.4/html/structure.html): 
-On local computer, created directory 'structure_run' to store package and data files.  
-To run structure analysis (must be in 'structure_run' directory.   
+Downloaded versions without front end [here](https://web.stanford.edu/group/pritchardlab/structure_software/release_versions/v2.3.4/html/structure.html): 
+Can run this on local computer or cluster (for multiple reps).  
+
+On local computer: created directory 'structure_run' to store package and data files.  To run structure analysis, must be in 'structure_run' directory.   
 ```
 chmod +x structure  # May be necessary to run first if getting permission denied errors
 cd ~/Dropbox/CurrentProjects/SPORE/structure_run
 ./structure -m mainparams2 -K 2 -o output
 ```
-Note the parameters listed in mainparams, and the format of the tester2.str are very specific. Copy/follow the versions attached here when running this analysis for real.    
+Note the parameters listed in mainparams, and the format of the tester.str are very specific. Copy/follow the versions attached here when running this analysis for real.    
 
 Note that I did provide population identifiers, based on population structure observed in the PCA, BUT I did not use this popinfo to inform the clustering in STRUCTURE (i.e. the clustering was unsupervised) 
 
@@ -550,14 +551,6 @@ Data file format
 
 To test which level of K is most appropriate: 
 ```
-for K in 2 3 4 5 6; do
-  for rep in {1..6}; do
-    ./structure -m mainparamsEnv -K $K -D $RANDOM -o output_K${K}_rep${rep}
-  done
-done
-```
-Or, run separately as:
-```
 # Reps 1–5
 for rep in {1..5}; do ./structure -m mainparamsClinEnv -K 2 -D 2000${rep} -o output_clinenvr_K2_rep${rep}; done
 for rep in {1..5}; do ./structure -m mainparamsClinEnv -K 3 -D 3000${rep} -o output_clinenvr_K3_rep${rep}; done
@@ -573,6 +566,9 @@ for rep in {6..10}; do ./structure -m mainparamsClinEnv -K 4 -D $((40000 + rep))
 for rep in {6..10}; do ./structure -m mainparamsClinEnv -K 5 -D $((50000 + rep)) -o output_clinenvr_K5_rep${rep}; done
 for rep in {6..10}; do ./structure -m mainparamsClinEnv -K 6 -D $((60000 + rep)) -o output_clinenvr_K6_rep${rep}; done
 ```
+
+To run on cluster (recommended).   
+Script: run_structure_Kx_reps.sbatch (K = 2 through K = 6).  
 
 ### Scaffolding SNPs into genes 
 

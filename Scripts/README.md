@@ -363,7 +363,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 #### 4.3 Joint genotyping to produce metaVCF
 
 Software used: java, gatk 4.5.0.0   
-Script name: genotypegvcfs.sh    
+Script name: genotypegvcfs.sh and genotypegvcfs_WithCpSilv.sh   
 
 ```
 module load java
@@ -382,6 +382,8 @@ Subset_envrclin.txt contains the names for all environmental and (new) clinical 
 Subset_envr.txt contains the names for all environmental samples   (no repreps)
 Subset_envr_withrepreps.txt contains the names for all environmental samples   (with repreps)
 Subset_envrclinlegacy.txt contains the names for all environmental, (new) clinical samples, and legacy clinical samples (no repreps)
+Subset_all_withCpSilv.txt contains the names for all samples (no preps) including Cp Silv
+
 
 Scripts: 
 - filtervcfs_clinenvr.sbatch (all of our environmental and clinical samples)

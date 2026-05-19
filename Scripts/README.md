@@ -581,33 +581,12 @@ cat CocciRef_GCA_000149335.2.fna | awk '$0 ~ ">" {if (NR > 1) {print c;} c=0;pri
 Each isolate of *Coccidioides* has a mating type locus with one or two idiomorphs, MAT1-1 or MAT1-2, and sexual reproduction can only occur between distinct idiomorphs. Identifying the mating type locus for each individual and population can therefore provide clues about sexual reproduction and recombination. 
 
 Step 1. Download MAT domain proteins from NCBI (Note: downloaded on local computer, then uploaded to Savio)
-```
-# α-box domain (MAT1-1-1), C. immitis 
-curl -L "https://rest.uniprot.org/uniprotkb/stream?format=fasta&query=(gene:MAT1-1-1)%20AND%20(organism:%22Coccidioides%20immitis%22%20OR%20organism:%22Coccidioides%20posadasii%22)" \
-  -o "${MAT_DIR}/MAT1-1-1_alpha_box.faa"
 
-# HMG domain (MAT1-2-1) from C. posadasii 
-curl -L "https://rest.uniprot.org/uniprotkb/stream?format=fasta&query=(gene:MAT1-2-1)%20AND%20(organism:%22Coccidioides%20immitis%22%20OR%20organism:%22Coccidioides%20posadasii%22)" \
-  -o "${MAT_DIR}/MAT1-2-1_HMG.faa"
-```
+[α-box domain (MAT1-1-1), C. immitis. EF472259.1](https://www.ncbi.nlm.nih.gov/search/all/?term=EF472259.1).
 
-Note that previously I was using the full genomes from [C. immitis RS assemebly](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000149335.2/) for MAT1-1 and [C. immitis strain H538.4 assembly](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000149815.1/) for MAT1-2. But this was causing errors. 
+[HMG domain (MAT1-2-1) from C. posadasii. EF472258.1](https://www.ncbi.nlm.nih.gov/search/all/?term=EF472258.1).
 
-
-Step 2. Query protein sequences from other cocci genomes against these α-box and HMG domain protein sequences.    
-Software used:  bio/bwa-mem2/2.2.1, bio/samtools/1.17-gcc-11.4.0, bio/blast-plus/2.13.0-gcc-11.4.0, python/3.10.12-gcc-11.4.0, spades/4.1.0  
-Script: matingtype_loop.sbatch, matingtype_loop_envr.sbatch (for clinical and environmental samples, respectively).
-Note, output was directed to: MatingTypeLoci_Files/MAT_idiomorph_summary.OtherCocciGenomes.tsv and MatingTypeLoci_Files/MAT_idiomorph_summary.OurSoilSamples.tsv for clinical and environmental samples, respectively.  
-Code snippet:   
-```
-  # tBLASTn (PRIMARY decision, domain proteins)
-  RES11P=$(best_tbl "$SAMPLE" "$MAT11_PROT")
-  RES12P=$(best_tbl "$SAMPLE" "$MAT12_PROT")
-
-  P11P=$(field_or "$RES11P" 3); L11P=$(field_or "$RES11P" 4); C11P=$(field_or "$RES11P" 5); E11P=$(field_or "$RES11P" 6); B11P=$(field_or "$RES11P" 7)
-  P12P=$(field_or "$RES12P" 3); L12P=$(field_or "$RES12P" 4); C12P=$(field_or "$RES12P" 5); E12P=$(field_or "$RES12P" 6); B12P=$(field_or "$RES12P" 7)
-```
-Optionally, compare reuslts with [Engelthaler et al. 2016](https://journals.asm.org/doi/full/10.1128/mbio.00550-16#figS9)
+Optionally, compare reuslts with [Engelthaler et al. 2016](https://journals.asm.org/doi/full/10.1128/mbio.00550-16#figS9) and [Teixeira et al. 2019](https://journals.asm.org/doi/full/10.1128/mbio.01976-19). 
 
 ### Tajima's D 
 

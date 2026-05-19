@@ -346,7 +346,7 @@ ls *.vcf.gz > gvcfs_withCp.list # repeat with CpSilv (outgroup for trees)
 Purpose: Creates a dataset where all variant sites across all samples are considered. This enables variant callers to use information from one sample to infer the most likely genotype in another, improving sensitivity and accuracy in low coverage regions, and reducing false positives.
 Here, all samples are included in the 'gvcfs.list'. We will filter the metaVCF later (step 15) for analyses using specific subsets of samples.  
 Software used: java, gatk 4.5.0.0    
-Script name: combinegvcfs.sbatch    
+Script name: combinegvcfs.sbatch and combinegvcfs_WithCpSilv.sbatch (for phylo tree later)      
 Note that this is done in batches of sample because otherwise the memory is exhausted. The original, not batched version of the script is: combinegvcfs_og.sbatch   
 Code snippet:  
 
@@ -387,7 +387,7 @@ Scripts:
 - filtervcfs_clinenvr.sbatch (all of our environmental and clinical samples)
 - filtervcfs_envr.sbatch (only our environmental samples)
 - filtervcfs_envr_withrepreps.sbatch (only our environmental samples)
-- filtervcfs_All.sbatch samples)
+- filtervcfs_All.sbatch (all samples)
   
 Software used: java, gatk 4.5.0.0, vcftools/0.1.16-gcc-11.4.0   
 Code snippet:     

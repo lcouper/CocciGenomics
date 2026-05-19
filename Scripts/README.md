@@ -434,7 +434,7 @@ Subset_envr.final.recode.vcf: 62,847
 Subset_envr_withrepreps.final.recode.vcf: 63,377      
 Subset_envrclin.final.recode.vcf: 56,791         
 allsamples.final.recode.vcf: 56,201    
-
+allsamples_withCpSilv.final.recode.vcf: 55,603   
 
 #### 4.5 Convert final vcf file to a pseudo-diploid genotype 
 Purpose: haploid genotypes are not natively supported by vcftools and other packages
@@ -450,9 +450,8 @@ bcftools +fixploidy allsamples.final.recode.vcf -- -p ploidy.txt > allsamples.fi
 bcftools +fixploidy Subset_envr.final.recode.vcf -- -p ploidy.txt > Subset_envr.final.diploid.vcf
 bcftools +fixploidy Subset_envrclin.final.recode.vcf -- -p ploidy.txt > Subset_envrclin.final.diploid.vcf
 bcftools +fixploidy Subset_envr_withrepreps.final.recode.vcf -- -p ploidy.txt > Subset_envr_withrepreps.final.diploid.vcf
-
+bcftools +fixploidy allsamples_withCpSilv.final.recode.vcf -- -p ploidy.txt > allsamples_withCpSilv.final.diploid.vcf
 ```
-
 
 # Additional downstream analyses 
 

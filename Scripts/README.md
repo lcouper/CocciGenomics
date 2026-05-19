@@ -390,7 +390,8 @@ Scripts:
 - filtervcfs_envr.sbatch (only our environmental samples)
 - filtervcfs_envr_withrepreps.sbatch (only our environmental samples)
 - filtervcfs_All.sbatch (all samples)
-  
+- filtervcfs_All_withCpSilv.sbatch (all samples, with Cp Silv as outgroup for phylo tree)
+
 Software used: java, gatk 4.5.0.0, vcftools/0.1.16-gcc-11.4.0   
 Code snippet:     
 

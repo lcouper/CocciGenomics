@@ -780,15 +780,15 @@ Script: phylo_tree.sh
 Code snippet:
 ```
 module load iqtree/3.0.0
-# iqtree3 -s final.SNPs.min4.phy -m GTR+G -nt AUTO -o CpSilv (# non-bootstrapped, fast version)
 
-iqtree3 -s final_withCp.min4.phy \
-        -m TEST \ # test different nucleotide substituion models and pick the best one based on BIC
-        -bb 1000 \ #  1,000 bootstraps
+iqtree3 -s allsamples_withCpSilv.final.recode.min4.phy \
+        -m MFP+ASC \ # test different nucleotide substituion models and pick the best one based on BIC. Includes ascertainment bias (For using VCF)
+        -bb 1000 \  #  1,000 bootstraps
         -alrt 1000 \ # 1,000 replicates of an approximate likelihood ratio test (to assess branch support)
-        -nt AUTO \ # automatically detect and use number of optimal threads
-        -o CpSilv \ # Specify C. posadasii Silveira strain as the outgroup
-        -pre final_withCpSilv.min4_1000
+        -nt 8 \ # use 8 threads
+        -o CpSilv \
+        -pre final_withCpSilv.min4_1000 \
+        -redo # overwrite old output
 ```
 
 One option for visualizing tree (but note we visualized in R using ggree):   

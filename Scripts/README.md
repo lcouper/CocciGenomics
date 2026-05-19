@@ -557,18 +557,12 @@ for rep in {1..5}; do ./structure -m mainparamsClinEnv -K 3 -D 3000${rep} -o out
 for rep in {1..5}; do ./structure -m mainparamsClinEnv -K 4 -D 4000${rep} -o output_clinenvr_K4_rep${rep}; done
 for rep in {1..5}; do ./structure -m mainparamsClinEnv -K 5 -D 5000${rep} -o output_clinenvr_K5_rep${rep}; done
 for rep in {1..5}; do ./structure -m mainparamsClinEnv -K 6 -D 6000${rep} -o output_clinenvr_K6_rep${rep}; done
-
-
-# Reps 6–10
-for rep in {6..10}; do ./structure -m mainparamsClinEnv -K 2 -D $((20000 + rep)) -o output_clinenvr_K2_rep${rep}; done
-for rep in {6..10}; do ./structure -m mainparamsClinEnv -K 3 -D $((30000 + rep)) -o output_clinenvr_K3_rep${rep}; done
-for rep in {6..10}; do ./structure -m mainparamsClinEnv -K 4 -D $((40000 + rep)) -o output_clinenvr_K4_rep${rep}; done
-for rep in {6..10}; do ./structure -m mainparamsClinEnv -K 5 -D $((50000 + rep)) -o output_clinenvr_K5_rep${rep}; done
-for rep in {6..10}; do ./structure -m mainparamsClinEnv -K 6 -D $((60000 + rep)) -o output_clinenvr_K6_rep${rep}; done
 ```
 
 To run on cluster (recommended).   
-Script: run_structure_Kx_reps.sbatch (K = 2 through K = 6).  
+Script: run_structure_Kx_reps.sbatch (K = 1 through K = 8).   
+With legacy genomes: run_structure_Kx_reps_legacy.sbatch    
+
 
 ### Scaffolding SNPs into genes 
 

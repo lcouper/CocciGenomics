@@ -561,7 +561,7 @@ for rep in {1..5}; do ./structure -m mainparamsClinEnv -K 6 -D 6000${rep} -o out
 
 To run on cluster (recommended).   
 Script: run_structure_Kx_reps.sbatch (K = 1 through K = 8).   
-With legacy genomes: run_structure_Kx_reps_legacy.sbatch    
+With legacy genomes: run_structure_Kx_reps_legacy.sbatch (only conducted on K = 3 and K = 4).   
 
 
 ### Scaffolding SNPs into genes 

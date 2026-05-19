@@ -451,60 +451,9 @@ bcftools +fixploidy Subset_envr_withrepreps.final.recode.vcf -- -p ploidy.txt > 
 ```
 
 
-## Additional downstream analyses 
+# Additional downstream analyses 
 
-### Fst differentiation between clinical and environmental isolates
-
-First, created pop1 and pop2 txt files indicating assignment to environmental or clinical 'populations'. I focused on only California samples to avoid spurious detection due to demographic processes. 
-
-California isolates:
-```
-echo -e "13B1\n14B1\n22AC2\n22BC1\34B2\n58B1\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3" > CApop1.txt
-echo -e "SD_1\nSJV_1\nSJV_10\nSJV_11\nSJV_2\nSJV_3\nSJV_4\nSJV_5\nSJV_6\nSJV_7\nSJV_8\nSJV_9\nUCLA293\nUCLA294\nUCLA295" > CApop2.txt
-```
-
-Lastly, run vcftools to estimate Fst along the genome.   
-Here, we estimated Fst per site, then took averages by gene in R
-
-```
-vcftools --vcf final_diploid.vcf \
-    --weir-fst-pop CApop1.txt \
-    --weir-fst-pop CApop2.txt \
-    --out fst_per_site_CA
-```
-
-To assess statistical significance, randomly re-shuffle 'population' labels, and re-estimate Fst (repeat 500 times).     
-Script: fst_perm.sbatch   
-Code snippet:
-```
-# number of permutations
-nperm=5000
-
-# file with all sample IDs
-samples=all_samples.txt
-
-# number of samples in group 1 (e.g., environmental)
-group1_n=15
-
-mkdir -p perm_fst
-
-for i in $(seq 1 $nperm); do
-  echo "Permutation $i"
-
-  # Shuffle and split samples
-  shuf $samples > perm_fst/tmp_samples.txt
-  head -n $group1_n perm_fst/tmp_samples.txt > perm_fst/group1.txt
-  tail -n +$((group1_n + 1)) perm_fst/tmp_samples.txt > perm_fst/group2.txt
-
- # Run Fst
-  vcftools --vcf final_diploid.vcf \
-    --weir-fst-pop perm_fst/group1.txt \
-    --weir-fst-pop perm_fst/group2.txt \
-    --out perm_fst/fst_perm_$i \
-    --stdout | grep -v "^#" | awk -v i=$i '{print $1, $2, $3, i}' >> perm_fst/fst_all_perms.txt
-done
-```
-### Assess population structure 
+## Assess population structure 
 
 Conducted using STRUCTURE v 2.3.4
 Downloaded versions without front end [here](https://web.stanford.edu/group/pritchardlab/structure_software/release_versions/v2.3.4/html/structure.html): 
@@ -576,7 +525,7 @@ cat CocciRef_GCA_000149335.2.fna | awk '$0 ~ ">" {if (NR > 1) {print c;} c=0;pri
 ![image](https://github.com/user-attachments/assets/3086e222-c492-4028-8700-0adc5b3c5ded)
 
 
-### Mating type locus assignment 
+## Mating type locus assignment 
 
 Each isolate of *Coccidioides* has a mating type locus with one or two idiomorphs, MAT1-1 or MAT1-2, and sexual reproduction can only occur between distinct idiomorphs. Identifying the mating type locus for each individual and population can therefore provide clues about sexual reproduction and recombination. 
 
@@ -587,6 +536,62 @@ Step 1. Download MAT domain proteins from NCBI (Note: downloaded on local comput
 [HMG domain (MAT1-2-1) from C. posadasii. EF472258.1](https://www.ncbi.nlm.nih.gov/search/all/?term=EF472258.1).
 
 Optionally, compare reuslts with [Engelthaler et al. 2016](https://journals.asm.org/doi/full/10.1128/mbio.00550-16#figS9) and [Teixeira et al. 2019](https://journals.asm.org/doi/full/10.1128/mbio.01976-19). 
+
+Step 2. Query samples against these sequences.   
+Script: matingtype_updated.sbatch   
+
+## Fst differentiation between clinical and environmental isolates
+
+First, created pop1 and pop2 txt files indicating assignment to environmental or clinical 'populations'. I focused on only California samples to avoid spurious detection due to demographic processes. 
+
+California isolates:
+```
+echo -e "13B1\n14B1\n22AC2\n22BC1\34B2\n58B1\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3" > CApop1.txt
+echo -e "SD_1\nSJV_1\nSJV_10\nSJV_11\nSJV_2\nSJV_3\nSJV_4\nSJV_5\nSJV_6\nSJV_7\nSJV_8\nSJV_9\nUCLA293\nUCLA294\nUCLA295" > CApop2.txt
+```
+
+Lastly, run vcftools to estimate Fst along the genome.   
+Here, we estimated Fst per site, then took averages by gene in R
+
+```
+vcftools --vcf final_diploid.vcf \
+    --weir-fst-pop CApop1.txt \
+    --weir-fst-pop CApop2.txt \
+    --out fst_per_site_CA
+```
+
+To assess statistical significance, randomly re-shuffle 'population' labels, and re-estimate Fst (repeat 500 times).     
+Script: fst_perm.sbatch   
+Code snippet:
+```
+# number of permutations
+nperm=5000
+
+# file with all sample IDs
+samples=all_samples.txt
+
+# number of samples in group 1 (e.g., environmental)
+group1_n=15
+
+mkdir -p perm_fst
+
+for i in $(seq 1 $nperm); do
+  echo "Permutation $i"
+
+  # Shuffle and split samples
+  shuf $samples > perm_fst/tmp_samples.txt
+  head -n $group1_n perm_fst/tmp_samples.txt > perm_fst/group1.txt
+  tail -n +$((group1_n + 1)) perm_fst/tmp_samples.txt > perm_fst/group2.txt
+
+ # Run Fst
+  vcftools --vcf final_diploid.vcf \
+    --weir-fst-pop perm_fst/group1.txt \
+    --weir-fst-pop perm_fst/group2.txt \
+    --out perm_fst/fst_perm_$i \
+    --stdout | grep -v "^#" | awk -v i=$i '{print $1, $2, $3, i}' >> perm_fst/fst_all_perms.txt
+done
+```
+
 
 ### Tajima's D 
 

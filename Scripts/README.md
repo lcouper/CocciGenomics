@@ -774,20 +774,33 @@ Note that the 'vcf2phylip.py' script was downloaded from [here](https://github.c
 python3 vcf2phylip.py -i allsamples_withCpSilv.final.recode.vcf -o CocciSamplesTree
 ```
 
-Step 2. Build phylogenetic tree    
+Step 2. Test different models of molecular evolution   
 Software used: iqtree/3.0.0    
-Script: phylo_tree.sh    
+Script: phylo_tree_testmodels.sh    
 Code snippet:
 ```
-module load iqtree/3.0.0
-
 iqtree3 -s allsamples_withCpSilv.final.recode.min4.phy \
-        -m MFP+ASC \ # test different nucleotide substituion models and pick the best one based on BIC. Includes ascertainment bias (For using VCF)
-        -bb 1000 \  #  1,000 bootstraps
-        -alrt 1000 \ # 1,000 replicates of an approximate likelihood ratio test (to assess branch support)
-        -nt 8 \ # use 8 threads
+        -m TESTONLY+ASC \ # test diff. nucleotide substituion models and pick the best one based on BIC. Includes ascertainment bias (For using VCF)
+        -mset JC,HKY,K80,TN,GTR \
+        -mrate E,G \
+        -nt 8 \
         -o CpSilv \
-        -pre final_withCpSilv.min4_1000 \
+        -pre modeltest_ASC_noR_rootCpSilv \
+        -redo
+```
+
+Step 3. Run tree using the best model as determined in step 2    
+Software used: iqtree/3.0.0    
+Script: phylo_tree_bestmodel.sh    
+Code snippet:
+```
+iqtree3 -s allsamples_withCpSilv.final.recode.min4.phy \
+        -m GTR+F+ASC+G4 \ # best modeled determined in step 2 
+        -bb 1000 \ #  1,000 bootstraps
+        -alrt 1000 \ # 1,000 replicates of an approximate likelihood ratio test (to assess branch support)
+        -nt 8 \ # run on 8 threads
+        -o CpSilv \ # use C posadasii as outgroup
+        -pre final_withCpSilv.bestmodel_1000 \
         -redo # overwrite old output
 ```
 

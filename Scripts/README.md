@@ -809,7 +809,9 @@ https://itol.embl.de/tree/136152214211185591747337347
 
 
 
+## Assessing and correcting for Linkage Disequilibrium ##
 
+Software used: bio/plink/1.07, gcc/11.4.0
 
 
 

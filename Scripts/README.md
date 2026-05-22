@@ -772,11 +772,14 @@ Run at command line, very fast.
 Note that the 'vcf2phylip.py' script was downloaded from [here](https://github.com/edgardomortiz/vcf2phylip/blob/master/vcf2phylip.py) and must be in working directory for command to work
 ```
 python3 vcf2phylip.py -i allsamples_withCpSilv.final.recode.vcf -o CocciSamplesTree
+# or for LD-pruned version:
+python3 vcf2phylip.py -i allsampleswithCpSilv_ld_r05_pruned.vcf -o CocciSamplesTreeLD
+
 ```
 
 Step 2. Test different models of molecular evolution   
 Software used: iqtree/3.0.0    
-Script: phylo_tree_testmodels.sh    
+Script: phylo_tree_testmodels.sh, phylo_tree_testmodels_LD.sh    
 Code snippet:
 ```
 iqtree3 -s allsamples_withCpSilv.final.recode.min4.phy \
@@ -817,25 +820,35 @@ Uploaded folder to cluster and made it executable.
 Step 1. Convert filtered SNP VCF into PLINK binary format (can run at command line. very fast)    
 ```
 cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
-global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --vcf allsamples.final.diploid.vcf --allow-extra-chr --double-id --set-missing-var-ids @:# --make-bed --out allsamples_plink
+/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --vcf allsamples.final.diploid.vcf --allow-extra-chr --double-id --set-missing-var-ids @:# --make-bed --out allsamples_plink
+
+# with CpSilv (outgroup for tree)
+/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --vcf allsamples_withCpSilv.final.diploid.vcf --allow-extra-chr --double-id --set-missing-var-ids @:# --make-bed --out allsampleswithCpSilv_plink
 ```
+
 
 Step 2. Create the LD-pruned dataset (again, can run at command line. very fast).    
 Here we are using a window size of 50 SNPs, sliding by 5 SNPs each time. Within each window, plink identifies SNP pairs with r2 > 0.5 and removes variants until no remaining pair exceeds this threshold.
 ```
 cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
 /global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile allsamples_plink --allow-extra-chr --indep-pairwise 50 5 0.5 --out allsamples_ld_r05
+
+# with CpSilv
+/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile allsampleswithCpSilv_plink --allow-extra-chr --indep-pairwise 50 5 0.5 --out allsampleswithCpSilv_ld_r05
 ```
 This removed 43,121 out of 56,201 variants, leaving 13,080 SNPs.
 
 Step 3. Make pruned plink files (for any downstream analyses that use plink)
 ```
 /global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile allsamples_plink --allow-extra-chr --extract allsamples_ld_r05.prune.in --make-bed --out allsamples_ld_r05_pruned
+
+# with Cp Silv
+/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile allsampleswithCpSilv_plink --allow-extra-chr --extract allsamples_ld_r05.prune.in --make-bed --out allsampleswithCpSilv_ld_r05_pruned
 ```
 
 Step 4. Make a pruned vcf file 
 ```
-/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile allsamples_plink --allow-extra-chr --extract allsamples_ld_r05.prune.in --recode vcf --out allsamples_ld_r05_pruned
+/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile allsampleswithCpSilv_plink --allow-extra-chr --extract allsamples_ld_r05.prune.in --recode vcf --out allsampleswithCpSilv_ld_r05_pruned
 ```
 Note the pruned vcf is called 'allsamples_ld_r05_pruned.vcf'
 

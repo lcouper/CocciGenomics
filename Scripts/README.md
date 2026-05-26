@@ -64,8 +64,9 @@ This repository documents the scripts and steps used to process *Coccidioides* s
 #### 1.1 Mask repeats in reference genome   
 *Only need to do once*
 Using reference genome for Coccidioides immitis RS (GCA_000149335.2)   
-Downloaded [here](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000149335.2/).  
-Using repeat library available here:   
+Downloaded [here for immitis](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000149335.2/).     
+and [here for posadasii](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000150055.1/).    
+Using repeat library available [here](https://github.com/hyphaltip/cocci_repeats/).    
 Purpose: Repetitive regions can lead to issues with reference alignment and variant calling    
 Software used: repeatmasker/4.1.0   *Note: need to use this and not the newest version*   
 Script: repeastmasker.sh *Note: this step done on SCG instead of Savio*    

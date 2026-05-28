@@ -456,7 +456,39 @@ bcftools +fixploidy allsamples_withCpSilv.final.recode.vcf -- -p ploidy.txt > al
 
 # Additional downstream analyses 
 
-## Assess population structure 
+## Assess population structure: ADMIXTURE
+
+Downlaoded ADMIXTURE [here](https://dalexander.github.io/admixture/download.html) and uploaded for use on savio  
+Scripts: run_admixture_envrclin.sbatch   
+Code snippet:   
+```
+for K in 2 3 4 5 6 7 8 9 10; do
+  for rep in $(seq 1 20); do
+    seed=$((1000 + K * 100 + rep))
+    run_prefix="K${K}_rep${rep}"
+    echo "Running K=${K}, rep=${rep}, seed=${seed}"
+    admixture --cv -s "$seed" -j8 "$admix_prefix.bed" "$K" | tee "${run_prefix}.log"
+    mv "$(basename "$admix_prefix").${K}.Q" "${run_prefix}.Q"
+    mv "$(basename "$admix_prefix").${K}.P" "${run_prefix}.P"
+  done
+done
+
+echo -e "K\trep\tseed\tcv_error\tloglikelihood" > admixture_envrclin_replicate_summary.tsv
+
+for log in K*_rep*.log; do
+  K=$(echo "$log" | sed -E 's/K([0-9]+)_rep([0-9]+).log/\1/')
+  rep=$(echo "$log" | sed -E 's/K([0-9]+)_rep([0-9]+).log/\2/')
+  seed=$((1000 + K * 100 + rep))
+  cv=$(grep "CV error" "$log" | awk '{print $4}')
+  ll=$(grep "Loglikelihood" "$log" | tail -n 1 | awk '{print $2}')
+  echo -e "${K}\t${rep}\t${seed}\t${cv}\t${ll}" >> admixture_envrclin_replicate_summary.tsv
+done
+```
+
+
+
+
+## Assess population structure: STRUCUTRE 
 
 Conducted using STRUCTURE v 2.3.4
 Downloaded versions without front end [here](https://web.stanford.edu/group/pritchardlab/structure_software/release_versions/v2.3.4/html/structure.html): 

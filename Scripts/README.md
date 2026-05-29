@@ -45,17 +45,18 @@ This repository documents the scripts and steps used to process *Coccidioides* s
 
 ### Downstream Genomic Analyses
 
-- [FST differentiation between clinical and environmental isolates](#fst-differentiation-between-clinical-and-environmental-isolates)  
-- [Population structure analysis](#assess-population-structure)  
-- [Map SNPs to genes](#scaffolding-snps-into-genes)  
-- [Determine chromosome sizes](#identify-size-of-each-chromosome)  
-- [Mating type analysis](#examining-mating-type-distribution)  
-- [Tajima’s D](#tajimas-d)  
-- [Nucleotide diversity (θπ)](#nucleotide-diversity-θπ)  
-- [McDonald–Kreitman test](#mk-test)  
-- [Gene function and GO term analysis](#investigating-gene-function-and-go-terms)  
-- [Extract amino acid sequences for differentiated genes](#get-amino-acid-sequence-for-significantly-differentiated-genes)  
-- [Construct phylogenetic tree](#construct-phylogenetic-tree)
+- [5.1 FST differentiation between clinical and environmental isolates](#fst-differentiation-between-clinical-and-environmental-isolates)  
+- [5.2 Population structure analysis](#assess-population-structure)  
+- [5.3 Map SNPs to genes](#scaffolding-snps-into-genes)  
+- [5.4 Determine chromosome sizes](#identify-size-of-each-chromosome)  
+- [5.5 Mating type analysis](#examining-mating-type-distribution)  
+- [5.6 Tajima’s D](#tajimas-d)  
+- [5.7 Nucleotide diversity (θπ)](#nucleotide-diversity-θπ)  
+- [5.8 McDonald–Kreitman test](#mk-test)  
+- [5.9 Gene function and GO term analysis](#investigating-gene-function-and-go-terms)  
+- [5.10 Extract amino acid sequences for differentiated genes](#get-amino-acid-sequence-for-significantly-differentiated-genes)  
+- [5.11 Construct phylogenetic tree](#construct-phylogenetic-tree)
+- [5.12 Linkage Disequilibrium](#linkage-disequilibrium)
 
 ---
 

@@ -452,6 +452,7 @@ module load bio/bcftools/1.16-gcc-11.4.0
 bcftools +fixploidy allsamples.final.recode.vcf -- -p ploidy.txt > allsamples.final.diploid.vcf
 bcftools +fixploidy Subset_envr.final.recode.vcf -- -p ploidy.txt > Subset_envr.final.diploid.vcf
 bcftools +fixploidy Subset_envrclin.final.recode.vcf -- -p ploidy.txt > Subset_envrclin.final.diploid.vcf
+bcftools +fixploidy Subset_envrclin_Cp.final.recode.vcf -- -p ploidy.txt > Subset_envrclin_Cp.final.diploid.vcf
 bcftools +fixploidy Subset_envr_withrepreps.final.recode.vcf -- -p ploidy.txt > Subset_envr_withrepreps.final.diploid.vcf
 bcftools +fixploidy allsamples_withCpSilv.final.recode.vcf -- -p ploidy.txt > allsamples_withCpSilv.final.diploid.vcf
 ```
@@ -862,6 +863,9 @@ cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
 
 # with just our environmental and clinical isolates
 /global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --vcf Subset_envrclin.final.diploid.vcf --allow-extra-chr --double-id --set-missing-var-ids @:# --make-bed --out Subset_envrclin_plink
+
+# our environmental and clinical isolates plus Cp
+/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --vcf Subset_envrclin_Cp.final.diploid.vcf --allow-extra-chr --double-id --set-missing-var-ids @:# --make-bed --out Subset_envrclin_Cp_plink
 ```
 
 Step 2. Create the LD-pruned dataset (again, can run at command line. very fast).    
@@ -875,6 +879,9 @@ cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
 
 # with just our environmental and clinical isolates
 /global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile Subset_envrclin_plink --allow-extra-chr --indep-pairwise 50 5 0.5 --out Subset_envrclin_ld_r05
+
+# our environmental and clinical isolates plus Cp
+/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile Subset_envrclin_Cp_plink --allow-extra-chr --indep-pairwise 50 5 0.5 --out Subset_envrclin_Cp_ld_r05
 ```
 This removed ~43,121 out of 56,201 variants, leaving 13,080 SNPs 
 
@@ -887,6 +894,9 @@ Step 3. Make pruned plink files (for any downstream analyses that use plink)
 
 # with just our environmental and clinical isolates
 /global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile Subset_envrclin_plink --allow-extra-chr --extract Subset_envrclin_ld_r05.prune.in --make-bed --out Subset_envrclin_ld_r05_pruned
+
+# our environmental and clinical isolates plus Cp
+/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile Subset_envrclin_Cp_plink --allow-extra-chr --extract Subset_envrclin_ld_r05.prune.in --make-bed --out Subset_envrclin_Cp_ld_r05_pruned
 ```
 
 Step 4. Make a pruned vcf file 

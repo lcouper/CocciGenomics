@@ -463,7 +463,7 @@ bcftools +fixploidy allsamples_withCpSilv.final.recode.vcf -- -p ploidy.txt > al
 ## Assess population structure: ADMIXTURE
 
 Downlaoded ADMIXTURE [here](https://dalexander.github.io/admixture/download.html) and uploaded for use on savio  
-Scripts: run_admixture_envrclin.sbatch   
+Scripts: run_admixture_envrclin.sbatch, run_admixture_envrclin_Cp.sbatch (version with CpSilv)   
 Code snippet:   
 ```
 for K in 2 3 4 5 6 7 8 9 10; do

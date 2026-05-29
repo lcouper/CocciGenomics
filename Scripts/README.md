@@ -380,6 +380,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 Here, we subset the vcf to the samples included in a particular analyses. Then, flag and remove variants based on quality score, coverage, missingness etc. for just those samples.
 
 Subset_envrclin.txt contains the names for all environmental and (new) clinical samples (no repreps)
+Subset_envrclin_Cp.txt contains the names for all environmental and (new) clinical samples (no repreps)
 Subset_envr.txt contains the names for all environmental samples   (no repreps)
 Subset_envr_withrepreps.txt contains the names for all environmental samples   (with repreps)
 Subset_envrclinlegacy.txt contains the names for all environmental, (new) clinical samples, and legacy clinical samples (no repreps)
@@ -388,6 +389,7 @@ Subset_all_withCpSilv.txt contains the names for all samples (no preps) includin
 
 Scripts: 
 - filtervcfs_clinenvr.sbatch (all of our environmental and clinical samples)
+- filtervcfs_clinenvr_Cp.sbatch (our environmental and clinical samples, plus C. posadasii)
 - filtervcfs_envr.sbatch (only our environmental samples)
 - filtervcfs_envr_withrepreps.sbatch (only our environmental samples)
 - filtervcfs_All.sbatch (all samples)

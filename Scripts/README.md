@@ -330,7 +330,7 @@ module load java
 java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" HaplotypeCaller \
 -R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
 -ploidy 1 \
--ERC GVCF \  # Note that this option specifies we only want SNPs retained
+-ERC GVCF \ 
 -I results/bam/58B1.deduped.bam \
 --output-mode EMIT_VARIANTS_ONLY \
 -O results/haplocalled/58B1.g.vcf.gz

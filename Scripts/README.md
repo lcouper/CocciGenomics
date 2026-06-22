@@ -581,22 +581,21 @@ Script: matingtype_updated.sbatch
 
 ## Fst differentiation between clinical and environmental isolates
 
-First, created pop1 and pop2 txt files indicating assignment to environmental or clinical 'populations'. I focused on only California samples to avoid spurious detection due to demographic processes. 
-
-California isolates:
-```
-echo -e "13B1\n14B1\n22AC2\n22BC1\34B2\n58B1\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3" > CApop1.txt
-echo -e "SD_1\nSJV_1\nSJV_10\nSJV_11\nSJV_2\nSJV_3\nSJV_4\nSJV_5\nSJV_6\nSJV_7\nSJV_8\nSJV_9\nUCLA293\nUCLA294\nUCLA295" > CApop2.txt
-```
-
-Lastly, run vcftools to estimate Fst along the genome.   
-Here, we estimated Fst per site, then took averages by gene in R
+First, created pop1a and pop1b txt files indicating assignment to environmental or clinical 'populations'. I focused on only samples with matching full ancestry (based on admixture results) to avoid spurious detection due to demographic processes. 
 
 ```
-vcftools --vcf final_diploid.vcf \
-    --weir-fst-pop CApop1.txt \
-    --weir-fst-pop CApop2.txt \
-    --out fst_per_site_CA
+echo -e "22AC2\n22BC1\n34B2\n58B1\n87A1\n137a1_redo" > Pop1a.txt
+echo -e "Kern6\nKern7\nKern13\nKern16\nKern21\nKern27" > Pop1b.txt
+```
+
+Then, run vcftools to estimate Fst along the genome.   
+Here, we estimated Fst per site (can take averages by gene in R if desired)
+
+```
+vcftools --vcf Subset_envrclin.final.diploid.vcf \
+    --weir-fst-pop Pop1a.txt \
+    --weir-fst-pop Pop1b.txt \
+    --out fst_per_site_Pop1
 ```
 
 To assess statistical significance, randomly re-shuffle 'population' labels, and re-estimate Fst (repeat 500 times).     

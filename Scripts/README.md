@@ -630,6 +630,40 @@ for i in $(seq 1 $nperm); do
 done
 ```
 
+## Fst between environmental clusters
+
+Similar to above, but using only environmental isolates and defining populations based on admixture output
+
+```
+echo -e "22AC2\n22BC1\n34B2\n58B1\n87A1\n137a1_redo" > Pop1.txt
+echo -e "PS02PN14-1\nPS02PN14-2\nPS02PN14-3\n13B1\n14B1" > Pop2.txt
+echo -e "118a3\n118b3\n157b2\n158b3\nL100\n239a3b2" > Pop3.txt
+```
+
+Then, run vcftools to estimate Fst along the genome.   
+Here, we estimated Fst per site (can take averages by gene in R if desired)
+
+```
+vcftools --vcf Subset_envr.final.diploid.vcf \
+    --weir-fst-pop Pop1.txt \
+    --weir-fst-pop Pop2.txt \
+    --out fstPop12
+
+vcftools --vcf Subset_envr.final.diploid.vcf \
+    --weir-fst-pop Pop1.txt \
+    --weir-fst-pop Pop3.txt \
+    --out fstPop13
+
+vcftools --vcf Subset_envr.final.diploid.vcf \
+    --weir-fst-pop Pop2.txt \
+    --weir-fst-pop Pop3.txt \
+    --out fstPop23
+```
+Results: 
+Fst 1 & 2: Weir and Cockerham mean Fst estimate: 0.27331; weighted Fst estimate: 0.41696   
+Fst 1 & 3: Weir and Cockerham mean Fst estimate: 0.15339; weighted Fst estimate: 0.22844
+Fst 2 & 3: Weir and Cockerham mean Fst estimate: 0.22700; weighted Fst estimate: 0.31262
+
 
 ### Tajima's D 
 

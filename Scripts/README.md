@@ -710,20 +710,33 @@ extract_callable_regions.py (python script in RefGenonme directory)
 Software used:  vcftools/0.1.16-gcc-11.4.0     
 Code snippet (run at command line, very fast):  
 ```
+echo -e "22AC2\n22BC1\n34B2\n58B1\n87A1\n137a1_redo\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3\n13B1\n14B1\n118a3\n118b3\n157b2\n158b3\nL100\n239a3b2" > Envr.txt
+
 # For environmental isolates
-vcftools --vcf final_diploid.vcf \
-  --keep CApop1.txt \
+vcftools --vcf Subset_envr.final.diploid.vcf \
+  --keep Envr.txt \
   --site-pi \
   --max-missing 0.9 \
   --out pi_environmental_sitewise
 
-# For clnical isolates
-vcftools --vcf final_diploid.vcf \
-  --keep CApop2.txt \
+# For clinical isolates
+bcftools query -l Subset_envrclin.final.diploid.vcf | grep '^Kern' > Clin_Kern.txt
+
+vcftools --vcf Subset_envrclin.final.diploid.vcf \
+  --keep Clin_Kern.txt \
   --site-pi \
   --max-missing 0.9 \
-  --out pi_clinical_sitewise
+  --out pi_clinical_kern_sitewise
 ```
+Then normalize each based on the number of callable bases:
+```
+callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
+sum_pi=$(awk 'NR > 1 {sum += $3} END {print sum}' pi_environmental_sitewise.sites.pi)
+# sum_pi=$(awk 'NR > 1 {sum += $3} END {print sum}' pi_clinical_kern_sitewise.sites.pi)
+awk -v s="$sum_pi" -v c="$callable" 'BEGIN {print "genome_wide_pi =", s/c}'
+```
+genome_wide_pi = 0.000771967 (environmental isolates)
+genome_wide_pi = 0.000688736 (clinical isolates only)
 
 [original window-based approach on scg that was not working]
 ```

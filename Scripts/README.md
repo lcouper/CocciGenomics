@@ -60,6 +60,18 @@ This repository documents the scripts and steps used to process *Coccidioides* s
 
 ---
 
+General software used:  
+vcftools/0.1.16-gcc-11.4.0\
+bio/bwa-mem2/2.2.1\
+bio/samtools/1.17-gcc-11.4.0\
+Trimmomatic V 0.39 (Bolger et al. 2014)\
+fastp v 1.0.1 (manually installed from [here](https://github.com/OpenGene/fastp).\
+gatk\
+java\
+python3\
+bio/picard/3.0.0-gcc-11.4.0\
+bio/fastqc/0.12.1-gcc-11.4.0  
+
 
 ## Reference Genome Preparation
 #### 1.1 Mask repeats in reference genome   
@@ -80,16 +92,14 @@ RepeatMasker -pa 16 -lib immitis_repeats.fa --norna CocciRef_GCA_000149335.2.fna
 #### 1.2 Index reference genome  
 *Only need to do once*
 Purpose: Enables quick access to specific locations of the genome (like the index of a book)   
-Software used: bio/bwa-mem2/2.2.1    
-Script name: bwamem_index.sh      
+   Script name: bwamem_index.sh      
 Command:      
 
 ```
 bwa-mem2 index CocciRef_GCA_000149335.2.fna.masked
 ```
 
-Alternatively, 
-Software used: bio/samtools/1.17-gcc-11.4.0  
+Alternatively,  
 ```
 samtools faidx CocciRef_GCA_000149335.2.masked.fna
 ```
@@ -114,7 +124,6 @@ Tracker for downloaded sequences and metadata [here](https://docs.google.com/spr
 #### 2.3 Filter low-quality reads and trim bases
 
 Note that Illumina adapters [available and downloaded from here](https://github.com/usadellab/Trimmomatic/blob/main/adapters/TruSeq3-PE.fa). Ensure this adapter sequence file is in the same folder as your fastq files.   
-Software used: Trimmomatic V 0.39 (Bolger et al. 2014)      
 Job Script: trim.sh and trim.sra.sh   
 Relevant code snippet:       
 ```
@@ -129,7 +138,6 @@ ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:35 SLIDINGWINDOW:
 
 Note: this is because there is variation in sequenced read lengths across genomes (ours are all 150bp paired end, but prior genomes vary from 75 - 300 bp PE). We want to normalize to the lowest common denominator -- here 75 bp.
 
-Software used: fastp v 1.0.1 (manually installed from [here](https://github.com/OpenGene/fastp).    
 Scripts: run_fastp_len75.sbatch, run_fastp_len75_b.sbatch       
 Relevant code snippet:
 ```
@@ -145,7 +153,6 @@ fastp \
 
 #### 2.5 Optional: Quality control with FastQC
 
-Software used: bio/fastqc/0.12.1-gcc-11.4.0   
 Script: fastqc.sh, fastqc.sra.sh        
 Relevant code snippet:      
 ```
@@ -157,7 +164,6 @@ fastqc trimmed_fastqc/*.fastq.gz
 #### 3.1 Align reads to reference genome
 
 Purpose: To determine where in the genome a given sequence/read is located    
-Software used: bio/bwa-mem2/2.2.1   
 Script name: alignreads.sh, alignreads.sra.sh    
 Relevant code snippet:   
 
@@ -176,7 +182,6 @@ done
 #### 3.2 Sort alignments and convert to BAM
 
 Compress sam to bam and sort bam file     
-Software used: gatk     
 Script name: SamToBam.sh, SamToBamSRA.sh
 
 ```
@@ -189,7 +194,6 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 
 #### 3.3 Optional: Extract mapping and coverage statistics
 
-Software used: samtools, java   
 Script name: MappingStats.sh, MappingStatsSRA.sh    
 Note that the cap for coverage is 250 so there may be a peak in the histograms at this value
 
@@ -215,8 +219,7 @@ Followed guidance [here](https://gatk.broadinstitute.org/hc/en-us/articles/36003
 and issue was diagnosed [here](https://gatk.broadinstitute.org/hc/en-us/community/posts/4412745467931-HaplotypeCaller-does-not-work). See [this spreadsheet](https://docs.google.com/spreadsheets/d/1wrwSLeURp-E7LDD0SKT1wXEnrET5IziknmJWmXCB_7o/edit?gid=1963297784#gid=1963297784) for what read group parameters were added:
 
 Purpose: Organize sequence data by library prep batch and sequencing runs parameters   
-Software used: bio/picard/3.0.0-gcc-11.4.0, java  
-Script name: addrg_loop.sbatch, addrgsrsa_loop.sbatch   (note to run in loop: upload tsv with read group info for all samples)   
+ Script name: addrg_loop.sbatch, addrgsrsa_loop.sbatch   (note to run in loop: upload tsv with read group info for all samples)   
 Otherwise (single sample): addrg.sbatch, addrgsra.sbatch   
 Code snippet for single sample:  
 
@@ -762,7 +765,6 @@ all theta_W: 0.00047252173477471156
 Here, we want to calculate θπ separately for sets of isolates, and are calculating this statistic PER SITE.  
 **Key note: because we are calculating pi using only variant sites (ie from the VCF), we need to normalize based on the number of 'callable regions'.   
 We did this using:extract_callable_regions.py (python script in RefGenonme directory) to create a file: callable_regions.bed.   
-Software used:  vcftools/0.1.16-gcc-11.4.0     
 ```
 # environmental:
 vcftools --vcf allsamples.final.diploid.vcf \

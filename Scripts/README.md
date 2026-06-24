@@ -60,17 +60,17 @@ This repository documents the scripts and steps used to process *Coccidioides* s
 
 ---
 
-General software used:  
-vcftools/0.1.16-gcc-11.4.0\
-bio/bwa-mem2/2.2.1\
-bio/samtools/1.17-gcc-11.4.0\
-Trimmomatic V 0.39 (Bolger et al. 2014)\
-fastp v 1.0.1 (manually installed from [here](https://github.com/OpenGene/fastp).\
-gatk\
-java\
-python3\
-bio/picard/3.0.0-gcc-11.4.0\
-bio/fastqc/0.12.1-gcc-11.4.0  
+**Software used**
+- vcftools/0.1.16-gcc-11.4.0
+- bio/bwa-mem2/2.2.1
+- bio/samtools/1.17-gcc-11.4.0
+- Trimmomatic V 0.39 (Bolger et al. 2014)
+- fastp v 1.0.1 (manually installed from [here](https://github.com/OpenGene/fastp).
+- gatk
+- java
+- python3
+- bio/picard/3.0.0-gcc-11.4.0
+- bio/fastqc/0.12.1-gcc-11.4.0  
 
 
 ## Reference Genome Preparation

@@ -669,11 +669,13 @@ Fst 2 & 3: Weir and Cockerham mean Fst estimate: 0.22700; weighted Fst estimate:
 These calculations will use the filtered VCF file that contains all samples (rather than subset-specific filtered vcf files since that will confounded diversity calculations due to QC steps).   
 First, create txt files indicating sample names for each subset:   
 
+```
 echo -e "22AC2\n22BC1\n34B2\n58B1\n87A1\n137a1_redo\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3\n13B1\n14B1\n118a3\n118b3\n157b2\n158b3\nL100\n239a3b2" > Envr.txt      
 bcftools query -l Subset_envrclin.final.diploid.vcf | grep '^Kern' > Clin.txt   
-cat Envr.txt Clin.txt > EnvrClin.txt   
+cat Envr.txt Clin.txt > EnvrClin.txt
+``` 
 
-##### S (number of segregating sites)
+**S (number of segregating sites)**
 
 ```
 S_envr=$(vcftools --vcf allsamples.final.recode.vcf --keep Envr.txt --mac 1 --recode --stdout | grep -vc "^#")
@@ -691,23 +693,72 @@ S_clin: 51,191\
 S_envrclin: 53,882\
 S_all: 56,201\
 
-##### Watterson's theta (S, normalized by # of ssamples)
+**Watterson's theta (S, normalized by # of ssamples)**
 
 ```
-S=$(grep -vc "^#" Subset_envr.final.diploid.vcf)
-n=$(bcftools query -l Subset_envr.final.diploid.vcf | wc -l)
+# Environmental
+S=$(vcftools --vcf allsamples.final.recode.vcf --keep Envr.txt --mac 1 --recode --stdout | grep -vc "^#")
+n=$(wc -l < Envr.txt)
 callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
 
 python3 - <<EOF
 S = $S
-n = 2 * $n
+n = $n
 callable = $callable
 a_n = sum(1/i for i in range(1, n))
-print((S / a_n) / callable)
+theta_w = (S / a_n) / callable
+print(f"environmental theta_W: {theta_w}")
+EOF
+
+# Clinical
+S=$(vcftools --vcf allsamples.final.recode.vcf --keep Clin.txt --mac 1 --recode --stdout | grep -vc "^#")
+n=$(wc -l < Clin.txt)
+callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
+
+python3 - <<EOF
+S = $S
+n = $n
+callable = $callable
+a_n = sum(1/i for i in range(1, n))
+theta_w = (S / a_n) / callable
+print(f"clinical theta_W: {theta_w}")
+EOF
+
+# Environmental and clinical
+S=$(vcftools --vcf allsamples.final.recode.vcf --keep EnvrClin.txt --mac 1 --recode --stdout | grep -vc "^#")
+n=$(wc -l < EnvrClin.txt)
+callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
+
+python3 - <<EOF
+S = $S
+n = $n
+callable = $callable
+a_n = sum(1/i for i in range(1, n))
+theta_w = (S / a_n) / callable
+print(f"envr and clin theta_W: {theta_w}")
+EOF
+
+# All (including legacies)
+S=$(vcftools --vcf allsamples.final.recode.vcf --mac 1 --recode --stdout | grep -vc "^#")
+n=$(bcftools query -l allsamples.final.recode.vcf | wc -l)
+callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
+
+python3 - <<EOF
+S = $S
+n = $n
+callable = $callable
+a_n = sum(1/i for i in range(1, n))
+theta_w = (S / a_n) / callable
+print(f"all theta_W: {theta_w}")
 EOF
 ```
+environmental theta_W: 0.0005455180932584511
+clinical theta_W: 0.0005681607521474858
+envr and clin theta_W: 0.0005274288114176259
+all theta_W: 0.00047252173477471156
 
-### Tajima's D 
+
+**Tajima's D**
 
 Here, we want to calculate Tajima's D separately for sets of samples. It is typically calculcated in  windows. I tried various window sizes but 100 kb seemed to be best 
 
@@ -725,8 +776,7 @@ vcftools --vcf final_diploid.vcf \ # Note, requires this 'diploid' version as in
   --out tajimasD_environmental
 ```
 
-### Nucleotide diversity, θπ
-
+**Nucleotide diversity, θπ**  
 θπ is the average number of pairwise differences *per site* between all sequences in a population.   
 Here, we want to calculate θπ separately for sets of isolates, and are calculating this statistic PER SITE.  
 **Key note: Pi is only calculated on variant sites. Thus if you calculate averages per gene, values will be inflated because it assumes non-variant sites were also included. SO, in order to normalize for these non-variant sites, you need to identify the 'callable regions'.  We did this using:   
@@ -759,25 +809,7 @@ awk -v s="$sum_pi" -v c="$callable" 'BEGIN {print "genome_wide_pi =", s/c}'
 genome_wide_pi = 0.000771967 (environmental isolates)
 genome_wide_pi = 0.000688736 (clinical isolates only)
 
-[original window-based approach on scg that was not working]
-```
-vcftools \
-  --vcf final_diploid.vcf \
-  --keep CApop1.txt \
-  --window-pi 10000 \
-  --window-pi-step 10000 \
-  --max-missing 0.9 \
-  --out pi_environmental
 
-# For clinical isolates
-vcftools \
-  --vcf final_diploid.vcf \
-  --keep CApop2.txt \
-  --window-pi 10000 \
-  --window-pi-step 10000 \
-  --max-missing 0.9 \
-  --out pi_clinical
-```
 
 
 ### MK Test

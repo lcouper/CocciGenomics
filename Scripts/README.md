@@ -664,19 +664,33 @@ Fst 1 & 2: Weir and Cockerham mean Fst estimate: 0.27331; weighted Fst estimate:
 Fst 1 & 3: Weir and Cockerham mean Fst estimate: 0.15339; weighted Fst estimate: 0.22844
 Fst 2 & 3: Weir and Cockerham mean Fst estimate: 0.22700; weighted Fst estimate: 0.31262
 
+### Diversity metrics
+
+##### S (number of segregating sites)
+
+```
+grep -v "^#" Subset_envr.final.recode.vcf | wc -l
+```
+
+##### Watterson's theta (S, normalized by # of ssamples)
+
+```
+S=$(grep -vc "^#" Subset_envr.final.diploid.vcf)
+n=$(bcftools query -l Subset_envr.final.diploid.vcf | wc -l)
+callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
+
+python3 - <<EOF
+S = $S
+n = 2 * $n
+callable = $callable
+a_n = sum(1/i for i in range(1, n))
+print((S / a_n) / callable)
+EOF
+```
 
 ### Tajima's D 
 
-Tajima's D provides evidence of different types of selection. Its calculation is based on the site frequency spectrum.   
-
-| Interpretation of Tajima's D | Description |
-|-----------------------------|-------------|
-| **Negative Tajima's D**     | Excess of rare alleles — may indicate purifying or positive selection. |
-| **Positive Tajima's D**     | Excess of intermediate-frequency alleles — may indicate balancing selection. |
-| **Tajima's D ≈ 0**          | Consistent with neutral evolution under constant population size. |   
-
-   
-Here, we want to calculate Tajima's D separately for the clinical and environmental samples. It is typically calculcated in  windows. I tried various window sizes but 100 kb seemed to be best 
+Here, we want to calculate Tajima's D separately for sets of samples. It is typically calculcated in  windows. I tried various window sizes but 100 kb seemed to be best 
 
 Software used: vcftools/0.1.16-gcc-11.4.0
 Code snippet (run at command line, very fast):
@@ -695,17 +709,9 @@ vcftools --vcf final_diploid.vcf \ # Note, requires this 'diploid' version as in
 ### Nucleotide diversity, θπ
 
 θπ is the average number of pairwise differences *per site* between all sequences in a population.   
-Here, we want to calculate θπ separately for clinical and environmental isolates from CA.       
-Note that we are calculating this statistic PER SITE, but we will calculate the average per gene in R.  
+Here, we want to calculate θπ separately for sets of isolates, and are calculating this statistic PER SITE.  
 **Key note: Pi is only calculated on variant sites. Thus if you calculate averages per gene, values will be inflated because it assumes non-variant sites were also included. SO, in order to normalize for these non-variant sites, you need to identify the 'callable regions'.  We did this using:   
 extract_callable_regions.py (python script in RefGenonme directory)
-
-
-| Interpretation of θπ | Description |
-|-----------------------------|-------------|
-| **High θπ in environmental isolates**     | Large, diverse populations. | 
-| **Low θπ in clinical isolates**     | Selection / adpatation in the host; population bottlenecks. |    
-| **Higher θπ in clinical vs environmental**     | Balancing selection in host |    
 
 Software used:  vcftools/0.1.16-gcc-11.4.0     
 Code snippet (run at command line, very fast):  

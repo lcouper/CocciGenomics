@@ -666,11 +666,30 @@ Fst 2 & 3: Weir and Cockerham mean Fst estimate: 0.22700; weighted Fst estimate:
 
 ### Diversity metrics
 
+These calculations will use the filtered VCF file that contains all samples (rather than subset-specific filtered vcf files since that will confounded diversity calculations due to QC steps).   
+First, create txt files indicating sample names for each subset:   
+
+echo -e "22AC2\n22BC1\n34B2\n58B1\n87A1\n137a1_redo\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3\n13B1\n14B1\n118a3\n118b3\n157b2\n158b3\nL100\n239a3b2" > Envr.txt      
+bcftools query -l Subset_envrclin.final.diploid.vcf | grep '^Kern' > Clin.txt   
+cat Envr.txt Clin.txt > EnvrClin.txt   
+
 ##### S (number of segregating sites)
 
 ```
-grep -v "^#" Subset_envr.final.recode.vcf | wc -l
+S_envr=$(vcftools --vcf allsamples.final.recode.vcf --keep Envr.txt --mac 1 --recode --stdout | grep -vc "^#")
+S_clin=$(vcftools --vcf allsamples.final.recode.vcf --keep Clin.txt --mac 1 --recode --stdout | grep -vc "^#")
+S_envrclin=$(vcftools --vcf allsamples.final.recode.vcf --keep EnvrClin.txt --mac 1 --recode --stdout | grep -vc "^#")
+S_all=$(vcftools --vcf allsamples.final.recode.vcf --mac 1 --recode --stdout | grep -vc "^#")
+
+echo "S_envr = $S_envr"
+echo "S_clin = $S_clin"
+echo "S_envrclin = $S_envrclin"
+echo "S_all = $S_all"
 ```
+S_envr: 43,545\
+S_clin: 51,191\
+S_envrclin: 53,882\
+S_all: 56,201\
 
 ##### Watterson's theta (S, normalized by # of ssamples)
 
@@ -716,8 +735,6 @@ extract_callable_regions.py (python script in RefGenonme directory)
 Software used:  vcftools/0.1.16-gcc-11.4.0     
 Code snippet (run at command line, very fast):  
 ```
-echo -e "22AC2\n22BC1\n34B2\n58B1\n87A1\n137a1_redo\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3\n13B1\n14B1\n118a3\n118b3\n157b2\n158b3\nL100\n239a3b2" > Envr.txt
-
 # For environmental isolates
 vcftools --vcf Subset_envr.final.diploid.vcf \
   --keep Envr.txt \
@@ -726,10 +743,8 @@ vcftools --vcf Subset_envr.final.diploid.vcf \
   --out pi_environmental_sitewise
 
 # For clinical isolates
-bcftools query -l Subset_envrclin.final.diploid.vcf | grep '^Kern' > Clin_Kern.txt
-
 vcftools --vcf Subset_envrclin.final.diploid.vcf \
-  --keep Clin_Kern.txt \
+  --keep Clin.txt \
   --site-pi \
   --max-missing 0.9 \
   --out pi_clinical_kern_sitewise

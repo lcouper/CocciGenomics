@@ -70,7 +70,7 @@ This repository documents the scripts and steps used to process *Coccidioides* s
 - java
 - python3
 - bio/picard/3.0.0-gcc-11.4.0
-- bio/fastqc/0.12.1-gcc-11.4.0  
+- bio/fastqc/0.12.1-gcc-11.4.0
 
 
 ## Reference Genome Preparation
@@ -761,10 +761,8 @@ envr and clin theta_W: 0.0005274288114176259
 all theta_W: 0.00047252173477471156
 
 **Nucleotide diversity, θπ**  
-θπ is the average number of pairwise differences *per site* between all sequences in a population.   
-Here, we want to calculate θπ separately for sets of isolates, and are calculating this statistic PER SITE.  
-**Key note: because we are calculating pi using only variant sites (ie from the VCF), we need to normalize based on the number of 'callable regions'.   
-We did this using:extract_callable_regions.py (python script in RefGenonme directory) to create a file: callable_regions.bed.   
+θπ is the average number of pairwise differences *per site* between all sequences in a population. **Key note: because we are calculating pi using only variant sites (ie from the VCF), we need to normalize based on the number of 'callable regions'.   
+We did this using:extract_callable_regions.py (python script in RefGenonme directory) to create a file: callable_regions.bed. This calculation requires using diploid version of vcf.  
 ```
 # environmental:
 vcftools --vcf allsamples.final.diploid.vcf \
@@ -822,25 +820,46 @@ pi_all = 0.000674365
 
 **Tajima's D**
 
-Here, we want to calculate Tajima's D separately for sets of samples. It is typically calculcated in  windows. I tried various window sizes but 100 kb seemed to be best 
-
-Software used: vcftools/0.1.16-gcc-11.4.0
-Code snippet (run at command line, very fast):
+Typically calculcated in  windows. I tried various window sizes but 100 kb seemed to be best. This calculation requires using diploid version of vcf. 
 ```
-vcftools --vcf final_diploid.vcf \ # Note, requires this 'diploid' version as input
-  --keep CApop2.txt \ # Names of the clinical CA samples stored in this text file
+# Environmental
+vcftools --vcf allsamples.final.diploid.vcf \
+  --keep Envr.txt \
+  --TajimaD 100000 \
+  --out tajimasD_environmental
+
+awk 'NR > 1 && $4 != "nan" {sum += $4; n++} END {print "mean_TajimasD_environmental =", sum/n}' tajimasD_environmental.Tajima.D
+
+
+# Clinical
+vcftools --vcf allsamples.final.diploid.vcf \
+  --keep Clin.txt \
   --TajimaD 100000 \
   --out tajimasD_clinical
 
-vcftools --vcf final_diploid.vcf \ # Note, requires this 'diploid' version as input
-  --keep CApop1.txt \ # Names of the environmental CA samples stored in this text file
+awk 'NR > 1 && $4 != "nan" {sum += $4; n++} END {print "mean_TajimasD_clinical =", sum/n}' tajimasD_clinical.Tajima.D
+
+
+# Environmental + clinical
+vcftools --vcf allsamples.final.diploid.vcf \
+  --keep EnvrClin.txt \
   --TajimaD 100000 \
-  --out tajimasD_environmental
+  --out tajimasD_envrclin
+
+awk 'NR > 1 && $4 != "nan" {sum += $4; n++} END {print "mean_TajimasD_envrclin =", sum/n}' tajimasD_envrclin.Tajima.D
+
+
+# All samples
+vcftools --vcf allsamples.final.diploid.vcf \
+  --TajimaD 100000 \
+  --out tajimasD_all
+
+awk 'NR > 1 && $4 != "nan" {sum += $4; n++} END {print "mean_TajimasD_all =", sum/n}' tajimasD_all.Tajima.D
 ```
-
-
-
-
+mean_TajimasD_environmental = 1.24342  
+mean_TajimasD_clinical = 1.17419  
+mean_TajimasD_envrclin = 1.3271  
+mean_TajimasD_all = 1.65487   
 
 
 ### MK Test

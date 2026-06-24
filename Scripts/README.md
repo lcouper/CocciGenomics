@@ -1143,6 +1143,9 @@ cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
 
 # our environmental and clinical isolates plus Cp
 /global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --vcf Subset_envrclin_Cp.final.diploid.vcf --allow-extra-chr --double-id --set-missing-var-ids @:# --make-bed --out Subset_envrclin_Cp_plink
+
+# just environmental isolates
+/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --vcf Subset_envr.final.diploid.vcf --allow-extra-chr --double-id --set-missing-var-ids @:# --make-bed --out Subset_envr_plink
 ```
 
 Step 2. Create the LD-pruned dataset (again, can run at command line. very fast).    
@@ -1159,6 +1162,9 @@ cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
 
 # our environmental and clinical isolates plus Cp
 /global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile Subset_envrclin_Cp_plink --allow-extra-chr --indep-pairwise 50 5 0.5 --out Subset_envrclin_Cp_ld_r05
+
+# just environmental
+/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile Subset_envr_plink --allow-extra-chr --indep-pairwise 50 5 0.5 --out Subset_envr_ld_r05
 ```
 This removed ~43,121 out of 56,201 variants, leaving 13,080 SNPs 
 
@@ -1174,6 +1180,9 @@ Step 3. Make pruned plink files (for any downstream analyses that use plink)
 
 # our environmental and clinical isolates plus Cp
 /global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile Subset_envrclin_Cp_plink --allow-extra-chr --extract Subset_envrclin_ld_r05.prune.in --make-bed --out Subset_envrclin_Cp_ld_r05_pruned
+
+# just environmental
+/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile Subset_envr_plink --allow-extra-chr --extract Subset_envr_ld_r05.prune.in --make-bed --out Subset_envr_ld_r05_pruned
 ```
 
 Step 4. Make a pruned vcf file 
@@ -1183,6 +1192,9 @@ Step 4. Make a pruned vcf file
 
 # with just our environmental and clinical isolates
 /global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile Subset_envrclin_plink --allow-extra-chr --extract Subset_envrclin_ld_r05.prune.in --recode vcf --out Subset_envrclin_ld_r05_pruned
+
+# just envirionmkental
+/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile Subset_envr_plink --allow-extra-chr --extract Subset_envr_ld_r05.prune.in --recode vcf --out Subset_envr_ld_r05_pruned
 ```
 Note the pruned vcf is called 'allsamples_ld_r05_pruned.vcf' or 'Subset_envrclin_ld_r05_pruned.vcf'
 

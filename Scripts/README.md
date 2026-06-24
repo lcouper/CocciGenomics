@@ -691,9 +691,9 @@ echo "S_all = $S_all"
 S_envr: 43,545\
 S_clin: 51,191\
 S_envrclin: 53,882\
-S_all: 56,201\
+S_all: 56,201   
 
-**Watterson's theta (S, normalized by # of ssamples)**
+**Watterson's theta (S, normalized by # of samples)**
 
 ```
 # Environmental
@@ -757,6 +757,66 @@ clinical theta_W: 0.0005681607521474858
 envr and clin theta_W: 0.0005274288114176259
 all theta_W: 0.00047252173477471156
 
+**Nucleotide diversity, θπ**  
+θπ is the average number of pairwise differences *per site* between all sequences in a population.   
+Here, we want to calculate θπ separately for sets of isolates, and are calculating this statistic PER SITE.  
+**Key note: because we are calculating pi using only variant sites (ie from the VCF), we need to normalize based on the number of 'callable regions'.   
+We did this using:extract_callable_regions.py (python script in RefGenonme directory) to create a file: callable_regions.bed.   
+Software used:  vcftools/0.1.16-gcc-11.4.0     
+```
+# environmental:
+vcftools --vcf allsamples.final.diploid.vcf \
+  --keep Envr.txt \
+  --site-pi \
+  --max-missing 0.9 \
+  --out pi_environmental_sitewise
+
+callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
+sum_pi=$(awk 'NR > 1 {sum += $3} END {print sum}' pi_environmental_sitewise.sites.pi)
+
+awk -v s="$sum_pi" -v c="$callable" 'BEGIN {print "pi_environmental =", s/c}'
+
+# clinical
+vcftools --vcf allsamples.final.diploid.vcf \
+  --keep Clin.txt \
+  --site-pi \
+  --max-missing 0.9 \
+  --out pi_clinical_sitewise
+
+callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
+sum_pi=$(awk 'NR > 1 {sum += $3} END {print sum}' pi_clinical_sitewise.sites.pi)
+
+awk -v s="$sum_pi" -v c="$callable" 'BEGIN {print "pi_clinical =", s/c}'
+
+# envr and clin:
+vcftools --vcf allsamples.final.diploid.vcf \
+  --keep EnvrClin.txt \
+  --site-pi \
+  --max-missing 0.9 \
+  --out pi_envrclin_sitewise
+
+callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
+sum_pi=$(awk 'NR > 1 {sum += $3} END {print sum}' pi_envrclin_sitewise.sites.pi)
+
+awk -v s="$sum_pi" -v c="$callable" 'BEGIN {print "pi_envrclin =", s/c}'
+
+# all:
+vcftools --vcf allsamples.final.diploid.vcf \
+  --site-pi \
+  --max-missing 0.9 \
+  --out pi_all_sitewise
+
+callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
+sum_pi=$(awk 'NR > 1 {sum += $3} END {print sum}' pi_all_sitewise.sites.pi)
+
+awk -v s="$sum_pi" -v c="$callable" 'BEGIN {print "pi_all =", s/c}'
+```
+
+pi_environmental = 0.000612615
+pi_clinical = 0.000653024
+pi_envrclin = 0.000666852
+pi_all = 0.000674365
+
 
 **Tajima's D**
 
@@ -776,38 +836,7 @@ vcftools --vcf final_diploid.vcf \ # Note, requires this 'diploid' version as in
   --out tajimasD_environmental
 ```
 
-**Nucleotide diversity, θπ**  
-θπ is the average number of pairwise differences *per site* between all sequences in a population.   
-Here, we want to calculate θπ separately for sets of isolates, and are calculating this statistic PER SITE.  
-**Key note: Pi is only calculated on variant sites. Thus if you calculate averages per gene, values will be inflated because it assumes non-variant sites were also included. SO, in order to normalize for these non-variant sites, you need to identify the 'callable regions'.  We did this using:   
-extract_callable_regions.py (python script in RefGenonme directory)
 
-Software used:  vcftools/0.1.16-gcc-11.4.0     
-Code snippet (run at command line, very fast):  
-```
-# For environmental isolates
-vcftools --vcf Subset_envr.final.diploid.vcf \
-  --keep Envr.txt \
-  --site-pi \
-  --max-missing 0.9 \
-  --out pi_environmental_sitewise
-
-# For clinical isolates
-vcftools --vcf Subset_envrclin.final.diploid.vcf \
-  --keep Clin.txt \
-  --site-pi \
-  --max-missing 0.9 \
-  --out pi_clinical_kern_sitewise
-```
-Then normalize each based on the number of callable bases:
-```
-callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
-sum_pi=$(awk 'NR > 1 {sum += $3} END {print sum}' pi_environmental_sitewise.sites.pi)
-# sum_pi=$(awk 'NR > 1 {sum += $3} END {print sum}' pi_clinical_kern_sitewise.sites.pi)
-awk -v s="$sum_pi" -v c="$callable" 'BEGIN {print "genome_wide_pi =", s/c}'
-```
-genome_wide_pi = 0.000771967 (environmental isolates)
-genome_wide_pi = 0.000688736 (clinical isolates only)
 
 
 

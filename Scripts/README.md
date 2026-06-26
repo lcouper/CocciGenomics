@@ -665,7 +665,11 @@ vcftools --vcf Subset_envr.final.diploid.vcf \
 Results: 
 Fst 1 & 2: Weir and Cockerham mean Fst estimate: 0.27331; weighted Fst estimate: 0.41696   
 Fst 1 & 3: Weir and Cockerham mean Fst estimate: 0.15339; weighted Fst estimate: 0.22844
-Fst 2 & 3: Weir and Cockerham mean Fst estimate: 0.22700; weighted Fst estimate: 0.31262
+Fst 2 & 3: Weir and Cockerham mean Fst estimate: 0.22700; weighted Fst estimate: 0.31262   
+
+For permutation approach here, scripts were:  
+fst_perm_12.sbatch, fst_perm.13.sbtach, fst_perm_23.sbatch   
+
 
 ### Diversity metrics
 

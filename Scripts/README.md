@@ -993,10 +993,9 @@ mean_TajimasD_pop2 = 2.30802\
 mean_TajimasD_pop3 = 1.6804\
 
 
-### MK Test
+### pN/pS, dN/dS, and MK Test
 
 - Requires multi-sample FASTA, reference genome (RefGenome/CocciRef_GCA_000149335.2.fna), and reference genome annotation file (RefGenome/genomic.gff)
-- Note: this calculation was done for only California genomes to minimize confounding by demography
 
 **Step 1. (only need to run once) Extract coding sequence coordinates by gene from the reference**     
 This uses the gene annotation file.     
@@ -1055,6 +1054,7 @@ Software used: python/3.10.12-gcc-11.4.0, egglib v3
 Script used:  compute_pnps_by_group.py 
 Note: may take ~10 minutes to run
 
+*for dN/dS and MK test:*   
 **Step 11. Count between group "divergences" (dN/dS)**
 Software used: python/3.10.12-gcc-11.4.0
 Script used: compute_dnds_between_groups.py   
@@ -1062,8 +1062,6 @@ Script used: compute_dnds_between_groups.py
 **Step 12. Conduct MK test from pN/pS and dN/dS counts**
 Software used: python/3.10.12-gcc-11.4.0
 Script used: mk_test_from_counts.py
-
-
 
 
 ### Investigating gene function and GO terms

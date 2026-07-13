@@ -1019,7 +1019,7 @@ Note that ~2% ambiguity is expected due to earlier repeat masking, and will be e
 
 Software used: biopython, python     
 Script: translate_all_cds.py  (old version: fasta_to_protein.py)
-*Run as: python translate_all_cds.py*
+*Run as: python translate_all_cds.py (after loading python)*
 
 **Step 5. Filter problematic genes**   
 

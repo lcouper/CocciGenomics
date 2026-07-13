@@ -1032,7 +1032,7 @@ Python script used: filter_genes.py or (without the 75% rule): filter_genes_no75
 
 Software used: muscle v3.8. Note the latest versions (v5) was giving issues, hence going with an older release. Program (muscle3.8.31_i86linux32.tar) was manually downloaded [here](https://drive5.com/muscle/downloads_v3.htm).   
 Script used: run_muscle_alignments.py      
-*Run as: run_muscle_alignments.py*    Note this may take ~30 minutes to run
+*Run as: python run_muscle_alignments.py*    Note this may take ~30 minutes to run
 
 **Step 7. Create per-gene CDS FASTA files across samples**    
 I.e. we need the nucleotide sequence of each gene from each sample. This is required input for PAL2NAL.    

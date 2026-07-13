@@ -1037,7 +1037,7 @@ Script used: run_muscle_alignments.py
 **Step 7. Create per-gene CDS FASTA files across samples**    
 I.e. we need the nucleotide sequence of each gene from each sample. This is required input for PAL2NAL.    
 Script used: generate_cds_by_gene_strict.py
-*Run as: generate_cds_by_gene_strict.py*   
+*Run as: python generate_cds_by_gene_strict.py*   Note this may take ~30 minutes to run
 Note there is a 'non-strict' version: generate_cds_by_gene.py that may hold on to duplicates.   
 
 **Step 8. Create codon-aware nucleotide alignments**     

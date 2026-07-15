@@ -49,7 +49,7 @@ This repository documents the scripts and steps used to process *Coccidioides* s
 - [5.2 Population structure analysis](#assess-population-structure)  
 - [5.3 Map SNPs to genes](#scaffolding-snps-into-genes)  
 - [5.4 Determine chromosome sizes](#identify-size-of-each-chromosome)  
-- [5.5 Mating type analysis](#examining-mating-type-distribution)  
+- [5.5 Mating type analysis](#mating-type-locus-assignment)  
 - [5.6 Tajima’s D](#tajimas-d)  
 - [5.7 Nucleotide diversity (θπ)](#nucleotide-diversity-θπ)  
 - [5.8 McDonald–Kreitman test](#mk-test)  

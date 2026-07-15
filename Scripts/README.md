@@ -1222,7 +1222,7 @@ Code snippet:
 ```
 python $HOME/software/genomics_general/phylo/raxml_sliding_windows.py \
   -g cocci44.geno.gz -p cocci44.w100 \
-  --windType sites -w 100 -M 50 --model GTRCAT \
+  --windType sites -w 100 -M 50 --model GTRCAT \  # 100 SNP sliding window
   --raxml raxmlHPC-AVX -T $SLURM_CPUS_PER_TASK \
   --log cocci44.w100.raxlog.txt
 ```

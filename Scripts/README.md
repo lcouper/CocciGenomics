@@ -1222,7 +1222,7 @@ Code snippet:
 ```
 python $HOME/software/genomics_general/phylo/raxml_sliding_windows.py \
   -g cocci44.geno.gz -p cocci44.w100 \
-  --windType sites -w 500 -M 50 --model GTRCAT \  # specific a 500 SNP sliding window
+  --windType sites -w 100 -M 50 --model GTRCAT \
   --raxml raxmlHPC-AVX -T $SLURM_CPUS_PER_TASK \
   --log cocci44.w100.raxlog.txt
 ```
@@ -1270,7 +1270,7 @@ CONTROL="Kern13"   # pure-C1 negative control
 
 for f in $FOCAL $CONTROL; do
   python $HOME/software/twisst/twisst.py \
-    -t cocci44.w500.trees.gz \
+    -t cocci44.w100.trees.gz \
     -w out/${f}.weights.csv.gz \
     --groupsFile groups/groups_${f}.tsv \
     -g C1_KernRiver -g C2_Carrizo -g C3_LosGatos -g Focal -g Outgroup \

@@ -1201,6 +1201,15 @@ Step 4. Make a pruned vcf file
 Note the pruned vcf is called 'allsamples_ld_r05_pruned.vcf' or 'Subset_envrclin_ld_r05_pruned.vcf'
 
 
+## Twisst, window-based genomic relationships ##
+
+For this, we will use the vcf file with our novel environmental and clinical isolates (no re-preps) and CpSilv as an outgroup. 
+
+
+
+
+
+
 
 
 

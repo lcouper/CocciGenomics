@@ -1204,7 +1204,49 @@ Note the pruned vcf is called 'allsamples_ld_r05_pruned.vcf' or 'Subset_envrclin
 
 ## Twisst, window-based genomic relationships
 
-For this, we will use the vcf file with our novel environmental and clinical isolates (no re-preps) and CpSilv as an outgroup. 
+For this, we will use the vcf file with our novel environmental and clinical isolates (no re-preps) and CpSilv as an outgroup.   
+Note that twisst requires numpy and a tree-building software (we will use raxml/8.2.12 here)
+
+```
+# from within the 'FinalOutputs/twisst' directory, parse the vcf to .geno for twisst processing: 
+python $HOME/software/genomics_general/VCF_processing/parseVCF.py \
+  -i ../Subset_envrclin_Cp.final.recode.vcf \
+  --ploidy 1 \
+  --skipIndels \
+  -o cocci44.geno.gz
+```
+
+Make the 'groupings' file. Note, these are the 'pure' soil isolates, that we'll use the 'reference groups' here, in addition to the Cp 'reference group' 
+```
+mkdir -p groups out
+
+cat > groups/refs.tsv <<'EOF'
+22AC2 C1_KernRiver
+22BC1 C1_KernRiver
+34B2  C1_KernRiver
+58B1  C1_KernRiver
+87A1  C1_KernRiver
+137a1_redo    C1_KernRiver
+13B1  C2_Carrizo
+14B1  C2_Carrizo
+PS02PN14-1    C2_Carrizo
+PS02PN14-2    C2_Carrizo
+PS02PN14-3    C2_Carrizo
+157b2 C3_LosGatos
+158b3 C3_LosGatos
+L100  C3_LosGatos
+CpSilv        Outgroup
+EOF
+```
+Then, make one groups file per focal isolate. Note that 13, which has pure ancestry to cluster 1 according to ADMIXTURE, is included here as a 'negative control' of sorts, to make sure the approach is working.  
+```
+FOCAL="Kern3 Kern4 Kern9 Kern12 Kern14 Kern17 Kern22 Kern23 Kern24" 
+CONTROL="Kern13"    # pure-C1 negative control
+for f in $FOCAL $CONTROL; do
+  cp groups/refs.tsv groups/groups_$f.tsv
+  printf "%s\tFocal\n" "$f" >> groups/groups_$f.tsv
+done
+
 
 
 

@@ -1216,7 +1216,18 @@ python $HOME/software/genomics_general/VCF_processing/parseVCF.py \
   -o cocci44.geno.gz
 ```
 
-Make the 'groupings' file. Note, these are the 'pure' soil isolates, that we'll use the 'reference groups' here, in addition to the Cp 'reference group' 
+Then, create trees in sliding windows:      
+Script: twisst_trees.sbatch  
+Code snippet:   
+```
+python $HOME/software/genomics_general/phylo/raxml_sliding_windows.py \
+  -g cocci44.geno.gz -p cocci44.w100 \
+  --windType sites -w 100 -M 50 --model GTRCAT \
+  --raxml raxmlHPC-AVX -T $SLURM_CPUS_PER_TASK \
+  --log cocci44.w100.raxlog.txt
+```
+
+Next, create the 'groupings' file. Note, these are the 'pure' soil isolates, that we'll use the 'reference groups' here, in addition to the Cp 'reference group' 
 ```
 mkdir -p groups out
 
@@ -1246,8 +1257,12 @@ for f in $FOCAL $CONTROL; do
   cp groups/refs.tsv groups/groups_$f.tsv
   printf "%s\tFocal\n" "$f" >> groups/groups_$f.tsv
 done
+```
 
-
+Now, for one focal isolate at a time, compute the "weightings", which indicate the level of support for each of the 15 possible topologies (15 because there are 4 'reference groups' and 1 'focal group'.   
+Script used: twisst_weights.sbatch    
+Code snippet:    
+``` 
 
 
 

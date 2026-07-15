@@ -1222,7 +1222,7 @@ Code snippet:
 ```
 python $HOME/software/genomics_general/phylo/raxml_sliding_windows.py \
   -g cocci44.geno.gz -p cocci44.w100 \
-  --windType sites -w 100 -M 50 --model GTRCAT \
+  --windType sites -w 500 -M 50 --model GTRCAT \  # specific a 500 SNP sliding window
   --raxml raxmlHPC-AVX -T $SLURM_CPUS_PER_TASK \
   --log cocci44.w100.raxlog.txt
 ```
@@ -1246,6 +1246,8 @@ PS02PN14-3    C2_Carrizo
 157b2 C3_LosGatos
 158b3 C3_LosGatos
 L100  C3_LosGatos
+118a3 C3_LosGatos
+118b3 C3_LosGatos
 CpSilv        Outgroup
 EOF
 ```
@@ -1262,7 +1264,22 @@ done
 Now, for one focal isolate at a time, compute the "weightings", which indicate the level of support for each of the 15 possible topologies (15 because there are 4 'reference groups' and 1 'focal group'.   
 Script used: twisst_weights.sbatch    
 Code snippet:    
-``` 
+```
+FOCAL="Kern3 Kern4 Kern9 Kern12 Kern14 Kern17 Kern22 Kern23 Kern24"
+CONTROL="Kern13"   # pure-C1 negative control
+
+for f in $FOCAL $CONTROL; do
+  python $HOME/software/twisst/twisst.py \
+    -t cocci44.w500.trees.gz \
+    -w out/${f}.weights.csv.gz \
+    --groupsFile groups/groups_${f}.tsv \
+    -g C1_KernRiver -g C2_Carrizo -g C3_LosGatos -g Focal -g Outgroup \
+    --outgroup Outgroup --outputTopos out/${f}.topos.txt \
+    2> out/${f}.twisst.log
+  echo "done $f"
+done
+```
+Then exports groups and coordinates (cocci44.w100.data.tsv) into R for downstream steps 
 
 
 

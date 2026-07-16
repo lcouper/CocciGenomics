@@ -1279,7 +1279,27 @@ for f in $FOCAL $CONTROL; do
   echo "done $f"
 done
 ```
-Then exports groups and coordinates (cocci44.w100.data.tsv) into R for downstream steps 
+Then exports groups and coordinates (cocci44.w100.data.tsv) into R for downstream steps.
+
+To repeat for K = 2, remake the groups (as below), then run: twisst_weights2.sbatch
+```
+cat > refs_K2.tsv <<'EOF'
+137a1_redo Bakersfield
+22AC2 Bakersfield
+22BC1 Bakersfield
+34B2 Bakersfield
+58B1 Bakersfield
+87A1 Bakersfield
+13B1 Carrizo
+14B1 Carrizo
+PS02PN14-1 Carrizo
+PS02PN14-2 Carrizo
+PS02PN14-3 Carrizo
+118a3 Carrizo
+118b3 Carrizo
+CpSilv Outgroup
+EOF
+```
 
 
 

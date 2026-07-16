@@ -58,6 +58,7 @@ This repository documents the scripts and steps used to process *Coccidioides* s
 - [5.11 Construct phylogenetic tree](#construct-phylogenetic-tree)
 - [5.12 Linkage Disequilibrium](#linkage-disequilibrium)
 - [5.13 Twisst](#Twisst-window-based-genomic-relationships)
+- [5.14 fineSTRUCTURE](#fineSTRUCTURE)
 
 ---
 
@@ -1300,6 +1301,12 @@ PS02PN14-3 Carrizo
 CpSilv Outgroup
 EOF
 ```
+
+## fineSTRUCTURE 
+
+An independent, haplotype-based population strucutre assessment, to complement ADMXIXTURE
+
+
 
 
 

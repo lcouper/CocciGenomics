@@ -1304,11 +1304,80 @@ EOF
 
 ## fineSTRUCTURE 
 
-An independent, haplotype-based population strucutre assessment, to complement ADMXIXTURE
+An independent, haplotype-based population strucutre assessment, to complement ADMXIXTURE. Unlike ADMIXTURE (allele-frequency based) and twisst (per-window genealogies), ChromoPainter/fineSTRUCTURE uses linked haplotype (tract-length) information, so it can resolve structure at low differentiation and detect mosaic ancestry missed by the other methods. We used for two purposes:
+1. an **unsupervised, all-vs-all run** to independently check the number and make-up
+   of the populations proposed by ADMIXTURE;
+2. a **targeted ChromoPainter donor–recipient painting** to distinguish admixed clinical
+   isolates (recent mixing of *sampled* soil populations → long, alternating ancestry tracts)
+   from isolates derived from *unsampled* populations (uniform/short tracts) — the question
+   twisst could not resolve.
 
+Software: `fs` v4 (fineSTRUCTURE 4.x + ChromoPainter v2; `danjlawson/finestructure4`), built from source. Run in haploid mode (`-ploidy 1`). Because no recombination map exists for *Coccidioides*, a **uniform recombination map** is used together with EM estimation of Ne and mu (ChromoPainter `-in -iM`), which corrects for the global recombination scale. We did not attempt admixture dating because the absolute tract lengths are approximate 
 
+#### Input preparation
 
+*Convert the analysis VCF (environmental + clinical isolates, no outgroup) into ChromoPainter PHASE, recombination, and ID files.* Isolates are haploid, so each is a single haplotype (one row per isolate — the "diploid" VCF used for ADMIXTURE is **not** used here). Sites are filtered
+to biallelic SNPs with no missing data, then split per scaffold. The tiny scaffold `GG704917.1` (<100 SNPs) is dropped. 51,008 SNPs across 6 scaffolds are retained.
 
+Software: bio/bcftools 1.16
+Script: `makeuniformrecfile.pl` (from fs, not a script I wrote)  
+
+```
+cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
+mkdir -p fs_input
+VCF=Subset_envrclin.final.recode.vcf
+SCAFS="GG704911.1 GG704912.1 GG704913.1 GG704914.1 GG704915.1 GG704916.1"
+
+# biallelic SNPs, complete data
+bcftools view -m2 -M2 -v snps -i 'F_MISSING=0' $VCF -Oz -o cocci43.clean.vcf.gz
+bcftools index cocci43.clean.vcf.gz
+
+# ID file (sample order = bcftools genotype order); population column unused by fs
+bcftools query -l cocci43.clean.vcf.gz | awk '{print $1" Pop1 1"}' > fs_input/cocci.ids
+
+# per-scaffold PHASE (v2) + uniform recombination file
+for s in $SCAFS; do
+  bcftools query -r $s -f '%POS\n'  cocci43.clean.vcf.gz > fs_input/$s.pos ; n=$(wc -l < fs_input/$s.pos)
+  bcftools query -r $s -f '[%GT]\n' cocci43.clean.vcf.gz > fs_input/$s.gtmat   # rows=SNPs, 43-char 0/1 strings
+  { echo 43; echo "$n"; printf 'P '; tr '\n' ' ' < fs_input/$s.pos | sed 's/ $//'; echo;
+    # transpose SNP x sample matrix -> 43 haplotype rows
+    awk '{for(i=1;i<=length($0);i++)a[i,NR]=substr($0,i,1); nc=length($0); nr=NR}
+         END{for(i=1;i<=nc;i++){l="";for(j=1;j<=nr;j++)l=l a[i,j]; print l}}' fs_input/$s.gtmat
+  } > fs_input/$s.phase
+  makeuniformrecfile.pl fs_input/$s.phase fs_input/$s.rec
+done
+rm fs_input/*.gtmat fs_input/*.pos
+```
+
+#### Unsupervised fineSTRUCTURE (population structure check)
+
+*Run the full ChromoPainter → fineSTRUCTURE pipeline all-vs-all (every isolate both donor and recipient), with no a priori groups, so clusters are inferred de novo.* Linked mode is used automatically (recombination files supplied); stage 1 estimates Ne and mu by EM.
+
+Script: finestructure_unsup.sbatch   
+Software used: fs v4
+
+```
+export PATH=$HOME/software/finestructure4:$HOME/software/finestructure4/scripts:$PATH
+cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
+
+SCAFS="GG704911.1 GG704912.1 GG704913.1 GG704914.1 GG704915.1 GG704916.1"
+PH=""; RC=""
+for s in $SCAFS; do PH="$PH fs_input/$s.phase"; RC="$RC fs_input/$s.rec"; done
+
+fs cocci_unsup.cp -n \
+  -idfile fs_input/cocci.ids \
+  -phasefiles $PH \
+  -recombfiles $RC \
+  -ploidy 1 \
+  -go
+```
+
+Notes: EM converged to sensible values (Ne = 920.7, mu = 0.00237). Key outputs:
+- cocci_unsup_linked_hap.chunkcounts.out (coancestry matrix)
+- cocci_unsup_linked_hap_mcmc.xml (clustering)
+- cocci_unsup_linked_hap_tree.xml (tree)
+  
+A second MCMC/tree run (`_run1`) was produced for a convergence check.
 
 
 

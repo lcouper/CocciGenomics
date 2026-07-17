@@ -1399,7 +1399,11 @@ for s in $SCAFS; do PH="$PH fs_input/$s.phase"; RC="$RC fs_input/$s.rec"; done
      -ploidy 1 -s2samples 10 \
      "-s1args:-in -iM --emfilesonly -n $NE" \
      -go
-``` 
+```
+
+To repeat the above, but include a few legacy clinical isolates for comparison:
+Script: prep_ghosts.sbatch
+
 
 
 

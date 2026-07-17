@@ -1404,7 +1404,6 @@ for s in $SCAFS; do PH="$PH fs_input/$s.phase"; RC="$RC fs_input/$s.rec"; done
 To repeat the above, but include a few legacy clinical isolates for comparison:
 Script: prep_ghosts.sbatch
 
-
-
+Then save output in local machine on fineSTRUCTURE/soilpaint. Downstream analysis in R 
 
 

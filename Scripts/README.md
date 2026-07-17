@@ -1355,7 +1355,7 @@ rm fs_input/*.gtmat fs_input/*.pos
 
 Script: finestructure_unsup.sbatch   
 Software used: fs v4
-
+Code snippet:   
 ```
 export PATH=$HOME/software/finestructure4:$HOME/software/finestructure4/scripts:$PATH
 cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
@@ -1371,15 +1371,34 @@ fs cocci_unsup.cp -n \
   -ploidy 1 \
   -go
 ```
-
-Notes: EM converged to sensible values (Ne = 920.7, mu = 0.00237). Key outputs:
+Notes: EM converged to sensible values (Ne = 920.7, mu = 0.00237). Key outputs that were exported for downstream analysis in R:
 - cocci_unsup_linked_hap.chunkcounts.out (coancestry matrix)
 - cocci_unsup_linked_hap_mcmc.xml (clustering)
 - cocci_unsup_linked_hap_tree.xml (tree)
   
-A second MCMC/tree run (`_run1`) was produced for a convergence check.
+#### Chromosome painting
 
+Script: finestructure_paint.sbatch   
+Software used: fs v4  
+Code snippet:   
+````
+set -euo pipefail
+export PATH=$HOME/software/finestructure4:$HOME/software/finestructure4/scripts:$PATH
+cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
 
+SCAFS="GG704911.1 GG704912.1 GG704913.1 GG704914.1 GG704915.1 GG704916.1"
+PH=""; RC=""
+for s in $SCAFS; do PH="$PH fs_input/$s.phase"; RC="$RC fs_input/$s.rec"; done
+
+#10 = number of sampled paintaints per receipient haplotypes (as recommended by manual)
+
+fs cocci_paint.cp -n \
+  -idfile fs_input/cocci.ids \
+  -phasefiles $PH -recombfiles $RC \
+  -ploidy 1 \
+  -s2samples 10 \
+  -go
+``` 
 
 
 

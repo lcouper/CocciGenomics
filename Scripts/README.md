@@ -1371,6 +1371,7 @@ fs cocci_unsup.cp -n \
   -ploidy 1 \
   -go
 ```
+
 Notes: EM converged to sensible values (Ne = 920.7, mu = 0.00237). Key outputs that were exported for downstream analysis in R:
 - cocci_unsup_linked_hap.chunkcounts.out (coancestry matrix)
 - cocci_unsup_linked_hap_mcmc.xml (clustering)
@@ -1382,6 +1383,7 @@ Note that here, we are only allowing the soil isolates to be 'donors'. Clinical 
 Script: finestructure_soilpaint.sbatch   
 Software used: fs v4  
 Code snippet:   
+
 ````
 set -euo pipefail
 export PATH=$HOME/software/finestructure4:$HOME/software/finestructure4/scripts:$PATH

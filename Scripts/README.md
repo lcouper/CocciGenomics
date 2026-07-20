@@ -1205,7 +1205,13 @@ Note the pruned vcf is called 'allsamples_ld_r05_pruned.vcf' or 'Subset_envrclin
 
 ## Twisst, window-based genomic relationships
 
-For this, we will use the vcf file with our novel environmental and clinical isolates (no re-preps) and CpSilv as an outgroup.   
+We are primarily interseted in our novel clinical samples, but we will use a few legacy clinical genomes as a control here. Therefore, we will use the vcf file with all samples (no re-preps) and CpSilv as an outgroup. These sample names live in: FinalOutputs/samples47.txt. We then subset the meta-sample vcf to these 47 using (which keeps only sites that are polymorphic within these 47 samples): 
+
+```
+bcftools view -S samples47.txt -m2 -M2 -v snps allsamples_withCpSilv.final.recode.vcf -Ou \
+  | bcftools +fill-tags -Ou -- -t AC,AN \
+  | bcftools view -e 'AC==0 || AC==AN' -Oz -o cocci47.snps.vcf.gz
+``` 
 Note that twisst requires numpy and a tree-building software (we will use raxml/8.2.12 here)
 
 ```

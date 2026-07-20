@@ -1215,12 +1215,14 @@ bcftools view -S samples47.txt -m2 -M2 -v snps allsamples_withCpSilv.final.recod
 Note that twisst requires numpy and a tree-building software (we will use raxml/8.2.12 here)
 
 ```
-# from within the 'FinalOutputs/twisst' directory, parse the vcf to .geno for twisst processing: 
+# from within the 'FinalOutputs/twisst' directory, parse the vcf to .geno for twisst processing (fast):
+module load anaconda3/2024.10-1-11.4
+export PYTHONPATH=$PYTHONPATH:$HOME/software/genomics_general
 python $HOME/software/genomics_general/VCF_processing/parseVCF.py \
-  -i ../Subset_envrclin_Cp.final.recode.vcf \
+  -i ../cocci47.snps.vcf.gz \
   --ploidy 1 \
   --skipIndels \
-  -o cocci44.geno.gz
+  -o cocci47.geno.gz
 ```
 
 Then, create trees in sliding windows:      
@@ -1228,10 +1230,10 @@ Script: twisst_trees.sbatch
 Code snippet:   
 ```
 python $HOME/software/genomics_general/phylo/raxml_sliding_windows.py \
-  -g cocci44.geno.gz -p cocci44.w100 \
+  -g cocci47.geno.gz -p cocci47.w100 \
   --windType sites -w 100 -M 50 --model GTRCAT \  # 100 SNP sliding window
   --raxml raxmlHPC-AVX -T $SLURM_CPUS_PER_TASK \
-  --log cocci44.w100.raxlog.txt
+  --log cocci47.w100.raxlog.txt
 ```
 
 Next, create the 'groupings' file. Note, these are the 'pure' soil isolates, that we'll use the 'reference groups' here, in addition to the Cp 'reference group' 

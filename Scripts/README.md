@@ -1290,7 +1290,8 @@ done
 ```
 Then exports groups and coordinates (cocci44.w100.data.tsv) into R for downstream steps.
 
-To repeat for K = 2, remake the groups (as below), then run: twisst_weights2.sbatch
+To repeat for K = 2, remake the groups (as below), then run: twisst_weights2.sbatch.   
+Note that here we are keeping only the true Carrizos (ie excluding Coalinga/McKittrick/Tracy since these look admixed)   
 ```
 cat > refs_K2.tsv <<'EOF'
 137a1_redo Bakersfield
@@ -1304,8 +1305,6 @@ cat > refs_K2.tsv <<'EOF'
 PS02PN14-1 Carrizo
 PS02PN14-2 Carrizo
 PS02PN14-3 Carrizo
-118a3 Carrizo
-118b3 Carrizo
 CpSilv Outgroup
 EOF
 ```

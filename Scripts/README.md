@@ -587,11 +587,29 @@ Script: matingtype_updated.sbatch
 
 ## Fst differentiation between clinical and environmental isolates
 
-First, created pop1a and pop1b txt files indicating assignment to environmental or clinical 'populations'. I focused on only samples with matching full ancestry (based on admixture results) to avoid spurious detection due to demographic processes. 
+First, created txt files indicating assignment to soil or patient sources from Bakersfield or western Central Valley 'populations'. To avoid spurious detection due to demographic processes, samples were chosen on the basis of: ancestry (Q) >=0.90 to that cluster (from  admixture K = 3) and NOT being present in a divergent clade in the phylogeny. For the soil pairs that appeared to be basically clonal, we thinned to include one of the pairs to avoid inflating Fst. 
 
 ```
-echo -e "22AC2\n22BC1\n34B2\n58B1\n87A1\n137a1_redo" > Pop1a.txt
-echo -e "Kern6\nKern7\nKern13\nKern16\nKern21\nKern27" > Pop1b.txt
+# Bakersfield (K3 Cluster1) 
+printf '%s\n' 137a1_redo 34B2 58B1 87A1 22AC2               > bak_soil.txt      # 5
+printf '%s\n' Kern7 Kern13 Kern21 Kern10                    > bak_clinical.txt  # 4
+
+#  western San Joaquin Valley (K3 Cluster3) 
+printf '%s\n' L100 157b2 118a3                              > wsjv_soil.txt     # 3
+printf '%s\n' Kern1 Kern2 Kern5 Kern8 Kern11 Kern19 Kern20 Kern25 Kern18 > wsjv_clinical.txt  # 9
+
+# combined list
+cat bak_soil.txt bak_clinical.txt wsjv_soil.txt wsjv_clinical.txt > samples_hierfst.txt
+
+# design table for hierfstat, including sample and source for each population
+{awk '{print $1"\tBakersfield\tsoil"}'     bak_soil.txt
+  awk '{print $1"\tBakersfield\tclinical"}' bak_clinical.txt
+  awk '{print $1"\twSJV\tsoil"}'            wsjv_soil.txt
+  awk '{print $1"\twSJV\tclinical"}'        wsjv_clinical.txt} > hierfst_design.tsv
+
+# filter vcf file to only the samples listed above, and removing any SNPs that are now monomorphic in this subset
+bcftools view -S samples_hierfst.txt -m2 -M2 -v snps --min-ac 1:minor \
+ Subset_envrclin.final.diploid.vcf -Ov -o Subset_hierFst.vcf
 ```
 
 Then, run vcftools to estimate Fst along the genome.   

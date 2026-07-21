@@ -1387,27 +1387,20 @@ Notes: EM converged to sensible values (Ne = 920.7, mu = 0.00237). Key outputs t
 #### Chromosome painting
 
 Note that here, we are only allowing the soil isolates to be 'donors'. Clinical isolates are 'recipients' and we run one at a time. We set the effective population size to be similar across all runs.    
-Script: finestructure_soilpaint.sbatch   
+Script: finestructure_soilpaint_updated.sbatch   
 Software used: fs v4  
 Code snippet:   
 
 ````
-set -euo pipefail
-export PATH=$HOME/software/finestructure4:$HOME/software/finestructure4/scripts:$PATH
-cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
-
-SCAFS="GG704911.1 GG704912.1 GG704913.1 GG704914.1 GG704915.1 GG704916.1"
-PH=""; RC=""
-for s in $SCAFS; do PH="$PH fs_input/$s.phase"; RC="$RC fs_input/$s.rec"; done
-
 #10 = number of sampled paintaints per receipient haplotypes (as recommended by manual)
 
-  fs cocci_soil_$F.cp -n \
-     -idfile "$wd/$F.ids" \
-     -phasefiles $PH -recombfiles $RC \
-     -ploidy 1 -s2samples 10 \
-     "-s1args:-in -iM --emfilesonly -n $NE" \
-     -go
+fs cocci_soil_$F.cp -n \
+   -idfile "$wd/$F.ids" \
+   -phasefiles $PH -recombfiles $RC \
+   -ploidy 1 -s2samples 10 \
+   "-s1args:-in -iM --emfilesonly -n $NE" \
+   -go
+
 ```
 
 To repeat the above, but include a few legacy clinical isolates for comparison:

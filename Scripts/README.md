@@ -59,6 +59,7 @@ This repository documents the scripts and steps used to process *Coccidioides* s
 - [5.12 Linkage Disequilibrium](#linkage-disequilibrium)
 - [5.13 Twisst](#Twisst-window-based-genomic-relationships)
 - [5.14 fineSTRUCTURE](#fineSTRUCTURE)
+- [5.15 Identifying deletion](#identifying-deletion)
 
 ---
 
@@ -1391,16 +1392,14 @@ Script: finestructure_soilpaint_updated.sbatch
 Software used: fs v4  
 Code snippet:   
 
-````
-#10 = number of sampled paintaints per receipient haplotypes (as recommended by manual)
-
+```
 fs cocci_soil_$F.cp -n \
    -idfile "$wd/$F.ids" \
    -phasefiles $PH -recombfiles $RC \
-   -ploidy 1 -s2samples 10 \
+   -ploidy 1 -s2samples 10 \ 
    "-s1args:-in -iM --emfilesonly -n $NE" \
    -go
-
+#10 = number of sampled paintaints per receipient haplotypes (as recommended by manual)
 ```
 
 To repeat the above, but include a few legacy clinical isolates for comparison:
@@ -1408,4 +1407,72 @@ Script: prep_ghosts.sbatch
 
 Then save output in local machine on fineSTRUCTURE/soilpaint. Downstream analysis in R 
 
+### Identifying deletion
 
+Three clinical isolates identified as unusual based on phylogenetic tree (they form a monophyletic clade that is basal to all other *C. immitis* and most similar to *C. posadasii*). To identify the underlying cause, we used the genotype matrix (GenotypeMatrix_ClinEnvr.csv) to look for sites where all three isolates were simultaneously `NA` and found 894 such sites. These NAs can mean either "no reads" (deletion) or that reads are too diverged to align. These were distinguished by using the bams for these three samples on Savio (stored in results/bam/Normalized75).    
+Here, coverage *shape* is the informative statistic: a deletion gives a hard-edged block of zero depth, whereas divergence gives patchy coverage with conserved islands and graded boundaries. We included a non-deletion carrier in the same commands for comparison:
+
+```
+# mean depth in 500 bp bins across the candidate tract
+samtools depth -a -r "$DEL1" "$bam" | awk '{b=int(($2-3154575)/500); s[b]+=$3; n[b]++}
+  END {for(i=0;i<=102;i++) if(n[i]) printf "%6d %6.1f %s\n", 3154575+i*500, s[i]/n[i], (s[i]/n[i]<2?"ZERO":"")}'
+```
+
+We then confirmed the deletion and pinned its breakpoints based on discordant read pairs. Namely, if the region is deleted, read pairs spanning it should align with an insert size approximately equal to the deletion length. The filter must bracket the expected size — a first attempt using `$9>45000` for a ~39 kb deletion removed exactly the informative pairs.
+
+```
+samtools view "$bam" GG704911.1:3162000-3204000 | awk '$9>30000 && $9<50000'
+```
+
+This returned pairs with left mate ~3,163,0xx–3,163,2xx, right mate 3,202,77x–3,202,85x, insert ~39.6–39.8 kb, MAPQ 60 and many `NM:i:0`, along with 18–22% soft-clipping in the trio versus 3–6% in controls. Breakpoints: last covered base 3,163,754, first covered base after 3,202,775. The exact edge can also be read directly:
+```
+samtools depth -a -r GG704911.1:3162500-3164000 "$bam" | awk '$3>0{last=$2} END{print last}'   # expect 3163754
+```
+
+We found that the three isolates share two large deletions (~47 kb total) that are private to the three of them, and that this sequence is present in *C. posadasii*, so it is a derived loss rather than sequence they never had.
+Coordinates reused throughout:
+```
+DEL1="GG704911.1:3163755-3202774"        # 39,020 bp, removes 6 protein-coding genes
+D1_INTERIOR="GG704911.1:3170000-3200000" # for depth screens; avoids the breakpoints
+DEL2="GG704913.1:4053986-4065345"        # ~8 kb deleted, with a retained ~1.75 kb island at 4,060,236-4,061,986
+FLANK="GG704911.1:3300000-3351404"       # normalizer: same size as DEL1, similar masking
+```
+
+We then screened all other isolates for this deletion. Note that depth must be normalized to each sample's **own flank**, never compared raw across samples: the reference used for alignment is repeat-masked and these tracts are 36–42% `N` versus a 19–24% scaffold average, so even non-carriers sit at a ratio of ~0.4–0.6 rather than 1.0. Printing the flank value alongside the ratio also catches failed libraries, which otherwise produce false deletion calls. 
+
+```
+meandepth () { samtools depth -a -r "$2" "$1" | awk '{t+=$3;n++} END{if(n) printf "%.1f", t/n; else printf "0"}'; }
+
+for bam in *.len75.aligned.sorted.deduped.bam; do
+  s=${bam%%_*}; f=$(meandepth "$bam" "$FLANK"); a=$(meandepth "$bam" "$D1_INTERIOR")
+  awk -v s="$s" -v f="$f" -v a="$a" 'BEGIN{r=(f>0?a/f:0); printf "%-14s flank=%7.1f del1=%7.1f (%.2f) %s\n", s,f,a,r,(r<0.10?"<== DEL1":"")}'
+done | sort
+```
+
+Result: ratio = 0.00 for all three trio isolates and 0.27–0.63 for every other isolate. Both deletions are unique to the clade.   
+Lastly, we sought to determine the putative function of genes inside the deletion. We downloaded the C. immitis RS annotation. We then overlapped the deletion interval with the GFF, finding 6 protein-coding genes, all annotated `hypothetical protein`: `CIMG_02019, CIMG_02016, CIMG_02011, CIMG_02010, CIMG_12729, CIMG_12730`. The neighboring CMGC/SRPK protein kinase `CIMG_02020` ends 84 bp before the breakpoint and is **intact**. Deletion 2 is gene-free in the current annotation. We then pulled the protein sequences (note that `protein.faa` headers key on `protein_id`, not `locus_tag`, and that `grep -A` on a FASTA ignores record boundaries)
+```
+zcat GCA_000149335.2_ASM14933v2_protein.faa.gz \
+| awk '/^>/{keep = /EAS36666|EAS36665|EAS36662|EAS36657|EAS36656|KJF60083|KJF60084/} keep' > deleted_proteins.faa
+```
+Lastly, we identified whether this deletion was present in C. posadasii. To do so, we chopped the C. posadasii reference regions into 500 bp chunks and mapped them to the *C. posadasii* assembly. The flank serves as a positive control that the aligner crosses the *immitis*–*posadasii* boundary. Important: use the **unmasked** reference here. The masked version (used for read alignment) is ~42% `N` in these tracts, which silently destroys the test.
+
+```
+module load bio/samtools bio/bwa-mem2/2.2.1
+REF=../../../RefGenome/CocciRef_GCA_000149335.2.fna
+CP=../../../RefGenomeCp/GCF_018416015.2_ASM1841601v2_genomic.fna
+
+chunk () { : > "$4"; for s in $(seq "$2" 500 "$3"); do e=$((s+499)); [ "$e" -gt "$3" ] && e="$3";
+           samtools faidx "$REF" "$1:$s-$e" >> "$4"; done; }
+
+chunk GG704911.1 3300000 3351404 flank_chunks.fa
+bwa-mem2 mem -t 8 "$CP" flank_chunks.fa 2> log | samtools view -c -F 4 -F 256 -F 2048 -
+```
+
+| region | chunks mapping to *C. posadasii* |
+|---|---|
+| flank `GG704911.1:3,300,000-3,351,404` (control) | 103/103 = 100% |
+| DEL1 `GG704911.1:3,163,755-3,202,774` | 50/79 = 63.3% |
+| DEL2 `GG704913.1:4,053,986-4,065,345` | 23/23 = 100% |
+
+We found that *C. posadasii* has the sequence, so it was present in the common ancestor and the trio's absence is a derived loss. 

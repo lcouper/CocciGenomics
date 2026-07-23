@@ -760,112 +760,80 @@ S_envr_pop3: 26,755
 *S, normalized by # of samples*
 
 ```
-# Environmental
-S=$(vcftools --vcf allsamples.final.recode.vcf --keep Envr.txt --mac 1 --recode --stdout | grep -vc "^#")
-n=$(wc -l < Envr.txt)
 callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
 
+# Environmental   
+S=$(vcftools --vcf allsamples.final.recode.vcf --keep Envr.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
+n=$(grep -vxFf Clones.txt Envr.txt | wc -l)
 python3 - <<EOF
-S = $S
-n = $n
-callable = $callable
+S = $S; n = $n; callable = $callable
 a_n = sum(1/i for i in range(1, n))
-theta_w = (S / a_n) / callable
-print(f"environmental theta_W: {theta_w}")
+print(f"environmental theta_W: {(S / a_n) / callable}")
 EOF
 
-# Clinical
-S=$(vcftools --vcf allsamples.final.recode.vcf --keep Clin.txt --mac 1 --recode --stdout | grep -vc "^#")
-n=$(wc -l < Clin.txt)
-callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
-
+# Clinical    
+S=$(vcftools --vcf allsamples.final.recode.vcf --keep Clin.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
+n=$(grep -vxFf Clones.txt Clin.txt | wc -l)
 python3 - <<EOF
-S = $S
-n = $n
-callable = $callable
+S = $S; n = $n; callable = $callable
 a_n = sum(1/i for i in range(1, n))
-theta_w = (S / a_n) / callable
-print(f"clinical theta_W: {theta_w}")
+print(f"clinical theta_W: {(S / a_n) / callable}")
 EOF
 
-# Environmental and clinical
-S=$(vcftools --vcf allsamples.final.recode.vcf --keep EnvrClin.txt --mac 1 --recode --stdout | grep -vc "^#")
-n=$(wc -l < EnvrClin.txt)
-callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
-
+# Environmental and clinical   
+S=$(vcftools --vcf allsamples.final.recode.vcf --keep EnvrClin.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
+n=$(grep -vxFf Clones.txt EnvrClin.txt | wc -l)
 python3 - <<EOF
-S = $S
-n = $n
-callable = $callable
+S = $S; n = $n; callable = $callable
 a_n = sum(1/i for i in range(1, n))
-theta_w = (S / a_n) / callable
-print(f"envr and clin theta_W: {theta_w}")
+print(f"envr and clin theta_W: {(S / a_n) / callable}")
 EOF
 
-# All (including legacies)
-S=$(vcftools --vcf allsamples.final.recode.vcf --mac 1 --recode --stdout | grep -vc "^#")
-n=$(bcftools query -l allsamples.final.recode.vcf | wc -l)
-callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
-
+# All (including legacies)    
+S=$(vcftools --vcf allsamples.final.recode.vcf --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
+n=$(bcftools query -l allsamples.final.recode.vcf | grep -vxFf Clones.txt | wc -l)
 python3 - <<EOF
-S = $S
-n = $n
-callable = $callable
+S = $S; n = $n; callable = $callable
 a_n = sum(1/i for i in range(1, n))
-theta_w = (S / a_n) / callable
-print(f"all theta_W: {theta_w}")
+print(f"all theta_W: {(S / a_n) / callable}")
 EOF
 
-# Soil population 1
-S=$(vcftools --vcf allsamples.final.recode.vcf --keep Pop1.txt --mac 1 --recode --stdout | grep -vc "^#")
-n=$(wc -l < Pop1.txt)
-callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
 
+# Soil population 1     
+S=$(vcftools --vcf allsamples.final.recode.vcf --keep Pop1.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
+n=$(grep -vxFf Clones.txt Pop1.txt | wc -l)
 python3 - <<EOF
-S = $S
-n = $n
-callable = $callable
+S = $S; n = $n; callable = $callable
 a_n = sum(1/i for i in range(1, n))
-theta_w = (S / a_n) / callable
-print(f"soil pop1 theta_W: {theta_w}")
+print(f"soil pop1 theta_W: {(S / a_n) / callable}")
 EOF
 
-# Soil population 2
-S=$(vcftools --vcf allsamples.final.recode.vcf --keep Pop2.txt --mac 1 --recode --stdout | grep -vc "^#")
-n=$(wc -l < Pop2.txt)
-callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
-
+# Soil population 2     
+S=$(vcftools --vcf allsamples.final.recode.vcf --keep Pop2.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
+n=$(grep -vxFf Clones.txt Pop2.txt | wc -l)
 python3 - <<EOF
-S = $S
-n = $n
-callable = $callable
+S = $S; n = $n; callable = $callable
 a_n = sum(1/i for i in range(1, n))
-theta_w = (S / a_n) / callable
-print(f"soil pop2 theta_W: {theta_w}")
+print(f"soil pop2 theta_W: {(S / a_n) / callable}")
 EOF
 
-# Soil population 3
-S=$(vcftools --vcf allsamples.final.recode.vcf --keep Pop3.txt --mac 1 --recode --stdout | grep -vc "^#")
-n=$(wc -l < Pop3.txt)
-callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
-
+# Soil population 3     
+S=$(vcftools --vcf allsamples.final.recode.vcf --keep Pop3.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
+n=$(grep -vxFf Clones.txt Pop3.txt | wc -l)
 python3 - <<EOF
-S = $S
-n = $n
-callable = $callable
+S = $S; n = $n; callable = $callable
 a_n = sum(1/i for i in range(1, n))
-theta_w = (S / a_n) / callable
-print(f"soil pop3 theta_W: {theta_w}")
+print(f"soil pop3 theta_W: {(S / a_n) / callable}")
 EOF
 ```
-environmental theta_W: 0.0005455180932584511\
-clinical theta_W: 0.0005681607521474858\
-envr and clin theta_W: 0.0005274288114176259\
-all theta_W: 0.00047252173477471156  
+environmental theta_W: 0.0006287761283504767   
+clinical theta_W: 0.0005805520548848345   
+envr and clin theta_W: 0.0005540024029518856   
+all theta_W: 0.00048180365806308286    
 
-soil pop1 theta_W: 0.0004652553588760232\
-soil pop2 theta_W: 0.00023421388432856067\
-soil pop3 theta_W: 0.0004975114314783995\   
+soil pop1 theta_W: 0.000509716580311605     
+soil pop2 theta_W: 0.00048307503049712893     
+soil pop3 theta_W: 0.0006180800746473476    
 
 
 #### Nucleotide diversity (θπ)

@@ -697,45 +697,63 @@ fst_perm_12.sbatch, fst_perm.13.sbtach, fst_perm_23.sbatch
 
 ### Diversity metrics
 
-These calculations will use the filtered VCF file that contains all samples (rather than subset-specific filtered vcf files since that will confounded diversity calculations due to QC steps).   
+These calculations will use the filtered VCF file that contains all samples (rather than subset-specific filtered vcf files since that will confound diversity calculations due to QC steps).   
 First, create txt files indicating sample names for each subset:   
 
 ```
 echo -e "22AC2\n22BC1\n34B2\n58B1\n87A1\n137a1_redo\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3\n13B1\n14B1\n118a3\n118b3\n157b2\n158b3\nL100\n239a3b2" > Envr.txt      
 bcftools query -l Subset_envrclin.final.diploid.vcf | grep '^Kern' > Clin.txt   
 cat Envr.txt Clin.txt > EnvrClin.txt
-``` 
+```
+
+For these diversity calculations, we exclude one isoalte from each pair that appear nearly clonal (i.e. <200 SNP differences)
+| Near-clonal lineage | Keep | Drop (raw VCF name) | Pairwise SNP distance |
+|---|---|---|---|
+| Carrizo_1 / Carrizo_2 | 13B1 | **14B1** | 14 |
+| PS02PN14 trio | PS02PN14-1 | **PS02PN14-2, PS02PN14-3** | 88 / 92 / 121 (3a–3b / 3c–3b / 3a–3c) |
+| Bakersfield_1 / _2 | 22AC2 | **22BC1** | 25 |
+| Coalinga_1 / _2 | 157b2 | **158b3** | 83 |
+| McKittrick_1 / _2 | 118a3 | **118b3** | 120 |
+| VFI19 / VFI20 | Kern19 | **Kern20** | 29 |
+| VFI25 / VFI5 | Kern25 | **Kern5** | 79 |
+o
+```
+# list out the near-clones to remove
+cat > Clones.txt <<'EOF'
+14B1
+PS02PN14-2
+PS02PN14-3
+22BC1
+158b3
+118b3
+Kern5
+Kern20
+EOF
+```
 
 #### Number of segregating sites
 *S*
 
 ```
-S_envr=$(vcftools --vcf allsamples.final.recode.vcf --keep Envr.txt --mac 1 --recode --stdout | grep -vc "^#")
-S_clin=$(vcftools --vcf allsamples.final.recode.vcf --keep Clin.txt --mac 1 --recode --stdout | grep -vc "^#")
-S_envrclin=$(vcftools --vcf allsamples.final.recode.vcf --keep EnvrClin.txt --mac 1 --recode --stdout | grep -vc "^#")
-S_all=$(vcftools --vcf allsamples.final.recode.vcf --mac 1 --recode --stdout | grep -vc "^#")
+S_envr=$(vcftools --vcf allsamples.final.recode.vcf --keep Envr.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
+S_clin=$(vcftools --vcf allsamples.final.recode.vcf --keep Clin.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
+S_envrclin=$(vcftools --vcf allsamples.final.recode.vcf --keep EnvrClin.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
+S_all=$(vcftools --vcf allsamples.final.recode.vcf --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
 
-S_envr_pop1=$(vcftools --vcf allsamples.final.recode.vcf --keep Pop1.txt --mac 1 --recode --stdout | grep -vc "^#")
-S_envr_pop2=$(vcftools --vcf allsamples.final.recode.vcf --keep Pop2.txt --mac 1 --recode --stdout | grep -vc "^#")
-S_envr_pop3=$(vcftools --vcf allsamples.final.recode.vcf --keep Pop3.txt --mac 1 --recode --stdout | grep -vc "^#")
+S_envr_pop1=$(vcftools --vcf allsamples.final.recode.vcf --keep Pop1.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
+S_envr_pop2=$(vcftools --vcf allsamples.final.recode.vcf --keep Pop2.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
+S_envr_pop3=$(vcftools --vcf allsamples.final.recode.vcf --keep Pop3.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
 
-echo "S_envr = $S_envr"
-echo "S_clin = $S_clin"
-echo "S_envrclin = $S_envrclin"
-echo "S_all = $S_all"
-
-echo "S_pop1 = $S_envr_pop1"
-echo "S_pop2 = $S_envr_pop2"
-echo "S_pop3 = $S_envr_pop3"
+# read out with: echo $S_envr
 ```
-S_envr: 43,545\
-S_clin: 51,191\
-S_envrclin: 53,882\
-S_all: 56,201\
+S_envr: 43,484   
+S_clin: 51,188
+S_envrclin: 53,869
+S_all: 56,201    
   
-S_envr_pop1: 25,083\
-S_envr_pop2: 11,521\
-S_envr_pop3: 26,822\
+S_envr_pop1: 25,073   
+S_envr_pop2: 11,406   
+S_envr_pop3: 26,755   
 
 
 #### Watterson's theta 

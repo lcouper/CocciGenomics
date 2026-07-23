@@ -840,98 +840,73 @@ soil pop3 theta_W: 0.0006180800746473476
 θπ is the average number of pairwise differences *per site* between all sequences in a population. **Key note: because we are calculating pi using only variant sites (ie from the VCF), we need to normalize based on the number of 'callable regions'.   
 We did this using:extract_callable_regions.py (python script in RefGenonme directory) to create a file: callable_regions.bed. This calculation requires using diploid version of vcf.  
 ```
+callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
+
 # environmental:
 vcftools --vcf allsamples.final.diploid.vcf \
-  --keep Envr.txt \
-  --site-pi \
-  --max-missing 0.9 \
+  --keep Envr.txt --remove Clones.txt \
+  --site-pi --max-missing 0.9 \
   --out pi_environmental_sitewise
-
-callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
 sum_pi=$(awk 'NR > 1 {sum += $3} END {print sum}' pi_environmental_sitewise.sites.pi)
-
 awk -v s="$sum_pi" -v c="$callable" 'BEGIN {print "pi_environmental =", s/c}'
 
-# clinical
+# clinical:
 vcftools --vcf allsamples.final.diploid.vcf \
-  --keep Clin.txt \
-  --site-pi \
-  --max-missing 0.9 \
+  --keep Clin.txt --remove Clones.txt \
+  --site-pi --max-missing 0.9 \
   --out pi_clinical_sitewise
-
-callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
 sum_pi=$(awk 'NR > 1 {sum += $3} END {print sum}' pi_clinical_sitewise.sites.pi)
-
 awk -v s="$sum_pi" -v c="$callable" 'BEGIN {print "pi_clinical =", s/c}'
 
 # envr and clin:
 vcftools --vcf allsamples.final.diploid.vcf \
-  --keep EnvrClin.txt \
-  --site-pi \
-  --max-missing 0.9 \
+  --keep EnvrClin.txt --remove Clones.txt \
+  --site-pi --max-missing 0.9 \
   --out pi_envrclin_sitewise
-
-callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
 sum_pi=$(awk 'NR > 1 {sum += $3} END {print sum}' pi_envrclin_sitewise.sites.pi)
-
 awk -v s="$sum_pi" -v c="$callable" 'BEGIN {print "pi_envrclin =", s/c}'
 
-# all:
+# all (including legacies):
 vcftools --vcf allsamples.final.diploid.vcf \
-  --site-pi \
-  --max-missing 0.9 \
+  --remove Clones.txt \
+  --site-pi --max-missing 0.9 \
   --out pi_all_sitewise
-
-callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
 sum_pi=$(awk 'NR > 1 {sum += $3} END {print sum}' pi_all_sitewise.sites.pi)
-
 awk -v s="$sum_pi" -v c="$callable" 'BEGIN {print "pi_all =", s/c}'
 
 # soil population 1:
 vcftools --vcf allsamples.final.diploid.vcf \
-  --keep Pop1.txt \
-  --site-pi \
-  --max-missing 0.9 \
+  --keep Pop1.txt --remove Clones.txt \
+  --site-pi --max-missing 0.9 \
   --out pi_pop1_sitewise
-
-callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
 sum_pi=$(awk 'NR > 1 {sum += $3} END {print sum}' pi_pop1_sitewise.sites.pi)
-
 awk -v s="$sum_pi" -v c="$callable" 'BEGIN {print "pi_pop1 =", s/c}'
 
 # soil population 2:
 vcftools --vcf allsamples.final.diploid.vcf \
-  --keep Pop2.txt \
-  --site-pi \
-  --max-missing 0.9 \
+  --keep Pop2.txt --remove Clones.txt \
+  --site-pi --max-missing 0.9 \
   --out pi_pop2_sitewise
-
-callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
 sum_pi=$(awk 'NR > 1 {sum += $3} END {print sum}' pi_pop2_sitewise.sites.pi)
-
 awk -v s="$sum_pi" -v c="$callable" 'BEGIN {print "pi_pop2 =", s/c}'
 
 # soil population 3:
 vcftools --vcf allsamples.final.diploid.vcf \
-  --keep Pop3.txt \
-  --site-pi \
-  --max-missing 0.9 \
+  --keep Pop3.txt --remove Clones.txt \
+  --site-pi --max-missing 0.9 \
   --out pi_pop3_sitewise
-
-callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
 sum_pi=$(awk 'NR > 1 {sum += $3} END {print sum}' pi_pop3_sitewise.sites.pi)
-
 awk -v s="$sum_pi" -v c="$callable" 'BEGIN {print "pi_pop3 =", s/c}'
 ```
 
-pi_environmental = 0.000612615\
-pi_clinical = 0.000653024\
-pi_envrclin = 0.000666852\
-pi_all = 0.000674365\  
+pi_environmental = 0.00063078   
+pi_clinical = 0.000659787  
+pi_envrclin = 0.000672379   
+pi_all = 0.000674751   
 
-pi_pop1 = 0.000454982\
-pi_pop2 = 0.000257798\
-pi_pop3 = 0.000514776\
+pi_pop1 = 0.000461357   
+pi_pop2 = 0.00032205    
+pi_pop3 = 0.00052863    
 
 
 
@@ -941,68 +916,62 @@ Typically calculcated in  windows. I tried various window sizes but 100 kb seeme
 ```
 # Environmental
 vcftools --vcf allsamples.final.diploid.vcf \
-  --keep Envr.txt \
+  --keep Envr.txt --remove Clones.txt \
   --TajimaD 100000 \
   --out tajimasD_environmental
-
 awk 'NR > 1 && $4 != "nan" {sum += $4; n++} END {print "mean_TajimasD_environmental =", sum/n}' tajimasD_environmental.Tajima.D
 
 # Clinical
 vcftools --vcf allsamples.final.diploid.vcf \
-  --keep Clin.txt \
+  --keep Clin.txt --remove Clones.txt \
   --TajimaD 100000 \
   --out tajimasD_clinical
-
 awk 'NR > 1 && $4 != "nan" {sum += $4; n++} END {print "mean_TajimasD_clinical =", sum/n}' tajimasD_clinical.Tajima.D
 
 # Environmental + clinical
 vcftools --vcf allsamples.final.diploid.vcf \
-  --keep EnvrClin.txt \
+  --keep EnvrClin.txt --remove Clones.txt \
   --TajimaD 100000 \
   --out tajimasD_envrclin
-
 awk 'NR > 1 && $4 != "nan" {sum += $4; n++} END {print "mean_TajimasD_envrclin =", sum/n}' tajimasD_envrclin.Tajima.D
 
-# All samples
+# All samples (including legacies)
 vcftools --vcf allsamples.final.diploid.vcf \
+  --remove Clones.txt \
   --TajimaD 100000 \
   --out tajimasD_all
-
 awk 'NR > 1 && $4 != "nan" {sum += $4; n++} END {print "mean_TajimasD_all =", sum/n}' tajimasD_all.Tajima.D
 
 # Soil population 1
 vcftools --vcf allsamples.final.diploid.vcf \
-  --keep Pop1.txt \
+  --keep Pop1.txt --remove Clones.txt \
   --TajimaD 100000 \
   --out tajimasD_pop1
-
 awk 'NR > 1 && $4 != "nan" {sum += $4; n++} END {print "mean_TajimasD_pop1 =", sum/n}' tajimasD_pop1.Tajima.D
 
 # Soil population 2
 vcftools --vcf allsamples.final.diploid.vcf \
-  --keep Pop2.txt \
+  --keep Pop2.txt --remove Clones.txt \
   --TajimaD 100000 \
   --out tajimasD_pop2
-
 awk 'NR > 1 && $4 != "nan" {sum += $4; n++} END {print "mean_TajimasD_pop2 =", sum/n}' tajimasD_pop2.Tajima.D
 
 # Soil population 3
 vcftools --vcf allsamples.final.diploid.vcf \
-  --keep Pop3.txt \
+  --keep Pop3.txt --remove Clones.txt \
   --TajimaD 100000 \
   --out tajimasD_pop3
-
 awk 'NR > 1 && $4 != "nan" {sum += $4; n++} END {print "mean_TajimasD_pop3 =", sum/n}' tajimasD_pop3.Tajima.D
-
 ```
-mean_TajimasD_environmental = 1.24342\
-mean_TajimasD_clinical = 1.17419\
-mean_TajimasD_envrclin = 1.3271\
-mean_TajimasD_all = 1.65487\
 
-mean_TajimasD_pop1 = 1.4539\
-mean_TajimasD_pop2 = 2.30802\
-mean_TajimasD_pop3 = 1.6804\
+mean_TajimasD_environmental = 0.825641   
+mean_TajimasD_clinical = 1.13959   
+mean_TajimasD_envrclin = 1.19482    
+mean_TajimasD_all = 1.60022    
+
+mean_TajimasD_pop1 = 1.14279   
+mean_TajimasD_pop2 = 2.25243    
+mean_TajimasD_pop3 = 1.15089    
 
 
 ### pN/pS, dN/dS, and MK Test

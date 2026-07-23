@@ -49,17 +49,20 @@ This repository documents the scripts and steps used to process *Coccidioides* s
 - [5.2 Population structure analysis](#assess-population-structure)  
 - [5.3 Map SNPs to genes](#scaffolding-snps-into-genes)  
 - [5.4 Determine chromosome sizes](#identify-size-of-each-chromosome)  
-- [5.5 Mating type analysis](#mating-type-locus-assignment)  
-- [5.6 Tajima’s D](#tajimas-d)  
-- [5.7 Nucleotide diversity (θπ)](#nucleotide-diversity-θπ)  
-- [5.8 McDonald–Kreitman test](#mk-test)  
-- [5.9 Gene function and GO term analysis](#investigating-gene-function-and-go-terms)  
-- [5.10 Extract amino acid sequences for differentiated genes](#get-amino-acid-sequence-for-significantly-differentiated-genes)  
-- [5.11 Construct phylogenetic tree](#construct-phylogenetic-tree)
-- [5.12 Linkage Disequilibrium](#linkage-disequilibrium)
-- [5.13 Twisst](#Twisst-window-based-genomic-relationships)
-- [5.14 fineSTRUCTURE](#fineSTRUCTURE)
-- [5.15 Identifying deletion](#identifying-deletion)
+- [5.5 Mating type analysis](#mating-type-locus-assignment)
+- [5.6 Diversity metrics: Segregating sites (S))](#number-of-segregating-sites)  
+- [5.7 Diversity metrics: Tajima’s D](#tajimas-d)  
+- [5.8 Diversity metrics: Nucleotide diversity (θπ)](#nucleotide-diversity-θπ)
+- [5.9 Diversity metrics: Wattersons theta (θπ)](#Wattersons-theta)
+- [5.10 Diversity metrics: Nucleotide diversity (θπ)](#nucleotide-diversity-θπ)  
+- [5.11 McDonald–Kreitman test](#mk-test)  
+- [5.12 Gene function and GO term analysis](#investigating-gene-function-and-go-terms)  
+- [5.13 Extract amino acid sequences for differentiated genes](#get-amino-acid-sequence-for-significantly-differentiated-genes)  
+- [5.14 Construct phylogenetic tree](#construct-phylogenetic-tree)
+- [5.15 Linkage Disequilibrium](#linkage-disequilibrium)
+- [5.16 Twisst](#Twisst-window-based-genomic-relationships)
+- [5.17 fineSTRUCTURE](#fineSTRUCTURE)
+- [5.18 Identifying deletion](#identifying-deletion)
 
 ---
 
@@ -703,7 +706,8 @@ bcftools query -l Subset_envrclin.final.diploid.vcf | grep '^Kern' > Clin.txt
 cat Envr.txt Clin.txt > EnvrClin.txt
 ``` 
 
-**S (number of segregating sites)**
+#### Number of segregating sites
+*S*
 
 ```
 S_envr=$(vcftools --vcf allsamples.final.recode.vcf --keep Envr.txt --mac 1 --recode --stdout | grep -vc "^#")
@@ -734,7 +738,8 @@ S_envr_pop2: 11,521\
 S_envr_pop3: 26,822\
 
 
-**Watterson's theta (S, normalized by # of samples)**
+#### Watterson's theta 
+*S, normalized by # of samples*
 
 ```
 # Environmental
@@ -845,7 +850,7 @@ soil pop2 theta_W: 0.00023421388432856067\
 soil pop3 theta_W: 0.0004975114314783995\   
 
 
-**Nucleotide diversity, θπ**  
+#### Nucleotide diversity (θπ)
 θπ is the average number of pairwise differences *per site* between all sequences in a population. **Key note: because we are calculating pi using only variant sites (ie from the VCF), we need to normalize based on the number of 'callable regions'.   
 We did this using:extract_callable_regions.py (python script in RefGenonme directory) to create a file: callable_regions.bed. This calculation requires using diploid version of vcf.  
 ```
@@ -944,7 +949,7 @@ pi_pop3 = 0.000514776\
 
 
 
-**Tajima's D**
+#### Tajima's D
 
 Typically calculcated in  windows. I tried various window sizes but 100 kb seemed to be best. This calculation requires using diploid version of vcf. 
 ```

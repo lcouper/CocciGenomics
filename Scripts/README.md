@@ -694,6 +694,22 @@ Fst 2 & 3: Weir and Cockerham mean Fst estimate: 0.22700; **weighted Fst estimat
 For permutation approach here, scripts were:  
 fst_perm_12.sbatch, fst_perm.13.sbtach, fst_perm_23.sbatch   
 
+To repeat under K = 2:
+```
+# Cluster 1 = Bakersfield
+echo -e "22AC2\n22BC1\n34B2\n58B1\n87A1\n137a1_redo" > Pop1_K2.txt
+
+# Cluster 2 = Carrizo + McKittrick + western SJV (dominant assignment)
+echo -e "13B1\n14B1\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3\n118a3\n118b3\n157b2\n158b3\nL100\n239a3b2" > Pop2_K2.txt
+
+# single pairwise Fst (only 2 clusters at K=2)
+vcftools --vcf Subset_envr.final.diploid.vcf \
+    --weir-fst-pop Pop1_K2.txt \
+    --weir-fst-pop Pop2_K2.txt \
+    --out fstK2_Pop12
+```
+Weir and Cockerham mean Fst estimate: 0.16885   
+Weir and Cockerham weighted Fst estimate: 0.24989    
 
 ### Diversity metrics
 

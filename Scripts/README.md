@@ -1454,3 +1454,20 @@ bwa-mem2 mem -t 8 "$CP" flank_chunks.fa 2> log | samtools view -c -F 4 -F 256 -F
 | DEL2 `GG704913.1:4,053,986-4,065,345` | 23/23 = 100% |
 
 We found that *C. posadasii* has the sequence, so it was present in the common ancestor and the trio's absence is a derived loss. 
+
+To pull out coverage from this region to generate figure in R: 
+```
+module load bio/samtools
+# Do this in the results/bam/Normalized75 folder with all the deduplicated .bam files and their index files
+> deletion_depth.tsv
+for bam in *.len75.aligned.sorted.deduped.bam; do
+  case "$bam" in *reprep*) continue ;; esac        # skip technical replicates (not in the 43-sample figure)
+  s=$(echo "$bam" | sed -E 's/\.len75\..*//; s/_S[0-9]+_L[0-9]+$//')   # core sample name
+  samtools depth -a \
+    -r GG704911.1:3158755-3207774 \
+    -r GG704913.1:4048986-4070345 \
+    "$bam" \
+  | awk -v s="$s" 'BEGIN{OFS="\t"} {print s,$1,$2,$3}'
+done >> deletion_depth.tsv
+gzip -f deletion_depth.tsv
+```

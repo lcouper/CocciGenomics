@@ -1461,13 +1461,12 @@ module load bio/samtools
 # Do this in the results/bam/Normalized75 folder with all the deduplicated .bam files and their index files
 > deletion_depth.tsv
 for bam in *.len75.aligned.sorted.deduped.bam; do
-  case "$bam" in *reprep*) continue ;; esac        # skip technical replicates (not in the 43-sample figure)
-  s=$(echo "$bam" | sed -E 's/\.len75\..*//; s/_S[0-9]+_L[0-9]+$//')   # core sample name
-  samtools depth -a \
-    -r GG704911.1:3158755-3207774 \
-    -r GG704913.1:4048986-4070345 \
-    "$bam" \
-  | awk -v s="$s" 'BEGIN{OFS="\t"} {print s,$1,$2,$3}'
+  case "$bam" in *reprep*) continue ;; esac
+  s=$(echo "$bam" | sed -E 's/\.len75\..*//; s/_S[0-9]+_L[0-9]+$//')
+  for reg in GG704911.1:3158755-3207774 GG704913.1:4048986-4070345; do
+    samtools depth -a -r "$reg" "$bam" \
+      | awk -v s="$s" 'BEGIN{OFS="\t"} {print s,$1,$2,$3}'
+  done
 done >> deletion_depth.tsv
 gzip -f deletion_depth.tsv
 ```

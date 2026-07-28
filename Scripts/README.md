@@ -1336,7 +1336,12 @@ Then, in the FinalOutputs/twisst directory:
 ```
 mkdir -p logs boot
 sbatch --array=1-2 ../../Scripts/twisst_boot.sbatch # here you can define how many iterations to do. Can start with 2 as a test
+
+# to bump it up:
+sbatch --array=3-100%25 ../../Scripts/twisst_boot.sbatch # the "%25 piece means submit only 25% of the jobs at once, in a sequence
 ```
+After this finishes, download FinalOutputs/Twisst/boot/summaries to local machine (i.e. SPORE/Twisst/BootstrapSummaries
+
 
 ## fineSTRUCTURE 
 

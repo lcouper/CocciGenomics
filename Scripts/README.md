@@ -1327,6 +1327,17 @@ CpSilv Outgroup
 EOF
 ```
 
+#### Bootstrapping twisst
+
+Repeating above, but bootstrapping the trees. Here, we will randomly sample 100 SNPs with replacement within each 100 SNP window. We'll do this for 100 bootstrap iterations. Then we'll repeat the downstream twisst weighting using each iteration.  
+
+First, created: boot_geno.py (see attached script. this lives in the twisst directory), and Scripts/twisst_boot.sbatch
+Then, in the FinalOutputs/twisst directory: 
+```
+mkdir -p logs boot
+sbatch --array=1-2 ../../Scripts/twisst_boot.sbatch # here you can define how many iterations to do. Can start with 2 as a test
+```
+
 ## fineSTRUCTURE 
 
 An independent, haplotype-based population strucutre assessment, to complement ADMXIXTURE. Unlike ADMIXTURE (allele-frequency based) and twisst (per-window genealogies), ChromoPainter/fineSTRUCTURE uses linked haplotype (tract-length) information, so it can resolve structure at low differentiation and detect mosaic ancestry missed by the other methods. We used for two purposes:

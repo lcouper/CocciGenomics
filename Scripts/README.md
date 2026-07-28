@@ -1231,7 +1231,7 @@ python $HOME/software/genomics_general/phylo/raxml_sliding_windows.py \
   --log cocci47.w100.raxlog.txt
 ```
 
-Next, create the 'groupings' file. Note, these are the 'pure' soil isolates, that we'll use the 'reference groups' here, in addition to the Cp 'reference group' 
+Next, create the 'groupings' file. Note, these are the 'pure' soil isolates, that we'll use the 'reference groups' here, in addition to the Cp 'reference group'. 
 ```
 mkdir -p groups out
 
@@ -1266,7 +1266,7 @@ done
 ```
 
 Now, for one focal isolate at a time, compute the "weightings", which indicate the level of support for each of the 15 possible topologies (15 because there are 4 'reference groups' and 1 'focal group'.   
-Script used: twisst_weights.sbatch    
+Script used: twisst_weights_option1.sbatch or twisst_weights_option2.sbatch     
 Code snippet:    
 ```
 FOCAL="Kern3 Kern4 Kern9 Kern12 Kern14 Kern17 Kern22 Kern23 Kern24"
@@ -1285,9 +1285,10 @@ done
 ```
 Then exports groups and coordinates (cocci44.w100.data.tsv) into R for downstream steps.
 
-To repeat for K = 2, remake the groups (as below), then run: twisst_weights2.sbatch.   
-Note that here we are keeping only the true Carrizos (ie excluding Coalinga/McKittrick/Tracy since these look admixed)   
+To repeat for K = 2, remake the groups (as below), then run: twisst_weights2_option1.sbatch or twisst_weights2_option2.sbatch.   
+Note there are two options here: One in which only the Carrizo soils are included, thus the comparison is between Bakersfield and Carrizo. And once in which all soils are included and the comparison is between Bakersfield and non-Bakersfield.    
 ```
+# option 1
 cat > refs_K2.tsv <<'EOF'
 137a1_redo Bakersfield
 22AC2 Bakersfield
@@ -1300,6 +1301,28 @@ cat > refs_K2.tsv <<'EOF'
 PS02PN14-1 Carrizo
 PS02PN14-2 Carrizo
 PS02PN14-3 Carrizo
+CpSilv Outgroup
+EOF
+
+# option 2
+cat > groups/refs_K2b.tsv <<'EOF'
+137a1_redo Bakersfield
+22AC2 Bakersfield
+22BC1 Bakersfield
+34B2 Bakersfield
+58B1 Bakersfield
+87A1 Bakersfield
+13B1 NonBakersfield
+14B1 NonBakersfield
+PS02PN14-1 NonBakersfield
+PS02PN14-2 NonBakersfield
+PS02PN14-3 NonBakersfield
+118a3 NonBakersfield
+118b3 NonBakersfield
+157b2 NonBakersfield
+158b3 NonBakersfield
+L100 NonBakersfield
+239a3b2 NonBakersfield
 CpSilv Outgroup
 EOF
 ```

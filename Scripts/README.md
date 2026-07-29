@@ -1288,7 +1288,7 @@ done
 ```
 
 Now, for one focal isolate at a time, compute the "weightings", which indicate the level of support for each of the 15 possible topologies (15 because there are 4 'reference groups' and 1 'focal group'.   
-Script used: twisst_weights_option1.sbatch or twisst_weights_option2.sbatch     
+Script used: twisst_weights_K3a.sbatch or twisst_weightsK3b.sbatch     
 Code snippet:    
 ```
 FOCAL="Kern3 Kern4 Kern9 Kern12 Kern14 Kern17 Kern22 Kern23 Kern24"
@@ -1362,7 +1362,8 @@ sbatch --array=1-2 ../../Scripts/twisst_boot.sbatch # here you can define how ma
 # to bump it up:
 sbatch --array=3-100%25 ../../Scripts/twisst_boot.sbatch # the "%25 piece means submit only 25% of the jobs at once, in a sequence
 ```
-After this finishes, download FinalOutputs/Twisst/boot/summaries to local machine (i.e. SPORE/Twisst/BootstrapSummaries
+After this finishes, download FinalOutputs/Twisst/boot/summaries to local machine (i.e. SPORE/Twisst/BootstrapSummaries.  
+similarly, for K = 3: run twisst_bootK3b.sbatch
 
 
 ## fineSTRUCTURE 

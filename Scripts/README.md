@@ -1254,6 +1254,28 @@ L100  C3_LosGatos
 118b3 C3_LosGatos
 CpSilv        Outgroup
 EOF
+
+# or option B that includes Tracy
+cat > groups/refs_K3b.tsv <<'EOF'
+  22AC2 C1_KernRiver
+  22BC1 C1_KernRiver
+  34B2 C1_KernRiver
+  58B1 C1_KernRiver
+  87A1 C1_KernRiver
+  137a1_redo C1_KernRiver
+  13B1 C2_Carrizo
+  14B1 C2_Carrizo
+  PS02PN14-1 C2_Carrizo
+  PS02PN14-2 C2_Carrizo
+  PS02PN14-3 C2_Carrizo
+  157b2 C3_LosGatos
+  158b3 C3_LosGatos
+  L100 C3_LosGatos
+  118a3 C3_LosGatos
+  118b3 C3_LosGatos
+  239a3b2 C3_LosGatos
+  CpSilv Outgroup
+  EOF
 ```
 Then, make one groups file per focal isolate. Note that 13, which has pure ancestry to cluster 1 according to ADMIXTURE, is included here as a 'negative control' of sorts, to make sure the approach is working.  
 ```

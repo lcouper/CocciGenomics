@@ -1212,12 +1212,12 @@ Note the pruned vcf is called 'allsamples_ld_r05_pruned.vcf' or 'Subset_envrclin
 
 ## Twisst, window-based genomic relationships
 
-We are primarily interseted in our novel clinical samples, but we will use a few legacy clinical genomes as a control here. Therefore, we will use the vcf file with all samples (no re-preps) and CpSilv as an outgroup. These sample names live in: FinalOutputs/samples47.txt. We then subset the meta-sample vcf to these 47 using (which keeps only sites that are polymorphic within these 47 samples): 
+We are primarily interseted in our novel clinical samples, but we will use a few legacy clinical genomes as a control here. Therefore, we will use the vcf file with all samples (no re-preps) and CpSilv as an outgroup. These sample names live in: FinalOutputs/samples43.txt. We then subset the meta-sample vcf to these 43 using (which keeps only sites that are polymorphic within these 46 samples): 
 
 ```
-bcftools view -S samples47.txt -m2 -M2 -v snps allsamples_withCpSilv.final.recode.vcf -Ou \
+bcftools view -S samples43.txt -m2 -M2 -v snps allsamples_withCpSilv.final.recode.vcf -Ou \
   | bcftools +fill-tags -Ou -- -t AC,AN \
-  | bcftools view -e 'AC==0 || AC==AN' -Oz -o cocci47.snps.vcf.gz
+  | bcftools view -e 'AC==0 || AC==AN' -Oz -o cocci43.snps.vcf.gz
 ``` 
 Note that twisst requires numpy and a tree-building software (we will use raxml/8.2.12 here)
 
@@ -1226,10 +1226,10 @@ Note that twisst requires numpy and a tree-building software (we will use raxml/
 module load anaconda3/2024.10-1-11.4
 export PYTHONPATH=$PYTHONPATH:$HOME/software/genomics_general
 python $HOME/software/genomics_general/VCF_processing/parseVCF.py \
-  -i ../cocci47.snps.vcf.gz \
+  -i ../cocci43.snps.vcf.gz \
   --ploidy 1 \
   --skipIndels \
-  -o cocci47.geno.gz
+  -o cocci43.geno.gz
 ```
 
 Then, create trees in sliding windows:      
@@ -1237,110 +1237,35 @@ Script: twisst_trees.sbatch
 Code snippet:   
 ```
 python $HOME/software/genomics_general/phylo/raxml_sliding_windows.py \
-  -g cocci47.geno.gz -p cocci47.w100 \
+  -g cocci43.geno.gz -p cocci43.w100 \
   --windType sites -w 100 -M 50 --model GTRCAT \  # 100 SNP sliding window
   --raxml raxmlHPC-AVX -T $SLURM_CPUS_PER_TASK \
-  --log cocci47.w100.raxlog.txt
+  --log cocci43.w100.raxlog.txt
 ```
 
 Next, create the 'groupings' file. Note, these are the 'pure' soil isolates, that we'll use the 'reference groups' here, in addition to the Cp 'reference group'. 
 ```
 mkdir -p groups out
 
-cat > groups/refs.tsv <<'EOF'
-22AC2 C1_KernRiver
-22BC1 C1_KernRiver
-34B2  C1_KernRiver
-58B1  C1_KernRiver
-87A1  C1_KernRiver
-137a1_redo    C1_KernRiver
-13B1  C2_Carrizo
-14B1  C2_Carrizo
-PS02PN14-1    C2_Carrizo
-PS02PN14-2    C2_Carrizo
-PS02PN14-3    C2_Carrizo
-157b2 C3_LosGatos
-158b3 C3_LosGatos
-L100  C3_LosGatos
-118a3 C3_LosGatos
-118b3 C3_LosGatos
-CpSilv        Outgroup
-EOF
-
-# or option B that includes Tracy
-cat > groups/refs_K3b.tsv <<'EOF'
-  22AC2 C1_KernRiver
-  22BC1 C1_KernRiver
-  34B2 C1_KernRiver
-  58B1 C1_KernRiver
-  87A1 C1_KernRiver
-  137a1_redo C1_KernRiver
-  13B1 C2_Carrizo
-  14B1 C2_Carrizo
-  PS02PN14-1 C2_Carrizo
-  PS02PN14-2 C2_Carrizo
-  PS02PN14-3 C2_Carrizo
-  157b2 C3_LosGatos
-  158b3 C3_LosGatos
-  L100 C3_LosGatos
-  118a3 C3_LosGatos
-  118b3 C3_LosGatos
-  239a3b2 C3_LosGatos
-  CpSilv Outgroup
-  EOF
-```
-Then, make one groups file per focal isolate. Note that 13, which has pure ancestry to cluster 1 according to ADMIXTURE, is included here as a 'negative control' of sorts, to make sure the approach is working.  
-```
-FOCAL="Kern3 Kern4 Kern9 Kern12 Kern14 Kern17 Kern22 Kern23 Kern24" 
-CONTROL="Kern13"    # pure-C1 negative control
-for f in $FOCAL $CONTROL; do
-  cp groups/refs.tsv groups/groups_$f.tsv
-  printf "%s\tFocal\n" "$f" >> groups/groups_$f.tsv
-done
-```
-
-Now, for one focal isolate at a time, compute the "weightings", which indicate the level of support for each of the 15 possible topologies (15 because there are 4 'reference groups' and 1 'focal group'.   
-Script used: twisst_weights_K3a.sbatch or twisst_weightsK3b.sbatch     
-Code snippet:    
-```
-FOCAL="Kern3 Kern4 Kern9 Kern12 Kern14 Kern17 Kern22 Kern23 Kern24"
-CONTROL="Kern13"   # pure-C1 negative control
-
-for f in $FOCAL $CONTROL; do
-  python $HOME/software/twisst/twisst.py \
-    -t cocci44.w100.trees.gz \
-    -w out/${f}.weights.csv.gz \
-    --groupsFile groups/groups_${f}.tsv \
-    -g C1_KernRiver -g C2_Carrizo -g C3_LosGatos -g Focal -g Outgroup \
-    --outgroup Outgroup --outputTopos out/${f}.topos.txt \
-    2> out/${f}.twisst.log
-  echo "done $f"
-done
-```
-Then exports groups and coordinates (cocci44.w100.data.tsv) into R for downstream steps.
-
-To repeat for K = 2, remake the groups (as below), then run: twisst_weights2_option1.sbatch or twisst_weights2_option2.sbatch.   
-Note there are two options here: One in which only the Carrizo soils are included, thus the comparison is between Bakersfield and Carrizo. And once in which all soils are included and the comparison is between Bakersfield and non-Bakersfield.    
-```
-# option 1
-cat > refs_K2.tsv <<'EOF'
-137a1_redo Bakersfield
+# option A for K = 2
+cat > groups/refs_K2a.tsv <<'EOF'
 22AC2 Bakersfield
 22BC1 Bakersfield
 34B2 Bakersfield
 58B1 Bakersfield
 87A1 Bakersfield
-13B1 Carrizo
-14B1 Carrizo
-PS02PN14-1 Carrizo
-PS02PN14-2 Carrizo
-PS02PN14-3 Carrizo
+13B1 NonBakersfield
+14B1 NonBakersfield
+PS02PN14-1 NonBakersfield
+PS02PN14-2 NonBakersfield
+PS02PN14-3 NonBakersfield
+118a3 NonBakersfield
+118b3 NonBakersfield
 CpSilv Outgroup
 EOF
 
-# option 2
+# option B for K = 2
 cat > groups/refs_K2b.tsv <<'EOF'
-137a1_redo Bakersfield
 22AC2 Bakersfield
 22BC1 Bakersfield
 34B2 Bakersfield
@@ -1359,23 +1284,62 @@ L100 NonBakersfield
 239a3b2 NonBakersfield
 CpSilv Outgroup
 EOF
+
+# option A for K = 3
+cat > groups/refs_K3a.tsv <<'EOF'
+22AC2 C1_Bakersfield
+22BC1 C1_Bakersfield
+34B2 C1_Bakersfield
+58B1 C1_Bakersfield
+87A1 C1_Bakersfield
+13B1 C2_southwestCV
+14B1 C2_southwestCV
+PS02PN14-1 C2_southwestCV
+PS02PN14-2 C2_southwestCV
+PS02PN14-3 C2_southwestCV
+118a3 C2_southwestCV
+118b3 C2_southwestCV
+157b2 C3_westCV
+158b3 C3_westCV
+L100 C3_westCV
+CpSilv Outgroup
+EOF
+
+# option B for K = 3
+cat > groups/refs_K3b.tsv <<'EOF'
+22AC2 C1_Bakersfield
+22BC1 C1_Bakersfield
+34B2 C1_Bakersfield
+58B1 C1_Bakersfield
+87A1 C1_Bakersfield
+13B1 C2_southwestCV
+14B1 C2_southwestCV
+PS02PN14-1 C2_southwestCV
+PS02PN14-2 C2_southwestCV
+PS02PN14-3 C2_southwestCV
+118a3 C2_southwestCV
+118b3 C2_southwestCV
+157b2 C3_westCV
+158b3 C3_westCV
+L100 C3_westCV
+239a3b2 C3_westCV
+CpSilv Outgroup
+EOF
 ```
 
-#### Bootstrapping twisst
+Now we will run the tree generation step. Here, we will randomly sample 100 SNPs with replacement within each 100 SNP window. We'll do this for 100 bootstrap iterations. Then we'll repeat the twisst weighting using each iteration.  
 
-Repeating above, but bootstrapping the trees. Here, we will randomly sample 100 SNPs with replacement within each 100 SNP window. We'll do this for 100 bootstrap iterations. Then we'll repeat the downstream twisst weighting using each iteration.  
-
-First, created: boot_geno.py and k3b_summarise.py (see attached scripts. this lives in the twisst directory), and Scripts/twisst_boot.sbatch
+First, created: boot_geno.py and twisst_summarise.py (see attached scripts. this lives in the twisst directory), and Scripts/twisst_boot.sbatch
 Then, in the FinalOutputs/twisst directory: 
 ```
-mkdir -p logs boot
-sbatch --array=1-2 ../../Scripts/twisst_boot.sbatch # here you can define how many iterations to do. Can start with 2 as a test
+mkdir -p logs
 
-# to bump it up:
-sbatch --array=3-100%25 ../../Scripts/twisst_boot.sbatch # the "%25 piece means submit only 25% of the jobs at once, in a sequence
+for S in K2a K2b K3a K3b; do
+  sbatch --export=ALL,SPEC=$S --array=1-100%25 ../../Scripts/twisst_boot.sbatch
+done
 ```
-After this finishes, download FinalOutputs/Twisst/boot/summaries to local machine (i.e. SPORE/Twisst/BootstrapSummaries.  
-similarly, for K = 3: run twisst_bootK3b.sbatch
+After this finishes, download FinalOutputs/Twisst/boot_[K2a or K2b or K3a or K3b]/summaries to local machine (i.e. SPORE/Twisst/BootstrapSummaries.  
+
 
 
 ## fineSTRUCTURE 

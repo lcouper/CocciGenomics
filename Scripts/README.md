@@ -471,7 +471,32 @@ bcftools +fixploidy allsamples_withCpSilv.final.recode.vcf -- -p ploidy.txt > al
 
 ## Assess population structure: ADMIXTURE
 
-Downlaoded ADMIXTURE [here](https://dalexander.github.io/admixture/download.html) and uploaded for use on savio  
+Downloaded ADMIXTURE [here](https://dalexander.github.io/admixture/download.html) and uploaded for use on savio  
+
+First, prepare PLINK files for ADMIXTURE.   
+ADMIXTURE requires numeric chromosome codes, but `--allow-extra-chr` retains the original scaffold
+names (e.g. `GG704916.1`) in the LD-pruned PLINK files. Made a copy of the fileset with column 1 of
+the .bim recoded to integers, numbered in order of appearance (i.e. reference dictionary order:
+GG704916.1 = 1, GG704915.1 = 2, GG704914.1 = 3, GG704913.1 = 4, GG704912.1 = 5, GG704911.1 = 6,
+GG704917.1 = 7). The .bed and .fam are copied unchanged, since recoding column 1 alters neither row
+count nor row order.
+Code snippet:
+```
+prefix=Admixture_EnvrClin/Subset_envrclin_ld_r05_pruned_admix
+
+awk 'BEGIN{OFS="\t"} {if(!($1 in m)) m[$1]=++n; $1=m[$1]; print}' \
+    Subset_envrclin_ld_r05_pruned.bim > "$prefix.bim"
+cp Subset_envrclin_ld_r05_pruned.bed "$prefix.bed"
+cp Subset_envrclin_ld_r05_pruned.fam "$prefix.fam"
+
+# To Checks run before launching ADMIXTURE:
+nsamp=$(wc -l < "$prefix.fam")
+wc -l Subset_envrclin_ld_r05_pruned.bim "$prefix.bim"        # must be equal
+awk '{print $1}' "$prefix.bim" | sort -u | tr '\n' ' '       # 1 2 3 4 5 6 7
+echo $(( 3 + ((nsamp + 3) / 4) * $(wc -l < "$prefix.bim") )) # must equal .bed size below
+stat -c %s "$prefix.bed"
+```
+
 Scripts: run_admixture_envrclin.sbatch, run_admixture_envrclin_Cp.sbatch (version with CpSilv)   
 Code snippet:   
 ```

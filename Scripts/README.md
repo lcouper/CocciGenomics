@@ -762,14 +762,6 @@ S_envr_pop3=$(vcftools --vcf allsamples.final.recode.vcf --keep Pop3.txt --remov
 
 # read out with: echo $S_envr
 ```
-S_envr: 43,484   
-S_clin: 51,188
-S_envrclin: 53,869
-S_all: 56,201    
-  
-S_envr_pop1: 25,073   
-S_envr_pop2: 11,406   
-S_envr_pop3: 26,755   
 
 
 #### Watterson's theta 
@@ -842,14 +834,6 @@ a_n = sum(1/i for i in range(1, n))
 print(f"soil pop3 theta_W: {(S / a_n) / callable}")
 EOF
 ```
-environmental theta_W: 0.0006287761283504767   
-clinical theta_W: 0.0005805520548848345   
-envr and clin theta_W: 0.0005540024029518856   
-all theta_W: 0.00048180365806308286    
-
-soil pop1 theta_W: 0.000509716580311605     
-soil pop2 theta_W: 0.00048307503049712893     
-soil pop3 theta_W: 0.0006180800746473476    
 
 
 #### Nucleotide diversity (θπ)

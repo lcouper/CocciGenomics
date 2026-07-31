@@ -442,12 +442,12 @@ Check how many SNPs retained:
 # example:
 bcftools view -H Subset_envrclin.final.recode.vcf | wc -l
 ```
-metavcf: 263,266 
-Subset_envr.final.recode.vcf: 62,847   
-Subset_envr_withrepreps.final.recode.vcf: 63,377      
-Subset_envrclin.final.recode.vcf: 56,791         
-allsamples.final.recode.vcf: 56,201    
-allsamples_withCpSilv.final.recode.vcf: 55,603   
+metavcf: 261,984
+Subset_envr.final.recode.vcf: 62,906   
+Subset_envr_withrepreps.final.recode.vcf: 62,580      
+Subset_envrclin.final.recode.vcf: 56,282        
+allsamples.final.recode.vcf: 55,874   
+allsamples_withCpSilv.final.recode.vcf: 55,336  
 
 #### 4.5 Convert final vcf file to a pseudo-diploid genotype 
 Purpose: haploid genotypes are not natively supported by vcftools and other packages
@@ -1165,7 +1165,7 @@ cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
 # just environmental
 /global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile Subset_envr_plink --allow-extra-chr --indep-pairwise 50 5 0.5 --out Subset_envr_ld_r05
 ```
-This removed ~43,121 out of 56,201 variants, leaving 13,080 SNPs 
+This removed 44,564 out of 56,282 variants, leaving 11,718 SNPs 
 
 Step 3. Make pruned plink files (for any downstream analyses that use plink)
 ```
@@ -1192,8 +1192,11 @@ Step 4. Make a pruned vcf file
 # with just our environmental and clinical isolates
 /global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile Subset_envrclin_plink --allow-extra-chr --extract Subset_envrclin_ld_r05.prune.in --recode vcf --out Subset_envrclin_ld_r05_pruned
 
-# just envirionmkental
+# just envirionmental
 /global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile Subset_envr_plink --allow-extra-chr --extract Subset_envr_ld_r05.prune.in --recode vcf --out Subset_envr_ld_r05_pruned
+
+# all samples
+/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile allsamples_plink --allow-extra-chr --extract allsamples_ld_r05.prune.in --recode vcf --out allsamples_ld_r05_pruned
 ```
 Note the pruned vcf is called 'allsamples_ld_r05_pruned.vcf' or 'Subset_envrclin_ld_r05_pruned.vcf'
 

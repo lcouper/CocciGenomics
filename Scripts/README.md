@@ -613,83 +613,30 @@ Optionally, compare reuslts with [Engelthaler et al. 2016](https://journals.asm.
 Step 2. Query samples against these sequences.   
 Script: matingtype_updated.sbatch   
 
-## Fst differentiation between clinical and environmental isolates
-
-First, created txt files indicating assignment to soil or patient sources from Bakersfield or western Central Valley 'populations'. To avoid spurious detection due to demographic processes, samples were chosen on the basis of: ancestry (Q) >=0.90 to that cluster (from  admixture K = 3) and NOT being present in a divergent clade in the phylogeny. For the soil pairs that appeared to be basically clonal, we thinned to include one of the pairs to avoid inflating Fst. 
-
-```
-# Bakersfield (K3 Cluster1) 
-printf '%s\n' 137a1_redo 34B2 58B1 87A1 22AC2               > bak_soil.txt      # 5
-printf '%s\n' Kern7 Kern13 Kern21 Kern10                    > bak_clinical.txt  # 4
-
-#  western San Joaquin Valley (K3 Cluster3) 
-printf '%s\n' L100 157b2 118a3                              > wsjv_soil.txt     # 3
-printf '%s\n' Kern1 Kern2 Kern5 Kern8 Kern11 Kern19 Kern20 Kern25 Kern18 > wsjv_clinical.txt  # 9
-
-# combined list
-cat bak_soil.txt bak_clinical.txt wsjv_soil.txt wsjv_clinical.txt > samples_hierfst.txt
-
-# design table for hierfstat, including sample and source for each population
-{awk '{print $1"\tBakersfield\tsoil"}'     bak_soil.txt
-  awk '{print $1"\tBakersfield\tclinical"}' bak_clinical.txt
-  awk '{print $1"\twSJV\tsoil"}'            wsjv_soil.txt
-  awk '{print $1"\twSJV\tclinical"}'        wsjv_clinical.txt} > hierfst_design.tsv
-
-# filter vcf file to only the samples listed above, and removing any SNPs that are now monomorphic in this subset
-bcftools view -S samples_hierfst.txt -m2 -M2 -v snps --min-ac 1:minor \
- Subset_envrclin.final.diploid.vcf -Ov -o Subset_hierFst.vcf
-```
-
-Then, run vcftools to estimate Fst along the genome.   
-Here, we estimated Fst per site (can take averages by gene in R if desired)
-
-```
-vcftools --vcf Subset_envrclin.final.diploid.vcf \
-    --weir-fst-pop Pop1a.txt \
-    --weir-fst-pop Pop1b.txt \
-    --out fst_per_site_Pop1
-```
-
-To assess statistical significance, randomly re-shuffle 'population' labels, and re-estimate Fst (repeat 500 times).     
-Script: fst_perm.sbatch   
-Code snippet:
-```
-# number of permutations
-nperm=5000
-
-# file with all sample IDs
-samples=all_samples.txt
-
-# number of samples in group 1 (e.g., environmental)
-group1_n=15
-
-mkdir -p perm_fst
-
-for i in $(seq 1 $nperm); do
-  echo "Permutation $i"
-
-  # Shuffle and split samples
-  shuf $samples > perm_fst/tmp_samples.txt
-  head -n $group1_n perm_fst/tmp_samples.txt > perm_fst/group1.txt
-  tail -n +$((group1_n + 1)) perm_fst/tmp_samples.txt > perm_fst/group2.txt
-
- # Run Fst
-  vcftools --vcf final_diploid.vcf \
-    --weir-fst-pop perm_fst/group1.txt \
-    --weir-fst-pop perm_fst/group2.txt \
-    --out perm_fst/fst_perm_$i \
-    --stdout | grep -v "^#" | awk -v i=$i '{print $1, $2, $3, i}' >> perm_fst/fst_all_perms.txt
-done
-```
-
 ## Fst between environmental clusters
 
 Similar to above, but using only environmental isolates and defining populations based on admixture output
 
 ```
-echo -e "22AC2\n22BC1\n34B2\n58B1\n87A1\n137a1_redo" > Pop1.txt
-echo -e "PS02PN14-1\nPS02PN14-2\nPS02PN14-3\n13B1\n14B1" > Pop2.txt
-echo -e "118a3\n118b3\n157b2\n158b3\nL100\n239a3b2" > Pop3.txt
+# For K = 3
+
+# Pop1 = Bakersfield          (Bakersfield_1-5)
+echo -e "22AC2\n22BC1\n34B2\n58B1\n87A1" > Pop1_K3.txt
+
+# Pop2 = southwestern Central Valley  (Carrizo_1-5 + McKittrick_1-2)
+echo -e "13B1\n14B1\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3\n118a3\n118b3" > Pop2_K3.txt
+
+# Pop3 = western Central Valley       (Coalinga_1-3 + Tracy_1)
+echo -e "157b2\n158b3\nL100\n239a3b2" > Pop3_K3.txt
+
+
+# For K = 2
+
+# Pop1 = Bakersfield
+echo -e "22AC2\n22BC1\n34B2\n58B1\n87A1" > Pop1_K2.txt
+
+# Pop2 = non-Bakersfield (everything else)
+echo -e "13B1\n14B1\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3\n118a3\n118b3\n157b2\n158b3\nL100\n239a3b2" > Pop2_K2.txt
 ```
 
 Then, run vcftools to estimate Fst along the genome.   
@@ -697,44 +644,31 @@ Here, we estimated Fst per site (can take averages by gene in R if desired)
 
 ```
 vcftools --vcf Subset_envr.final.diploid.vcf \
-    --weir-fst-pop Pop1.txt \
-    --weir-fst-pop Pop2.txt \
+    --weir-fst-pop Pop1_K3.txt \
+    --weir-fst-pop Pop2_K3.txt \
     --out fstPop12
 
 vcftools --vcf Subset_envr.final.diploid.vcf \
-    --weir-fst-pop Pop1.txt \
-    --weir-fst-pop Pop3.txt \
+    --weir-fst-pop Pop1_K3.txt \
+    --weir-fst-pop Pop3_K3.txt \
     --out fstPop13
 
 vcftools --vcf Subset_envr.final.diploid.vcf \
-    --weir-fst-pop Pop2.txt \
-    --weir-fst-pop Pop3.txt \
+    --weir-fst-pop Pop2_K3.txt \
+    --weir-fst-pop Pop3_K3.txt \
     --out fstPop23
-```
-Results:      
-Fst 1 & 2: Weir and Cockerham mean Fst estimate: 0.27331; **weighted Fst estimate: 0.41696**       
-Fst 1 & 3: Weir and Cockerham mean Fst estimate: 0.15339; **weighted Fst estimate: 0.22844**    
-Fst 2 & 3: Weir and Cockerham mean Fst estimate: 0.22700; **weighted Fst estimate: 0.31262**       
 
-For permutation approach here, scripts were:  
-fst_perm_12.sbatch, fst_perm.13.sbtach, fst_perm_23.sbatch   
-
-To repeat under K = 2:
-```
-# Cluster 1 = Bakersfield
-echo -e "22AC2\n22BC1\n34B2\n58B1\n87A1\n137a1_redo" > Pop1_K2.txt
-
-# Cluster 2 = Carrizo + McKittrick + western SJV (dominant assignment)
-echo -e "13B1\n14B1\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3\n118a3\n118b3\n157b2\n158b3\nL100\n239a3b2" > Pop2_K2.txt
-
-# single pairwise Fst (only 2 clusters at K=2)
 vcftools --vcf Subset_envr.final.diploid.vcf \
     --weir-fst-pop Pop1_K2.txt \
     --weir-fst-pop Pop2_K2.txt \
     --out fstK2_Pop12
+
 ```
-Weir and Cockerham mean Fst estimate: 0.16885   
-Weir and Cockerham weighted Fst estimate: 0.24989    
+Results:      
+K3: Fst 1 & 2: Weir and Cockerham mean Fst estimate: 0.24219; **weighted Fst estimate: 0.36126**       
+K3: Fst 1 & 3: Weir and Cockerham mean Fst estimate: 0.15527; **weighted Fst estimate: 0.27468**    
+K3: Fst 2 & 3: Weir and Cockerham mean Fst estimate: 0.28213; **weighted Fst estimate: 0.39395**       
+K2: Weir and Cockerham mean Fst estimate: 0.16215; **weighted Fst estimate: 0.24086**    
 
 ### Diversity metrics
 
@@ -1090,11 +1024,12 @@ The vcf file *without* C. posadasii were used in all other analyses
 
 Step 1. Convert vcf to phylipp:   
 Run at command line, very fast.  
-Note that the 'vcf2phylip.py' script was downloaded from [here](https://github.com/edgardomortiz/vcf2phylip/blob/master/vcf2phylip.py) and must be in working directory for command to work
+Note that the 'vcf2phylip.py' script was downloaded from [here](https://github.com/edgardomortiz/vcf2phylip/blob/master/vcf2phylip.py) and added to:
+/global/home/users/lcouper/Software
 ```
-python3 vcf2phylip.py -i allsamples_withCpSilv.final.recode.vcf -o CocciSamplesTree
-# or for LD-pruned version:
-python3 vcf2phylip.py -i allsampleswithCpSilv_ld_r05_pruned.vcf -o CocciSamplesTreeLD
+python3 ~/software/vcf2phylip.py \
+  -i allsamples_withCpSilv.final.recode.vcf \
+  -o CpSilv
 
 ```
 
@@ -1523,4 +1458,77 @@ for bam in *.len75.aligned.sorted.deduped.bam; do
   done
 done >> deletion_depth.tsv
 gzip -f deletion_depth.tsv
+```
+## Old/ No longer using
+
+## Fst differentiation between clinical and environmental isolates
+
+First, created txt files indicating assignment to soil or patient sources from Bakersfield or western Central Valley 'populations'. To avoid spurious detection due to demographic processes, samples were chosen on the basis of: ancestry (Q) >=0.90 to that cluster (from  admixture K = 3) and NOT being present in a divergent clade in the phylogeny. For the soil pairs that appeared to be basically clonal, we thinned to include one of the pairs to avoid inflating Fst. 
+
+```
+# Bakersfield (K3 Cluster1) 
+printf '%s\n' 137a1_redo 34B2 58B1 87A1 22AC2               > bak_soil.txt      # 5
+printf '%s\n' Kern7 Kern13 Kern21 Kern10                    > bak_clinical.txt  # 4
+
+#  western San Joaquin Valley (K3 Cluster3) 
+printf '%s\n' L100 157b2 118a3                              > wsjv_soil.txt     # 3
+printf '%s\n' Kern1 Kern2 Kern5 Kern8 Kern11 Kern19 Kern20 Kern25 Kern18 > wsjv_clinical.txt  # 9
+
+# combined list
+cat bak_soil.txt bak_clinical.txt wsjv_soil.txt wsjv_clinical.txt > samples_hierfst.txt
+
+# design table for hierfstat, including sample and source for each population
+{awk '{print $1"\tBakersfield\tsoil"}'     bak_soil.txt
+  awk '{print $1"\tBakersfield\tclinical"}' bak_clinical.txt
+  awk '{print $1"\twSJV\tsoil"}'            wsjv_soil.txt
+  awk '{print $1"\twSJV\tclinical"}'        wsjv_clinical.txt} > hierfst_design.tsv
+
+# filter vcf file to only the samples listed above, and removing any SNPs that are now monomorphic in this subset
+bcftools view -S samples_hierfst.txt -m2 -M2 -v snps --min-ac 1:minor \
+ Subset_envrclin.final.diploid.vcf -Ov -o Subset_hierFst.vcf
+```
+
+Then, run vcftools to estimate Fst along the genome.   
+Here, we estimated Fst per site (can take averages by gene in R if desired)
+
+```
+vcftools --vcf Subset_envrclin.final.diploid.vcf \
+    --weir-fst-pop Pop1a.txt \
+    --weir-fst-pop Pop1b.txt \
+    --out fst_per_site_Pop1
+```
+
+To assess statistical significance, randomly re-shuffle 'population' labels, and re-estimate Fst (repeat 500 times).     
+Script: fst_perm.sbatch   
+Code snippet:
+```
+# number of permutations
+nperm=5000
+
+# file with all sample IDs
+samples=all_samples.txt
+
+# number of samples in group 1 (e.g., environmental)
+group1_n=15
+
+mkdir -p perm_fst
+
+for i in $(seq 1 $nperm); do
+  echo "Permutation $i"
+
+  # Shuffle and split samples
+  shuf $samples > perm_fst/tmp_samples.txt
+  head -n $group1_n perm_fst/tmp_samples.txt > perm_fst/group1.txt
+  tail -n +$((group1_n + 1)) perm_fst/tmp_samples.txt > perm_fst/group2.txt
+
+ # Run Fst
+  vcftools --vcf final_diploid.vcf \
+    --weir-fst-pop perm_fst/group1.txt \
+    --weir-fst-pop perm_fst/group2.txt \
+    --out perm_fst/fst_perm_$i \
+    --stdout | grep -v "^#" | awk -v i=$i '{print $1, $2, $3, i}' >> perm_fst/fst_all_perms.txt
+done
+
+For permutation approach here, scripts were:  
+fst_perm_12.sbatch, fst_perm.13.sbtach, fst_perm_23.sbatch   
 ```

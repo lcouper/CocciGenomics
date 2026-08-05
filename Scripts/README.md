@@ -670,6 +670,54 @@ K3: Fst 1 & 3: Weir and Cockerham mean Fst estimate: 0.15527; **weighted Fst est
 K3: Fst 2 & 3: Weir and Cockerham mean Fst estimate: 0.28213; **weighted Fst estimate: 0.39395**       
 K2: Weir and Cockerham mean Fst estimate: 0.16215; **weighted Fst estimate: 0.24086**    
 
+For the clone-corrected version:
+```
+# ---- K = 3, clone-corrected ----
+
+# Pop1 = Bakersfield (4)
+echo -e "22AC2\n34B2\n58B1\n87A1" > Pop1_K3_cc.txt
+
+# Pop2 = southwestern Central Valley (3)
+echo -e "13B1\nPS02PN14-1\n118a3" > Pop2_K3_cc.txt
+
+# Pop3 = western Central Valley (3)
+echo -e "157b2\nL100\n239a3b2" > Pop3_K3_cc.txt
+
+# ---- K = 2, clone-corrected ----
+
+# Pop1 = Bakersfield (4)
+echo -e "22AC2\n34B2\n58B1\n87A1" > Pop1_K2_cc.txt
+
+# Pop2 = non-Bakersfield (6)
+echo -e "13B1\nPS02PN14-1\n118a3\n157b2\nL100\n239a3b2" > Pop2_K2_cc.txt
+
+vcftools --vcf Subset_envr.final.diploid.vcf \
+    --weir-fst-pop Pop1_K3_cc.txt \
+    --weir-fst-pop Pop2_K3_cc.txt \
+    --out fstPop12_cc
+
+vcftools --vcf Subset_envr.final.diploid.vcf \
+    --weir-fst-pop Pop1_K3_cc.txt \
+    --weir-fst-pop Pop3_K3_cc.txt \
+    --out fstPop13_cc
+
+vcftools --vcf Subset_envr.final.diploid.vcf \
+    --weir-fst-pop Pop2_K3_cc.txt \
+    --weir-fst-pop Pop3_K3_cc.txt \
+    --out fstPop23_cc
+
+vcftools --vcf Subset_envr.final.diploid.vcf \
+    --weir-fst-pop Pop1_K2_cc.txt \
+    --weir-fst-pop Pop2_K2_cc.txt \
+    --out fstK2_Pop12_cc
+```
+Results:      
+K3: Fst 1 & 2: Weir and Cockerham mean Fst estimate: 0.093219; **weighted Fst estimate: 0.21072**       
+K3: Fst 1 & 3: Weir and Cockerham mean Fst estimate: 0.070195; **weighted Fst estimate: 0.17581**    
+K3: Fst 2 & 3: Weir and Cockerham mean Fst estimate: 0.11248; **weighted Fst estimate: 0.23387**       
+K2: Weir and Cockerham mean Fst estimate: 0.073157; **weighted Fst estimate: 0.14578**    
+
+
 ### Diversity metrics
 
 These calculations will use the filtered VCF file that contains all samples (rather than subset-specific filtered vcf files since that will confound diversity calculations due to QC steps).   

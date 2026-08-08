@@ -1198,9 +1198,9 @@ Note the pruned vcf is called 'allsamples_ld_r05_pruned.vcf' or 'Subset_envrclin
 We are primarily interseted in our novel clinical samples, but we will use a few legacy clinical genomes as a control here. Therefore, we will use the vcf file with all samples (no re-preps) and CpSilv as an outgroup. These sample names live in: FinalOutputs/samples43.txt. We then subset the meta-sample vcf to these 43 using (which keeps only sites that are polymorphic within these 46 samples): 
 
 ```
-bcftools view -S samples43.txt -m2 -M2 -v snps allsamples_withCpSilv.final.recode.vcf -Ou \
+bcftools view -S samples37.txt -m2 -M2 -v snps allsamples_withCpSilv.final.recode.vcf -Ou \
   | bcftools +fill-tags -Ou -- -t AC,AN \
-  | bcftools view -e 'AC==0 || AC==AN' -Oz -o cocci43.snps.vcf.gz
+  | bcftools view -e 'AC==0 || AC==AN' -Oz -o cocci37.snps.vcf.gz
 ``` 
 Note that twisst requires numpy and a tree-building software (we will use raxml/8.2.12 here)
 
@@ -1209,10 +1209,10 @@ Note that twisst requires numpy and a tree-building software (we will use raxml/
 module load anaconda3/2024.10-1-11.4
 export PYTHONPATH=$PYTHONPATH:$HOME/software/genomics_general
 python $HOME/software/genomics_general/VCF_processing/parseVCF.py \
-  -i ../cocci43.snps.vcf.gz \
+  -i ../cocci37.snps.vcf.gz \
   --ploidy 1 \
   --skipIndels \
-  -o cocci43.geno.gz
+  -o cocci37.geno.gz
 ```
 
 Then, create trees in sliding windows:      
@@ -1220,92 +1220,51 @@ Script: twisst_trees.sbatch
 Code snippet:   
 ```
 python $HOME/software/genomics_general/phylo/raxml_sliding_windows.py \
-  -g cocci43.geno.gz -p cocci43.w100 \
+  -g cocci37.geno.gz -p cocci37.w100 \
   --windType sites -w 100 -M 50 --model GTRCAT \  # 100 SNP sliding window
   --raxml raxmlHPC-AVX -T $SLURM_CPUS_PER_TASK \
-  --log cocci43.w100.raxlog.txt
+  --log cocci37.w100.raxlog.txt
 ```
 
 Next, create the 'groupings' file. Note, these are the 'pure' soil isolates, that we'll use the 'reference groups' here, in addition to the Cp 'reference group'. 
 ```
 mkdir -p groups out
 
-# option A for K = 2
-cat > groups/refs_K2a.tsv <<'EOF'
-22AC2 Bakersfield
-22BC1 Bakersfield
-34B2 Bakersfield
-58B1 Bakersfield
-87A1 Bakersfield
-13B1 NonBakersfield
-14B1 NonBakersfield
-PS02PN14-1 NonBakersfield
-PS02PN14-2 NonBakersfield
-PS02PN14-3 NonBakersfield
-118a3 NonBakersfield
-118b3 NonBakersfield
-CpSilv Outgroup
-EOF
+# Reference groups are clone-corrected: one isolate per burrow, so leave-one-out is
+# automatically leave-one-lineage-out. Patient clones are retained (they are focals, never
+# references). Dropped: 22BC1, 14B1, 158b3, 118b3, PS02PN14-2, PS02PN14-3.
 
-# option B for K = 2
-cat > groups/refs_K2b.tsv <<'EOF'
+mkdir -p groups out
+
+# Primary spec, K = 2: ADMIXTURE's Bakersfield vs everything else, clone-corrected.
+cat > groups/refs_K2.tsv <<'EOF'
 22AC2 Bakersfield
-22BC1 Bakersfield
 34B2 Bakersfield
 58B1 Bakersfield
 87A1 Bakersfield
 13B1 NonBakersfield
-14B1 NonBakersfield
 PS02PN14-1 NonBakersfield
-PS02PN14-2 NonBakersfield
-PS02PN14-3 NonBakersfield
 118a3 NonBakersfield
-118b3 NonBakersfield
 157b2 NonBakersfield
-158b3 NonBakersfield
 L100 NonBakersfield
 239a3b2 NonBakersfield
 CpSilv Outgroup
 EOF
 
-# option A for K = 3
-cat > groups/refs_K3a.tsv <<'EOF'
-22AC2 C1_Bakersfield
-22BC1 C1_Bakersfield
-34B2 C1_Bakersfield
-58B1 C1_Bakersfield
-87A1 C1_Bakersfield
-13B1 C2_southwestCV
-14B1 C2_southwestCV
-PS02PN14-1 C2_southwestCV
-PS02PN14-2 C2_southwestCV
-PS02PN14-3 C2_southwestCV
-118a3 C2_southwestCV
-118b3 C2_southwestCV
-157b2 C3_westCV
-158b3 C3_westCV
-L100 C3_westCV
-CpSilv Outgroup
-EOF
-
-# option B for K = 3
-cat > groups/refs_K3b.tsv <<'EOF'
-22AC2 C1_Bakersfield
-22BC1 C1_Bakersfield
-34B2 C1_Bakersfield
-58B1 C1_Bakersfield
-87A1 C1_Bakersfield
-13B1 C2_southwestCV
-14B1 C2_southwestCV
-PS02PN14-1 C2_southwestCV
-PS02PN14-2 C2_southwestCV
-PS02PN14-3 C2_southwestCV
-118a3 C2_southwestCV
-118b3 C2_southwestCV
-157b2 C3_westCV
-158b3 C3_westCV
-L100 C3_westCV
-239a3b2 C3_westCV
+# Alternative spec: three groups defined by SITE rather than by ADMIXTURE. Justified by
+# pairwise divergence -- Coalinga-Tracy (14,776) and Carrizo-McKittrick (15,926) are the two
+# most similar site pairs, Bakersfield is most divergent from all (20,743-22,383).
+cat > groups/refs_site3.tsv <<'EOF'
+22AC2 Bakersfield
+34B2 Bakersfield
+58B1 Bakersfield
+87A1 Bakersfield
+13B1 CarrizoMcKittrick
+PS02PN14-1 CarrizoMcKittrick
+118a3 CarrizoMcKittrick
+157b2 CoalingaTracy
+L100 CoalingaTracy
+239a3b2 CoalingaTracy
 CpSilv Outgroup
 EOF
 ```

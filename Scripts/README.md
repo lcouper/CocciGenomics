@@ -617,52 +617,40 @@ Script: matingtype_updated.sbatch
 
 Similar to above, but using only environmental isolates and defining populations based on admixture output
 
+For the clone-corrected version:
 ```
-# For K = 3
+# For K = 2 or 3 (since groupings stay the same)
+# Pop1 = Bakersfield (4)
+echo -e "22AC2\n34B2\n58B1\n87A1" > Pop1_K23_cc.txt
 
-# Pop1 = Bakersfield          (Bakersfield_1-5)
-echo -e "22AC2\n22BC1\n34B2\n58B1\n87A1" > Pop1_K3.txt
+# Pop2 = non-Bakersfield (6)
+echo -e "13B1\nPS02PN14-1\n118a3\n157b2\nL100\n239a3b2" > Pop2_K23_cc.txt
 
-# Pop2 = southwestern Central Valley  (Carrizo_1-5 + McKittrick_1-2)
-echo -e "13B1\n14B1\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3\n118a3\n118b3" > Pop2_K3.txt
+vcftools --vcf Subset_envr.final.diploid.vcf \
+    --weir-fst-pop Pop1_K23_cc.txt \
+    --weir-fst-pop Pop2_K23_cc.txt \
+    --out fst_cc
+```
+Results:      
+Weir and Cockerham mean Fst estimate: 0.073157; **weighted Fst estimate:  0.14578**       
 
-# Pop3 = western Central Valley       (Coalinga_1-3 + Tracy_1)
-echo -e "157b2\n158b3\nL100\n239a3b2" > Pop3_K3.txt
-
-
-# For K = 2
+From previously, when I was doing this before clone-corrected (improper)
+```
+# For K = 2 or 3 (since groupings stay the same)
 
 # Pop1 = Bakersfield
-echo -e "22AC2\n22BC1\n34B2\n58B1\n87A1" > Pop1_K2.txt
+echo -e "22AC2\n22BC1\n34B2\n58B1\n87A1" > Pop1_K23.txt
 
-# Pop2 = non-Bakersfield (everything else)
-echo -e "13B1\n14B1\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3\n118a3\n118b3\n157b2\n158b3\nL100\n239a3b2" > Pop2_K2.txt
-```
+# Pop2 = non-Bakersfield
+echo -e "13B1\n14B1\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3\n118a3\n118b3\n157b2\n158b3\nL100\n239a3b2" > Pop2_K23.txt
 
-Then, run vcftools to estimate Fst along the genome.   
-Here, we estimated Fst per site (can take averages by gene in R if desired)
-
-```
-vcftools --vcf Subset_envr.final.diploid.vcf \
-    --weir-fst-pop Pop1_K3.txt \
-    --weir-fst-pop Pop2_K3.txt \
-    --out fstPop12
+#Then, run vcftools to estimate Fst along the genome.   
+#Here, we estimated Fst per site (can take averages by gene in R if desired)
 
 vcftools --vcf Subset_envr.final.diploid.vcf \
-    --weir-fst-pop Pop1_K3.txt \
-    --weir-fst-pop Pop3_K3.txt \
-    --out fstPop13
-
-vcftools --vcf Subset_envr.final.diploid.vcf \
-    --weir-fst-pop Pop2_K3.txt \
-    --weir-fst-pop Pop3_K3.txt \
-    --out fstPop23
-
-vcftools --vcf Subset_envr.final.diploid.vcf \
-    --weir-fst-pop Pop1_K2.txt \
-    --weir-fst-pop Pop2_K2.txt \
-    --out fstK2_Pop12
-
+    --weir-fst-pop Pop1_K23.txt \
+    --weir-fst-pop Pop2_K23.txt \
+    --out fst_all
 ```
 Results:      
 K3: Fst 1 & 2: Weir and Cockerham mean Fst estimate: 0.24219; **weighted Fst estimate: 0.36126**       
@@ -670,52 +658,6 @@ K3: Fst 1 & 3: Weir and Cockerham mean Fst estimate: 0.15527; **weighted Fst est
 K3: Fst 2 & 3: Weir and Cockerham mean Fst estimate: 0.28213; **weighted Fst estimate: 0.39395**       
 K2: Weir and Cockerham mean Fst estimate: 0.16215; **weighted Fst estimate: 0.24086**    
 
-For the clone-corrected version:
-```
-# ---- K = 3, clone-corrected ----
-
-# Pop1 = Bakersfield (4)
-echo -e "22AC2\n34B2\n58B1\n87A1" > Pop1_K3_cc.txt
-
-# Pop2 = southwestern Central Valley (3)
-echo -e "13B1\nPS02PN14-1\n118a3" > Pop2_K3_cc.txt
-
-# Pop3 = western Central Valley (3)
-echo -e "157b2\nL100\n239a3b2" > Pop3_K3_cc.txt
-
-# ---- K = 2, clone-corrected ----
-
-# Pop1 = Bakersfield (4)
-echo -e "22AC2\n34B2\n58B1\n87A1" > Pop1_K2_cc.txt
-
-# Pop2 = non-Bakersfield (6)
-echo -e "13B1\nPS02PN14-1\n118a3\n157b2\nL100\n239a3b2" > Pop2_K2_cc.txt
-
-vcftools --vcf Subset_envr.final.diploid.vcf \
-    --weir-fst-pop Pop1_K3_cc.txt \
-    --weir-fst-pop Pop2_K3_cc.txt \
-    --out fstPop12_cc
-
-vcftools --vcf Subset_envr.final.diploid.vcf \
-    --weir-fst-pop Pop1_K3_cc.txt \
-    --weir-fst-pop Pop3_K3_cc.txt \
-    --out fstPop13_cc
-
-vcftools --vcf Subset_envr.final.diploid.vcf \
-    --weir-fst-pop Pop2_K3_cc.txt \
-    --weir-fst-pop Pop3_K3_cc.txt \
-    --out fstPop23_cc
-
-vcftools --vcf Subset_envr.final.diploid.vcf \
-    --weir-fst-pop Pop1_K2_cc.txt \
-    --weir-fst-pop Pop2_K2_cc.txt \
-    --out fstK2_Pop12_cc
-```
-Results:      
-K3: Fst 1 & 2: Weir and Cockerham mean Fst estimate: 0.093219; **weighted Fst estimate: 0.21072**       
-K3: Fst 1 & 3: Weir and Cockerham mean Fst estimate: 0.070195; **weighted Fst estimate: 0.17581**    
-K3: Fst 2 & 3: Weir and Cockerham mean Fst estimate: 0.11248; **weighted Fst estimate: 0.23387**       
-K2: Weir and Cockerham mean Fst estimate: 0.073157; **weighted Fst estimate: 0.14578**    
 
 
 ### Diversity metrics

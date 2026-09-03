@@ -388,29 +388,15 @@ awk 'NR > 1 && $4 != "nan" {sum += $4; n++} END {print "mean_TajimasD_all =", su
 ```
 
 ### 4.5 Construct phylogenetic tree 
-
-** Note: In order to root the phylogenetic tree, we used the C. posadasii Silveira strain [SRR9644374](https://www.ncbi.nlm.nih.gov/biosample/?term=SRS007089) **
-These fastqs were then taken through the same steps as all other samples above (e.g. starting from step 1)   
-The resulting vcf files were only used for rooting the tree.   
-The vcf file *without* C. posadasii were used in all other analyses 
-
-
-Step 1. Convert vcf to phylipp:   
-Run at command line, very fast.  
-Note that the 'vcf2phylip.py' script was downloaded from [here](https://github.com/edgardomortiz/vcf2phylip/blob/master/vcf2phylip.py) and added to:
-/global/home/users/lcouper/Software
+**Notes:** We used the C. posadasii Silveira strain [SRR9644374](https://www.ncbi.nlm.nih.gov/biosample/?term=SRS007089) to root the tree   
+**Code:**  
 ```
+# First, convert vcf to phylipp:   
 python3 ~/software/vcf2phylip.py \
   -i allsamples_withCpSilv.final.recode.vcf \
   -o CpSilv
 
-```
-
-Step 2. Test different models of molecular evolution   
-Software used: iqtree/3.0.0    
-Script: phylo_tree_testmodels.sh, phylo_tree_testmodels_LD.sh    
-Code snippet:
-```
+# Next, test different models of molecular evolution   
 iqtree3 -s allsamples_withCpSilv.final.recode.min4.phy \
         -m TESTONLY+ASC \ # test diff. nucleotide substituion models and pick the best one based on BIC. Includes ascertainment bias (For using VCF)
         -mset JC,HKY,K80,TN,GTR \
@@ -419,13 +405,8 @@ iqtree3 -s allsamples_withCpSilv.final.recode.min4.phy \
         -o CpSilv \
         -pre modeltest_ASC_noR_rootCpSilv \
         -redo
-```
 
-Step 3. Run tree using the best model as determined in step 2    
-Software used: iqtree/3.0.0    
-Script: phylo_tree_bestmodel.sh    
-Code snippet:
-```
+# Finally, run tree using the best model as determined above
 iqtree3 -s allsamples_withCpSilv.final.recode.min4.phy \
         -m GTR+F+ASC+G4 \ # best modeled determined in step 2 
         -bb 1000 \ #  1,000 bootstraps
@@ -436,178 +417,45 @@ iqtree3 -s allsamples_withCpSilv.final.recode.min4.phy \
         -redo # overwrite old output
 ```
 
-One option for visualizing tree (but note we visualized in R using ggree):   
-https://itol.embl.de/tree/136152214211185591747337347
-
-
-
 ### 4.6 Assessing and correcting for linkage disequilibrium
 
-Downloaded plink version 1.9 [here](https://www.cog-genomics.org/plink/). (specifically the 64-bit Linux, stable beta version)
-Uploaded folder to cluster and made it executable. 
-
-Step 1. Convert filtered SNP VCF into PLINK binary format (can run at command line. very fast)    
+**Notes:** We use the plink package the investigate LD and remove linked SNPs   
+**Code:** 
 ```
-cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
-/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --vcf allsamples.final.diploid.vcf --allow-extra-chr --double-id --set-missing-var-ids @:# --make-bed --out allsamples_plink
+# Convert filtered SNP VCF into PLINK binary format 
+plink --vcf allsamples.final.diploid.vcf --allow-extra-chr --double-id --set-missing-var-ids @:# --make-bed --out allsamples_plink
 
-# with CpSilv (outgroup for tree)
-/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --vcf allsamples_withCpSilv.final.diploid.vcf --allow-extra-chr --double-id --set-missing-var-ids @:# --make-bed --out allsampleswithCpSilv_plink
+# Create the LD-pruned dataset 
+plink --bfile allsamples_plink --allow-extra-chr --indep-pairwise 50 5 0.5 --out allsamples_ld_r05
 
-# with just our environmental and clinical isolates
-/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --vcf Subset_envrclin.final.diploid.vcf --allow-extra-chr --double-id --set-missing-var-ids @:# --make-bed --out Subset_envrclin_plink
-
-# our environmental and clinical isolates plus Cp
-/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --vcf Subset_envrclin_Cp.final.diploid.vcf --allow-extra-chr --double-id --set-missing-var-ids @:# --make-bed --out Subset_envrclin_Cp_plink
-
-# just environmental isolates
-/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --vcf Subset_envr.final.diploid.vcf --allow-extra-chr --double-id --set-missing-var-ids @:# --make-bed --out Subset_envr_plink
+#  Make a pruned vcf file 
+plink --bfile allsamples_plink --allow-extra-chr --extract allsamples_ld_r05.prune.in --recode vcf --out allsamples_ld_r05_pruned
 ```
-
-Step 2. Create the LD-pruned dataset (again, can run at command line. very fast).    
-Here we are using a window size of 50 SNPs, sliding by 5 SNPs each time. Within each window, plink identifies SNP pairs with r2 > 0.5 and removes variants until no remaining pair exceeds this threshold.
-```
-cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
-/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile allsamples_plink --allow-extra-chr --indep-pairwise 50 5 0.5 --out allsamples_ld_r05
-
-# with CpSilv
-/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile allsampleswithCpSilv_plink --allow-extra-chr --indep-pairwise 50 5 0.5 --out allsampleswithCpSilv_ld_r05
-
-# with just our environmental and clinical isolates
-/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile Subset_envrclin_plink --allow-extra-chr --indep-pairwise 50 5 0.5 --out Subset_envrclin_ld_r05
-
-# our environmental and clinical isolates plus Cp
-/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile Subset_envrclin_Cp_plink --allow-extra-chr --indep-pairwise 50 5 0.5 --out Subset_envrclin_Cp_ld_r05
-
-# just environmental
-/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile Subset_envr_plink --allow-extra-chr --indep-pairwise 50 5 0.5 --out Subset_envr_ld_r05
-```
-This removed 44,564 out of 56,282 variants, leaving 11,718 SNPs 
-
-Step 3. Make pruned plink files (for any downstream analyses that use plink)
-```
-/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile allsamples_plink --allow-extra-chr --extract allsamples_ld_r05.prune.in --make-bed --out allsamples_ld_r05_pruned
-
-# with Cp Silv
-/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile allsampleswithCpSilv_plink --allow-extra-chr --extract allsamples_ld_r05.prune.in --make-bed --out allsampleswithCpSilv_ld_r05_pruned
-
-# with just our environmental and clinical isolates
-/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile Subset_envrclin_plink --allow-extra-chr --extract Subset_envrclin_ld_r05.prune.in --make-bed --out Subset_envrclin_ld_r05_pruned
-
-# our environmental and clinical isolates plus Cp
-/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile Subset_envrclin_Cp_plink --allow-extra-chr --extract Subset_envrclin_ld_r05.prune.in --make-bed --out Subset_envrclin_Cp_ld_r05_pruned
-
-# just environmental
-/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile Subset_envr_plink --allow-extra-chr --extract Subset_envr_ld_r05.prune.in --make-bed --out Subset_envr_ld_r05_pruned
-```
-
-Step 4. Make a pruned vcf file 
-```
-# with Cp Silv
-/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile allsampleswithCpSilv_plink --allow-extra-chr --extract allsamples_ld_r05.prune.in --recode vcf --out allsampleswithCpSilv_ld_r05_pruned
-
-# with just our environmental and clinical isolates
-/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile Subset_envrclin_plink --allow-extra-chr --extract Subset_envrclin_ld_r05.prune.in --recode vcf --out Subset_envrclin_ld_r05_pruned
-
-# just envirionmental
-/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile Subset_envr_plink --allow-extra-chr --extract Subset_envr_ld_r05.prune.in --recode vcf --out Subset_envr_ld_r05_pruned
-
-# all samples
-/global/scratch/users/lcouper/SoilCocciSeqs/plink/plink --bfile allsamples_plink --allow-extra-chr --extract allsamples_ld_r05.prune.in --recode vcf --out allsamples_ld_r05_pruned
-```
-Note the pruned vcf is called 'allsamples_ld_r05_pruned.vcf' or 'Subset_envrclin_ld_r05_pruned.vcf'
-
 
 ### 4.7 Twisst, window-based genomic relationships
-
-We are primarily interseted in our novel clinical samples, but we will use a few legacy clinical genomes as a control here. Therefore, we will use the vcf file with all samples (no re-preps) and CpSilv as an outgroup. These sample names live in: FinalOutputs/samples43.txt. We then subset the meta-sample vcf to these 43 using (which keeps only sites that are polymorphic within these 46 samples): 
-
+**Notes:** Twisst (topology weighting by iterative sampling of sub-trees) is a tool that assesses support for different genealogical relationships in moving windows along the genome. Note that twisst requires numpy and a tree-building software (we used raxml/8.2.12)   
+**Code:**
 ```
-bcftools view -S samples37.txt -m2 -M2 -v snps allsamples_withCpSilv.final.recode.vcf -Ou \
-  | bcftools +fill-tags -Ou -- -t AC,AN \
-  | bcftools view -e 'AC==0 || AC==AN' -Oz -o cocci37.snps.vcf.gz
-``` 
-Note that twisst requires numpy and a tree-building software (we will use raxml/8.2.12 here)
-
-```
-# from within the 'FinalOutputs/twisst' directory, parse the vcf to .geno for twisst processing (fast):
+# First, parse the vcf to .geno for twisst processing:
 module load anaconda3/2024.10-1-11.4
 export PYTHONPATH=$PYTHONPATH:$HOME/software/genomics_general
 python $HOME/software/genomics_general/VCF_processing/parseVCF.py \
-  -i ../cocci37.snps.vcf.gz \
+  -i cocci37.snps.vcf.gz \
   --ploidy 1 \
   --skipIndels \
   -o cocci37.geno.gz
-```
 
-Then, create trees in sliding windows:      
-Script: twisst_trees.sbatch  
-Code snippet:   
-```
+# Then, create trees in sliding windows (this is the time-consuming step)   
 python $HOME/software/genomics_general/phylo/raxml_sliding_windows.py \
   -g cocci37.geno.gz -p cocci37.w100 \
   --windType sites -w 100 -M 50 --model GTRCAT \  # 100 SNP sliding window
   --raxml raxmlHPC-AVX -T $SLURM_CPUS_PER_TASK \
   --log cocci37.w100.raxlog.txt
+
+# Next, assess tree weights. Here, we will randomly sample 100 SNPs with replacement within each 100 SNP window. We'll do this for 100 bootstrap iterations. Then we'll repeat the twisst weighting using each iteration.  
+See scripts linked below as these are longer code chunks
 ```
-
-Next, create the 'groupings' file. Note, these are the 'pure' soil isolates, that we'll use the 'reference groups' here, in addition to the Cp 'reference group'. 
-```
-mkdir -p groups out
-
-# Reference groups are clone-corrected: one isolate per burrow, so leave-one-out is
-# automatically leave-one-lineage-out. Patient clones are retained (they are focals, never
-# references). Dropped: 22BC1, 14B1, 158b3, 118b3, PS02PN14-2, PS02PN14-3.
-
-mkdir -p groups out
-
-# Primary spec, K = 2: ADMIXTURE's Bakersfield vs everything else, clone-corrected.
-cat > groups/refs_K2.tsv <<'EOF'
-22AC2 Bakersfield
-34B2 Bakersfield
-58B1 Bakersfield
-87A1 Bakersfield
-13B1 NonBakersfield
-PS02PN14-1 NonBakersfield
-118a3 NonBakersfield
-157b2 NonBakersfield
-L100 NonBakersfield
-239a3b2 NonBakersfield
-CpSilv Outgroup
-EOF
-
-# Alternative spec: three groups defined by SITE rather than by ADMIXTURE. Justified by
-# pairwise divergence -- Coalinga-Tracy (14,776) and Carrizo-McKittrick (15,926) are the two
-# most similar site pairs, Bakersfield is most divergent from all (20,743-22,383).
-cat > groups/refs_site3.tsv <<'EOF'
-22AC2 Bakersfield
-34B2 Bakersfield
-58B1 Bakersfield
-87A1 Bakersfield
-13B1 CarrizoMcKittrick
-PS02PN14-1 CarrizoMcKittrick
-118a3 CarrizoMcKittrick
-157b2 CoalingaTracy
-L100 CoalingaTracy
-239a3b2 CoalingaTracy
-CpSilv Outgroup
-EOF
-```
-
-Now we will run the tree generation step. Here, we will randomly sample 100 SNPs with replacement within each 100 SNP window. We'll do this for 100 bootstrap iterations. Then we'll repeat the twisst weighting using each iteration.  
-
-First, created: boot_geno.py and twisst_summarise.py (see attached scripts. this lives in the twisst directory), and Scripts/twisst_boot.sbatch
-Then, in the FinalOutputs/twisst directory: 
-```
-mkdir -p logs
-
-for S in K2a K2b K3a K3b; do
-  sbatch --export=ALL,SPEC=$S --array=1-100%25 ../../Scripts/twisst_boot.sbatch
-done
-```
-After this finishes, download FinalOutputs/Twisst/boot_[K2a or K2b or K3a or K3b]/summaries to local machine (i.e. SPORE/Twisst/BootstrapSummaries.  
-
-
+**Scripts:** boot_geno.py, twisst_summarise.py, twisst_boot.sbatch
 
 ### 4.8 Identifying deletion
 

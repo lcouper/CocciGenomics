@@ -88,7 +88,6 @@ Note that the aligned genomes can be found under NCBI BioProject PRJNA1522484.
 
 #### 1.2 Filter low-quality reads and trim bases
 **Notes:** Illumina adapters [are available and downloaded from here (https://github.com/usadellab/Trimmomatic/blob/main/adapters/TruSeq3-PE.fa). Ensure this adapter sequence file is in the same folder as your fastq files.   
-**Slurm script:** : trim.sra.sh   
 **Code:**       
 ```
 module load bio/trimmomatic/0.39-gcc-11.4.0
@@ -98,12 +97,10 @@ PS02PN14-1_S1_L007_R2_001.trim.fastq.gz PS02PN14-1_S1_L007_R2_001.untrim.fastq.g
 ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:35 SLIDINGWINDOW:4:15
 ```
 
-#### 1.4 Normalize read lengths to 75 bp 
+#### 1.3 Normalize read lengths to 75 bp 
 
-Note: this is because there is variation in sequenced read lengths across genomes (ours are all 150bp paired end, but prior genomes vary from 75 - 300 bp PE). We want to normalize to the lowest common denominator -- here 75 bp.
-
-Scripts: run_fastp_len75.sbatch, run_fastp_len75_b.sbatch       
-Relevant code snippet:
+**Notes:** This is to account for variation in sequenced read lengths across genomes (e.g. 150 bp, 300 bp, 75b p). We want to normalize to the lowest common denominator (here, 75 bp)
+**Code:**
 ```
 fastp \
   -i PS02PN14-1_S1_L007_R1_001.trim.fastq \
@@ -115,12 +112,11 @@ fastp \
   --html PS02PN14_fastp_report.html --thread 4
 ```
 
-#### 1.5 Optional: Quality control with FastQC
+#### 1.4 Optional: Quality control with FastQC
 
-Script: fastqc.sh, fastqc.sra.sh        
-Relevant code snippet:      
+**Notes:** Outputs HTML report of per base and per sequence quality scores
+**Code:**  
 ```
-module load bio/fastqc/0.12.1-gcc-11.4.0
 fastqc trimmed_fastqc/*.fastq.gz
 ```
 
@@ -130,10 +126,8 @@ fastqc trimmed_fastqc/*.fastq.gz
 
 #### 2.1 Align reads to reference genome
 
-Purpose: To determine where in the genome a given sequence/read is located    
-Script name: alignreads.sh, alignreads.sra.sh    
-Relevant code snippet:   
-
+**Notes:** Purpose is to determine where in the genome a given sequence/read is located    
+**Code:** 
 ```
 #First unzip trimmed fastq files if not done already, then align to ref genome
 gunzip trimmed_fastq/*.gz
@@ -148,24 +142,20 @@ done
 
 #### 2.2 Sort alignments and convert to BAM
 
-Compress sam to bam and sort bam file     
-Script name: SamToBam.sh, SamToBamSRA.sh
-
+**Notes:** Compress sam to bam and sort bam file     
+**Code:**
 ```
-module load java
-java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" SortSam \
+# Set $YOUR-PATH to point to where the gatk package lives
+java -jar "$YOUR-PATH/gatk-package-4.5.0.0-local.jar" SortSam \
 -I temp.sam \
 -O temp.bam \
 -SORT_ORDER coordinate
 ```
 
-#### 2.3 Optional: Extract mapping and coverage statistics
-
-Script name: MappingStats.sh, MappingStatsSRA.sh    
-Note that the cap for coverage is 250 so there may be a peak in the histograms at this value
-
+#### 2.3 Optional: Mapping and coverage statistics
+**Notes:** Obtain mapping and coverage statistics for each sample
+**Code:**
 ```
-# Loop through each sorted BAM file
 for bam_file in "$bam_dir"/*.sorted.bam; do
     sample_id=$(basename "$bam_file" .sorted.bam)
 
@@ -181,22 +171,14 @@ done
 ```
 
 #### 2.4 Add or replace read groups
-
-Followed guidance [here](https://gatk.broadinstitute.org/hc/en-us/articles/360035532352-Errors-about-read-group-RG-information)
-and issue was diagnosed [here](https://gatk.broadinstitute.org/hc/en-us/community/posts/4412745467931-HaplotypeCaller-does-not-work). See [this spreadsheet](https://docs.google.com/spreadsheets/d/1wrwSLeURp-E7LDD0SKT1wXEnrET5IziknmJWmXCB_7o/edit?gid=1963297784#gid=1963297784) for what read group parameters were added:
-
-Purpose: Organize sequence data by library prep batch and sequencing runs parameters   
- Script name: addrg_loop.sbatch, addrgsrsa_loop.sbatch   (note to run in loop: upload tsv with read group info for all samples)   
-Otherwise (single sample): addrg.sbatch, addrgsra.sbatch   
-Code snippet for single sample:  
-
+**Notes:** The purpose of this step is to organize sequence data by library prep batch and sequencing runs parameters. Information on this step informed by these resources: [1](https://gatk.broadinstitute.org/hc/en-us/articles/360035532352-Errors-about-read-group-RG-information)
+[2](https://gatk.broadinstitute.org/hc/en-us/community/posts/4412745467931-HaplotypeCaller-does-not-work).
+**Code:** 
 ```
-module load java
-module load bio/picard/3.0.0-gcc-11.4.0 
-
+# Note this is for a single sample
 picard AddOrReplaceReadGroups \
-I=results/dedupedbams/PS02PN14-2_S2_L007.deduped.bam \
-O=results/bamswithrg/PS02PN14-2_S2_L007.rg.bam \
+I=$YOUR-PATH-IN/PS02PN14-2_S2_L007.deduped.bam \
+O=$YOUR-PATH-OUT/PS02PN14-2_S2_L007.rg.bam \
 RGID=4 \
 RGLB=lib1 \
 RGPL=ILLUMINA \

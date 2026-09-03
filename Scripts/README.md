@@ -15,11 +15,10 @@ Note that the aligned genomes can be found under NCBI BioProject PRJNA1522484.
 
 **[1. Raw data processing](#1-raw-data-processing)**
 
-- [1.1 Obtain raw reads from Berkeley QB3](#11-obtain-raw-reads-from-berkeley-qb3)
-- [1.2 Download published sequences from NCBI SRA](#12-download-published-sequences-from-ncbi-sra)
-- [1.3 Filter low-quality reads and trim bases](#13-filter-low-quality-reads-and-trim-bases)
-- [1.4 Normalize read lengths to 75 bp](#14-normalize-read-lengths-to-75-bp)
-- [1.5 Optional: Quality control with FastQC](#15-optional-quality-control-with-fastqc)
+- [1.1 Obtain raw reads](#11-obtain-raw-reads)
+- [1.2 Filter low-quality reads and trim bases](#12-filter-low-quality-reads-and-trim-bases)
+- [1.3 Normalize read lengths to 75 bp](#13-normalize-read-lengths-to-75-bp)
+- [1.4 Optional: Quality control with FastQC](#14-optional-quality-control-with-fastqc)
 
 **[2. Alignment and BAM processing](#2-alignment-and-bam-processing)**
 
@@ -59,24 +58,24 @@ Note that the aligned genomes can be found under NCBI BioProject PRJNA1522484.
 
 **Software used**
 - vcftools/0.1.16-gcc-11.4.0
-- bio/bwa-mem2/2.2.1
-- bio/samtools/1.17-gcc-11.4.0
+- sratoolkit.3.0.7
+- bwa-mem2/2.2.1
+- samtools/1.17-gcc-11.4.0
 - Trimmomatic V 0.39 (Bolger et al. 2014)
 - fastp v 1.0.1 (manually installed from [here](https://github.com/OpenGene/fastp).
 - gatk
 - java
 - python3
-- bio/picard/3.0.0-gcc-11.4.0
-- bio/fastqc/0.12.1-gcc-11.4.0
+- picard/3.0.0-gcc-11.4.0
+- fastqc/0.12.1-gcc-11.4.0
 
 ---
 
 ## 1. Raw data processing
 
 #### 1.1 Obtain raw reads
-Software used: sratoolkit.3.0.7. 
-Description: Either download raw reads from sequencer or from NCBI SRA for previously published sequences.  
-Example:   
+**Notes:** Either download raw reads from sequencer or from NCBI SRA for previously published sequences.  
+**Code:**   
 ```
 # To download [this cocci genome](https://www.ncbi.nlm.nih.gov/sra/?term=SRR25635497):
 ~/Downloads/sratoolkit*/bin/prefetch SRR25635497
@@ -88,10 +87,9 @@ Example:
 ```
 
 #### 1.2 Filter low-quality reads and trim bases
-
-Note that Illumina adapters [available and downloaded from here](https://github.com/usadellab/Trimmomatic/blob/main/adapters/TruSeq3-PE.fa). Ensure this adapter sequence file is in the same folder as your fastq files.   
-Job Script: trim.sh and trim.sra.sh   
-Relevant code snippet:       
+**Notes:** Illumina adapters [are available and downloaded from here (https://github.com/usadellab/Trimmomatic/blob/main/adapters/TruSeq3-PE.fa). Ensure this adapter sequence file is in the same folder as your fastq files.   
+**Slurm script:** : trim.sra.sh   
+**Code:**       
 ```
 module load bio/trimmomatic/0.39-gcc-11.4.0
 trimmomatic PE PS02PN14-1_S1_L007_R1_001.fastq.gz PS02PN14-1_S1_L007_R2_001.fastq.gz \

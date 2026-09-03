@@ -235,7 +235,7 @@ java -jar "$YOUR-PATH/gatk-package-4.5.0.0-local.jar" HaplotypeCaller \
 ```
 
 #### 3.2 Combine GVCF files 
-**Notes:** Purpose of this step is to create a dataset where all variant sites across all samples are considered.  
+**Notes:** Purpose of this step is to create a dataset where all variant sites across all samples are considered.    
 **Code:**
 ```
 # first, combined all individual g.vcf.gz files created in the prior step into a single directory, then created a list of files in this directory:
@@ -248,83 +248,48 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -O combined.g.vcf.gz
 ```
 
-#### 3.3 Joint genotyping to produce metaVCF
-
-Software used: java, gatk 4.5.0.0   
-Script name: genotypegvcfs.sh and genotypegvcfs_WithCpSilv.sh   
-
+#### 3.3 Joint genotyping to produce metaVCF 
+**Notes:** Now, genotype samples using variant sites considered across all samples to create a global ('meta') vcf file, from which we can subset for specific analyses     
+**Code:**
 ```
-module load java
-java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" GenotypeGVCFs \
--R "/global/scratch/users/lcouper/SoilCocciSeqs/RefGenome/CocciRef_GCA_000149335.2.masked.fna" \
+java -jar "$YOUR-PATH/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" GenotypeGVCFs \
+-R CocciRef_GCA_000149335.2.masked.fna \
 -ploidy 1 \
 -V combined.g.vcf.gz \
 -O metavcf.gz
 ```
 
 #### 3.4 Filter variants to produce project-specific VCF
-
-Here, we subset the vcf to the samples included in a particular analyses. Then, flag and remove variants based on quality score, coverage, missingness etc. for just those samples.
-
-Subset_envrclin.txt contains the names for all environmental and (new) clinical samples (no repreps)
-Subset_envrclin_Cp.txt contains the names for all environmental and (new) clinical samples (no repreps)
-Subset_envr.txt contains the names for all environmental samples   (no repreps)
-Subset_envr_withrepreps.txt contains the names for all environmental samples   (with repreps)
-Subset_envrclinlegacy.txt contains the names for all environmental, (new) clinical samples, and legacy clinical samples (no repreps)
-Subset_all_withCpSilv.txt contains the names for all samples (no preps) including Cp Silv
-
-
-Scripts: 
-- filtervcfs_clinenvr.sbatch (all of our environmental and clinical samples)
-- filtervcfs_clinenvr_Cp.sbatch (our environmental and clinical samples, plus C. posadasii)
-- filtervcfs_envr.sbatch (only our environmental samples)
-- filtervcfs_envr_withrepreps.sbatch (only our environmental samples)
-- filtervcfs_All.sbatch (all samples)
-- filtervcfs_All_withCpSilv.sbatch (all samples, with Cp Silv as outgroup for phylo tree)
-
-Software used: java, gatk 4.5.0.0, vcftools/0.1.16-gcc-11.4.0   
-Code snippet:     
-
+**Notes:** Subset the vcf to the samples included in a particular analyses. Then, flag and remove variants based on quality score, coverage, missingness etc. for just those samples    
+**Code:**
 ```
-# Step 1: "Filter" (identify) Variants
+# List all samples to include for a given analysis
+Subset_analysis1.txt 
 
-java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" VariantFiltration \
--R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
---variant jointvcf.vcf.gz \
+# Identify variants
+java -jar "$YOUR-PATH/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" VariantFiltration \
+-R CocciRef_GCA_000149335.2.masked.fna \
+--variant metavcf.gz \
 --filter-expression "QD < 2.0 || FS > 60.0 || MQ < 40.0 || DP < 10 || QUAL < 20" \
 --filter-name "BasicAndBiasFilters" \
 -O joint.filtered.vcf.gz
 
-
-# Step 2: "Select" (remove filtered) Variants
-
-java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" SelectVariants \
--R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
---variant jointvcf_filtered.vcf.gz \
+# Select (remove filtered) variants
+java -jar "$YOUR-PATH//gatk-package-4.5.0.0-local.jar" SelectVariants \
+-R CocciRef_GCA_000149335.2.masked.fna \
+--variant joint.filtered.vcf.gz \
 --restrict-alleles-to BIALLELIC \
 --select-type-to-include SNP \
 --exclude-filtered \
 -O final.vcf.gz
 
-# Step 3: Keep only sites with >=90% samples genotyped 
-
+# Keep only sites with >=90% samples genotyped 
 vcftools --gzvcf final.vcf.gz \
   --max-missing 0.9 \
   --recode --recode-INFO-all \
   --out final_filtered_maxmissing
 ```
 
-Check how many SNPs retained:
-```
-# example:
-bcftools view -H Subset_envrclin.final.recode.vcf | wc -l
-```
-metavcf: 261,984
-Subset_envr.final.recode.vcf: 62,906   
-Subset_envr_withrepreps.final.recode.vcf: 62,580      
-Subset_envrclin.final.recode.vcf: 56,282        
-allsamples.final.recode.vcf: 55,874   
-allsamples_withCpSilv.final.recode.vcf: 55,336  
 
 #### 3.5 Convert final vcf file to a pseudo-diploid genotype 
 Purpose: haploid genotypes are not natively supported by vcftools and other packages

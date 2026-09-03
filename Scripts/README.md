@@ -186,7 +186,7 @@ RGSM=PS02PN14-2
 ```
 
 #### 2.5 Optional: Compute depth
-**Notes:** This step computes the depth at each position of the genome. This creates a txt file where the second and third columns are the position and coverage, respectively. 
+**Notes:** This step computes the depth at each position of the genome. This creates a txt file where the second and third columns are the position and coverage, respectively    
 **Code:**  
 ```
 # To compute depth at each position of the genome:   
@@ -235,29 +235,17 @@ java -jar "$YOUR-PATH/gatk-package-4.5.0.0-local.jar" HaplotypeCaller \
 ```
 
 #### 3.2 Combine GVCF files 
-
-First, combined all the above files into a single directory 'AllGenomesHaploCalled'. Then, created a list of files in this directory using:
+**Notes:** Purpose of this step is to create a dataset where all variant sites across all samples are considered.  
+**Code:**
 ```
-cd AllGenomesHaploCalled
+# first, combined all individual g.vcf.gz files created in the prior step into a single directory, then created a list of files in this directory:
+
 ls *.vcf.gz > gvcfs.list
-ls *.vcf.gz > gvcfs_withCp.list # repeat with CpSilv (outgroup for trees)
-
-```
-Purpose: Creates a dataset where all variant sites across all samples are considered. This enables variant callers to use information from one sample to infer the most likely genotype in another, improving sensitivity and accuracy in low coverage regions, and reducing false positives.
-Here, all samples are included in the 'gvcfs.list'. We will filter the metaVCF later (step 3.4) for analyses using specific subsets of samples.  
-Software used: java, gatk 4.5.0.0    
-Script name: combinegvcfs.sbatch and combinegvcfs_WithCpSilv.sbatch (for phylo tree later)      
-Note that this is done in batches of sample because otherwise the memory is exhausted. The original, not batched version of the script is: combinegvcfs_og.sbatch   
-Code snippet:  
-
-```
-module load java
 
 java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" CombineGVCFs \
 -R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
 --variant gvcfs.list \
 -O combined.g.vcf.gz
-
 ```
 
 #### 3.3 Joint genotyping to produce metaVCF

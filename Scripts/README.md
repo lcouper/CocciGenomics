@@ -292,63 +292,28 @@ vcftools --gzvcf final.vcf.gz \
 
 
 #### 3.5 Convert final vcf file to a pseudo-diploid genotype 
-Purpose: haploid genotypes are not natively supported by vcftools and other packages
-
+**Notes:** This step useful because haploid genotypes are not natively supported by vcftools and other packages    
+**Code:** 
 ```
 # First, create a 'ploidy' file to tell vcftools which part of the chromsome to consider haploid. Here, we are specificying all positions (by using large value of 999999999)
 echo "* 0 999999999 . 2" > ploidy.txt
 
 # Next, use the bcftools plug-in to correct ploidy across all sites (as specificed in the ploidy.txt file above)
-module load bio/bcftools/1.16-gcc-11.4.0
-# run:
-bcftools +fixploidy allsamples.final.recode.vcf -- -p ploidy.txt > allsamples.final.diploid.vcf
-bcftools +fixploidy Subset_envr.final.recode.vcf -- -p ploidy.txt > Subset_envr.final.diploid.vcf
-bcftools +fixploidy Subset_envrclin.final.recode.vcf -- -p ploidy.txt > Subset_envrclin.final.diploid.vcf
-bcftools +fixploidy Subset_envrclin_Cp.final.recode.vcf -- -p ploidy.txt > Subset_envrclin_Cp.final.diploid.vcf
-bcftools +fixploidy Subset_envr_withrepreps.final.recode.vcf -- -p ploidy.txt > Subset_envr_withrepreps.final.diploid.vcf
-bcftools +fixploidy allsamples_withCpSilv.final.recode.vcf -- -p ploidy.txt > allsamples_withCpSilv.final.diploid.vcf
+bcftools +fixploidy final_filtered_maxmissing.vcf -- -p ploidy.txt > final.diploid.vcf
 ```
 
 ---
 
 ## 4. Downstream genomic analyses
 
-### 4.1 Assess population structure: ADMIXTURE
-
-Downloaded ADMIXTURE [here](https://dalexander.github.io/admixture/download.html) and uploaded for use on savio  
-
-First, prepare PLINK files for ADMIXTURE.   
-ADMIXTURE requires numeric chromosome codes, but `--allow-extra-chr` retains the original scaffold
-names (e.g. `GG704916.1`) in the LD-pruned PLINK files. Made a copy of the fileset with column 1 of
-the .bim recoded to integers, numbered in order of appearance (i.e. reference dictionary order:
-GG704916.1 = 1, GG704915.1 = 2, GG704914.1 = 3, GG704913.1 = 4, GG704912.1 = 5, GG704911.1 = 6,
-GG704917.1 = 7). The .bed and .fam are copied unchanged, since recoding column 1 alters neither row
-count nor row order.
-Code snippet:
-```
-prefix=Admixture_EnvrClin/Subset_envrclin_ld_r05_pruned_admix
-
-awk 'BEGIN{OFS="\t"} {if(!($1 in m)) m[$1]=++n; $1=m[$1]; print}' \
-    Subset_envrclin_ld_r05_pruned.bim > "$prefix.bim"
-cp Subset_envrclin_ld_r05_pruned.bed "$prefix.bed"
-cp Subset_envrclin_ld_r05_pruned.fam "$prefix.fam"
-
-# To Checks run before launching ADMIXTURE:
-nsamp=$(wc -l < "$prefix.fam")
-wc -l Subset_envrclin_ld_r05_pruned.bim "$prefix.bim"        # must be equal
-awk '{print $1}' "$prefix.bim" | sort -u | tr '\n' ' '       # 1 2 3 4 5 6 7
-echo $(( 3 + ((nsamp + 3) / 4) * $(wc -l < "$prefix.bim") )) # must equal .bed size below
-stat -c %s "$prefix.bed"
-```
-
-Scripts: run_admixture_envrclin.sbatch, run_admixture_envrclin_Cp.sbatch (version with CpSilv)   
-Code snippet:   
+### 4.1 ADMIXTURE
+**Notes:** ADMIXTURE estimates ancestry to each of K clusters. We ran ADMIXTURE across K = 2-10 in our analysis. Note that the ADMIXTURE software requires that samples are in PLINK format. See [here](https://gaworkshop.readthedocs.io/en/latest/contents/07_admixture/admixture.html) for more info   
+**Code:**      
 ```
 for K in 2 3 4 5 6 7 8 9 10; do
   for rep in $(seq 1 20); do
     seed=$((1000 + K * 100 + rep))
     run_prefix="K${K}_rep${rep}"
-    echo "Running K=${K}, rep=${rep}, seed=${seed}"
     admixture --cv -s "$seed" -j8 "$admix_prefix.bed" "$K" | tee "${run_prefix}.log"
     mv "$(basename "$admix_prefix").${K}.Q" "${run_prefix}.Q"
     mv "$(basename "$admix_prefix").${K}.P" "${run_prefix}.P"
@@ -368,66 +333,26 @@ done
 ```
 
 ### 4.2 Mating type locus assignment 
+**Notes:** Each isolate of *Coccidioides* has a mating type locus with one or two idiomorphs, MAT1-1 or MAT1-2, and sexual reproduction can only occur between distinct idiomorphs. Identifying the mating type locus for each individual and population can therefore provide clues about sexual reproduction and recombination. We first downloaded the MAT domain proteins from NCBI:
+- [α-box domain (MAT1-1-1), C. immitis. EF472259.1](https://www.ncbi.nlm.nih.gov/search/all/?term=EF472259.1).
+- [HMG domain (MAT1-2-1) from C. posadasii. EF472258.1](https://www.ncbi.nlm.nih.gov/search/all/?term=EF472258.1).
+Then queried samples against these sequences. 
+**Scripts:** See 'matingtype_updated.sbatch   
 
-Each isolate of *Coccidioides* has a mating type locus with one or two idiomorphs, MAT1-1 or MAT1-2, and sexual reproduction can only occur between distinct idiomorphs. Identifying the mating type locus for each individual and population can therefore provide clues about sexual reproduction and recombination. 
-
-Step 1. Download MAT domain proteins from NCBI (Note: downloaded on local computer, then uploaded to Savio)
-
-[α-box domain (MAT1-1-1), C. immitis. EF472259.1](https://www.ncbi.nlm.nih.gov/search/all/?term=EF472259.1).
-
-[HMG domain (MAT1-2-1) from C. posadasii. EF472258.1](https://www.ncbi.nlm.nih.gov/search/all/?term=EF472258.1).
-
-Optionally, compare reuslts with [Engelthaler et al. 2016](https://journals.asm.org/doi/full/10.1128/mbio.00550-16#figS9) and [Teixeira et al. 2019](https://journals.asm.org/doi/full/10.1128/mbio.01976-19). 
-
-Step 2. Query samples against these sequences.   
-Script: matingtype_updated.sbatch   
 
 ### 4.3 Fst between environmental clusters
-
-Similar to above, but using only environmental isolates and defining populations based on admixture output
-
-For the clone-corrected version:
+**Notes:** Here we estimate genomic differentiation between different inferred clusters (using only the soil-derived isolates)   
+**Code:**  
 ```
-# For K = 2 or 3 (since groupings stay the same)
-# Pop1 = Bakersfield (4)
-echo -e "22AC2\n34B2\n58B1\n87A1" > Pop1_K23_cc.txt
-
-# Pop2 = non-Bakersfield (6)
-echo -e "13B1\nPS02PN14-1\n118a3\n157b2\nL100\n239a3b2" > Pop2_K23_cc.txt
-
-vcftools --vcf Subset_envr.final.diploid.vcf \
-    --weir-fst-pop Pop1_K23_cc.txt \
-    --weir-fst-pop Pop2_K23_cc.txt \
-    --out fst_cc
-```
-Results:      
-Weir and Cockerham mean Fst estimate: 0.073157; **weighted Fst estimate:  0.14578**       
-
-From previously, when I was doing this before clone-corrected (improper)
-```
-# For K = 2 or 3 (since groupings stay the same)
-
-# Pop1 = Bakersfield
-echo -e "22AC2\n22BC1\n34B2\n58B1\n87A1" > Pop1_K23.txt
-
-# Pop2 = non-Bakersfield
-echo -e "13B1\n14B1\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3\n118a3\n118b3\n157b2\n158b3\nL100\n239a3b2" > Pop2_K23.txt
-
-#Then, run vcftools to estimate Fst along the genome.   
-#Here, we estimated Fst per site (can take averages by gene in R if desired)
+# First, note the samples to include in each 'population' in a txt file
+echo -e "22AC2\n34B2\n58B1\n87A1" > Pop1_K23.txt
+echo -e "13B1\nPS02PN14-1\n118a3\n157b2\nL100\n239a3b2" > Pop2_K23.txt
 
 vcftools --vcf Subset_envr.final.diploid.vcf \
     --weir-fst-pop Pop1_K23.txt \
     --weir-fst-pop Pop2_K23.txt \
-    --out fst_all
+    --out fst_cc
 ```
-Results:      
-K3: Fst 1 & 2: Weir and Cockerham mean Fst estimate: 0.24219; **weighted Fst estimate: 0.36126**       
-K3: Fst 1 & 3: Weir and Cockerham mean Fst estimate: 0.15527; **weighted Fst estimate: 0.27468**    
-K3: Fst 2 & 3: Weir and Cockerham mean Fst estimate: 0.28213; **weighted Fst estimate: 0.39395**       
-K2: Weir and Cockerham mean Fst estimate: 0.16215; **weighted Fst estimate: 0.24086**    
-
-
 
 ### 4.4 Diversity metrics
 

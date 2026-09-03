@@ -11,20 +11,15 @@ This repository documents the scripts and steps used to process *Coccidioides* s
 
 ## 🔬 Table of Contents
 
-## 1. Reference Genome Preparation (run once)
+## 1. Raw Data Preparation
 
-- [1.1 Mask repeats in reference genome](#11-mask-repeats-in-reference-genome)  
-- [1.2 Index reference genome](#12-index-reference-genome)  
-
-## 2. Raw Data Preparation
-
-- [2.1 Obtain raw reads from Berkeley QB3](#21-obtain-raw-reads-from-berkeley-qb3)  
+- [2.1 Download raw reads from sequencer](#21-obtain-raw-reads-from-berkeley-qb3)  
 - [2.2 Download published sequences from NCBI SRA](#22-download-published-sequences-from-ncbi-sra)  
 - [2.3 Filter low-quality reads and trim bases](#23-filter-low-quality-reads-and-trim-bases)  
 - [2.4 Normalize read length to 75 bp](#24-normalize-read-length-to-75-bp)  
 - [2.5 Optional: Quality control with FastQC](#25-optional-quality-control-with-fastqc)  
 
-### 3. Alignment and BAM Processing
+### 2. Alignment and BAM Processing
 
 - [3.1 Align reads to reference genome](#31-align-reads-to-reference-genome)  
 - [3.2 Sort alignments and convert to BAM](#32-sort-alignments-and-convert-to-bam)  
@@ -35,7 +30,7 @@ This repository documents the scripts and steps used to process *Coccidioides* s
 - [3.7 Optional: Calculate genome coverage at >10× depth](#37-optional-calculate-genome-coverage-at-10-depth)  
 - [3.8 Index BAM files](#38-index-bam-files)
 
-### 4. Variant Calling
+### 3. Variant Calling
 
 - [4.1 Call variants using GATK HaplotypeCaller](#41-call-variants-using-gatk-haplotypecaller)  
 - [4.2 Combine GVCF files](#42-combine-gvcf-files)  
@@ -45,23 +40,17 @@ This repository documents the scripts and steps used to process *Coccidioides* s
 
 ### Downstream Genomic Analyses
 
-- [5.1 FST differentiation between clinical and environmental isolates](#fst-differentiation-between-clinical-and-environmental-isolates)  
 - [5.2 Population structure analysis](#assess-population-structure)  
-- [5.3 Map SNPs to genes](#scaffolding-snps-into-genes)  
-- [5.4 Determine chromosome sizes](#identify-size-of-each-chromosome)  
 - [5.5 Mating type analysis](#mating-type-locus-assignment)
 - [5.6 Diversity metrics: Segregating sites (S))](#number-of-segregating-sites)  
 - [5.7 Diversity metrics: Tajima’s D](#tajimas-d)  
 - [5.8 Diversity metrics: Nucleotide diversity (θπ)](#nucleotide-diversity-θπ)
 - [5.9 Diversity metrics: Wattersons theta (θπ)](#Wattersons-theta)
 - [5.10 Diversity metrics: Nucleotide diversity (θπ)](#nucleotide-diversity-θπ)  
-- [5.11 McDonald–Kreitman test](#mk-test)  
 - [5.12 Gene function and GO term analysis](#investigating-gene-function-and-go-terms)  
-- [5.13 Extract amino acid sequences for differentiated genes](#get-amino-acid-sequence-for-significantly-differentiated-genes)  
 - [5.14 Construct phylogenetic tree](#construct-phylogenetic-tree)
 - [5.15 Linkage Disequilibrium](#linkage-disequilibrium)
 - [5.16 Twisst](#Twisst-window-based-genomic-relationships)
-- [5.17 fineSTRUCTURE](#fineSTRUCTURE)
 - [5.18 Identifying deletion](#identifying-deletion)
 
 ---
@@ -79,36 +68,6 @@ This repository documents the scripts and steps used to process *Coccidioides* s
 - bio/fastqc/0.12.1-gcc-11.4.0
 
 
-## Reference Genome Preparation
-#### 1.1 Mask repeats in reference genome   
-*Only need to do once*
-Using reference genome for Coccidioides immitis RS (GCA_000149335.2)   
-Downloaded [here for immitis](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000149335.2/).     
-and [here for posadasii](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000150055.1/).    
-Using repeat library available [here](https://github.com/hyphaltip/cocci_repeats/).    
-Purpose: Repetitive regions can lead to issues with reference alignment and variant calling    
-Software used: repeatmasker/4.1.0   *Note: need to use this and not the newest version*   
-Script: repeastmasker.sh *Note: this step done on SCG instead of Savio*    
-Command:
-
-```
-RepeatMasker -pa 16 -lib immitis_repeats.fa --norna CocciRef_GCA_000149335.2.fna
-```
-
-#### 1.2 Index reference genome  
-*Only need to do once*
-Purpose: Enables quick access to specific locations of the genome (like the index of a book)   
-   Script name: bwamem_index.sh      
-Command:      
-
-```
-bwa-mem2 index CocciRef_GCA_000149335.2.fna.masked
-```
-
-Alternatively,  
-```
-samtools faidx CocciRef_GCA_000149335.2.masked.fna
-```
 
 ## Raw data processing
 #### 2.1 Obtain raw reads from Berkeley QB3
@@ -523,81 +482,6 @@ for log in K*_rep*.log; do
 done
 ```
 
-
-
-
-## Assess population structure: STRUCUTRE 
-
-Conducted using STRUCTURE v 2.3.4
-Downloaded versions without front end [here](https://web.stanford.edu/group/pritchardlab/structure_software/release_versions/v2.3.4/html/structure.html): 
-Can run this on local computer or cluster (for multiple reps).  
-
-On local computer: created directory 'structure_run' to store package and data files.  To run structure analysis, must be in 'structure_run' directory.   
-```
-chmod +x structure  # May be necessary to run first if getting permission denied errors
-cd ~/Dropbox/CurrentProjects/SPORE/structure_run
-./structure -m mainparams2 -K 2 -o output
-```
-Note the parameters listed in mainparams, and the format of the tester.str are very specific. Copy/follow the versions attached here when running this analysis for real.    
-
-Note that I did provide population identifiers, based on population structure observed in the PCA, BUT I did not use this popinfo to inform the clustering in STRUCTURE (i.e. the clustering was unsupervised) 
-
-Some relevant parameters from mainparams2:
-```
-Basic Program Parameters
-
-#define MAXPOPS    2      // (int) number of populations assumed
-#define BURNIN    10000   // (int) length of burnin period
-#define NUMREPS   20000   // (int) number of MCMC reps after burnin
-
-Input/Output files
-
-#define INFILE   tester2.str   // (str) name of input data file
-#define OUTFILE  outfile  //(str) name of output data file
-
-Data file format
-
-#define NUMINDS    76    // (int) number of diploid individuals in data file
-#define NUMLOCI    196269    // (int) number of loci in data file
-#define PLOIDY       1    // (int) ploidy of data
-#define MISSING     -9    // (int) value given to missing genotype data
-#define ONEROWPERIND 1    // (B) store data for individuals in a single line
-
-
-#define LABEL     1     // (B) Input file contains individual labels
-#define POPDATA   1     // (B) Input file contains a population identifier
-#define POPFLAG   0     // (B) Input file contains a flag which says 
-                              whether to use popinfo when USEPOPINFO==1
-#define LOCDATA   0     // (B) Input file contains a location identifier
-```
-
-To test which level of K is most appropriate: 
-```
-# Reps 1–5
-for rep in {1..5}; do ./structure -m mainparamsClinEnv -K 2 -D 2000${rep} -o output_clinenvr_K2_rep${rep}; done
-for rep in {1..5}; do ./structure -m mainparamsClinEnv -K 3 -D 3000${rep} -o output_clinenvr_K3_rep${rep}; done
-for rep in {1..5}; do ./structure -m mainparamsClinEnv -K 4 -D 4000${rep} -o output_clinenvr_K4_rep${rep}; done
-for rep in {1..5}; do ./structure -m mainparamsClinEnv -K 5 -D 5000${rep} -o output_clinenvr_K5_rep${rep}; done
-for rep in {1..5}; do ./structure -m mainparamsClinEnv -K 6 -D 6000${rep} -o output_clinenvr_K6_rep${rep}; done
-```
-
-To run on cluster (recommended).   
-Script: run_structure_Kx_reps.sbatch (K = 1 through K = 8).   
-With legacy genomes: run_structure_Kx_reps_legacy.sbatch (only conducted on K = 3 and K = 4).   
-
-
-### Scaffolding SNPs into genes 
-
-Download .gtf file for cocci reference [here](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000149335.2/).
-
-### Identify size of each chromosome
-
-```
-cat CocciRef_GCA_000149335.2.fna | awk '$0 ~ ">" {if (NR > 1) {print c;} c=0;printf substr($0,2,100) "\t"; } $0 !~ ">" {c+=length($0);} END { print c; }'
-```
-![image](https://github.com/user-attachments/assets/3086e222-c492-4028-8700-0adc5b3c5ded)
-
-
 ## Mating type locus assignment 
 
 Each isolate of *Coccidioides* has a mating type locus with one or two idiomorphs, MAT1-1 or MAT1-2, and sexual reproduction can only occur between distinct idiomorphs. Identifying the mating type locus for each individual and population can therefore provide clues about sexual reproduction and recombination. 
@@ -923,87 +807,6 @@ mean_TajimasD_pop2 = 2.25243
 mean_TajimasD_pop3 = 1.15089    
 
 
-### pN/pS, dN/dS, and MK Test
-
-- Requires multi-sample FASTA, reference genome (RefGenome/CocciRef_GCA_000149335.2.fna), and reference genome annotation file (RefGenome/genomic.gff)
-
-**Step 1. (only need to run once) Extract coding sequence coordinates by gene from the reference**     
-This uses the gene annotation file.     
-Script used: pnps/extract_cds_bed12.sh. Original version: pnps/extract_and_merge_cds_coords.sh    
-To run:
-```
-bash pnps/extract_cds_bed12.sh RefGenome/genomic.gff pnps/cds_coords_merged.bed12
-```
-**Step 2. Generate consensus genomes per sample** 
-For each sample, apply its variants (from a multisample VCF) to the reference genome to generate a personalized FASTA — i.e., the consensus genome.   
-Script used: generate_consensus_genomes.sh
-
-**Step 3. Extract CDS sequences from each sample's consensus genome**
-
-Software used: bedtools 2.31.0, bcftools 1.16     
-Script: extract_sample_cds_from_consensus.sh. (Prior version: generate_per_sample_gene_vcfs_og.sh).   
-Note that ~2% ambiguity is expected due to earlier repeat masking, and will be excluded in downstream analyses.   
-
-**Step 4. Translate nucleotide sequences to proteins**  
-
-Software used: biopython, python     
-Script: translate_all_cds.py  (old version: fasta_to_protein.py)
-*Run as: python translate_all_cds.py (after loading python)*
-
-**Step 5. Filter problematic genes**   
-
-Here, we are removing CDS with any of the following: internal stop codons (likely due to sequencing errors), >10% missing (coded as Xs), or lack of representation in >=75% of each group (clinical or environmental). We are removing those here as they will cause issues in downstream steps and/or introduce biases in our analyses. The output is one FASTA per gene containing only the passing samples.    
-Note this first requires making a file that indicates to which group each sample belongs, called 'sample_to_group.tsv'  
-Python script used: filter_genes.py or (without the 75% rule): filter_genes_no75rule.py  
-*Run as: python filter_genes.py*
-
-**Step 6. Align protein sequence per gene across samples**
-
-Software used: muscle v3.8. Note the latest versions (v5) was giving issues, hence going with an older release. Program (muscle3.8.31_i86linux32.tar) was manually downloaded [here](https://drive5.com/muscle/downloads_v3.htm).   
-Script used: run_muscle_alignments.py      
-*Run as: python run_muscle_alignments.py*    Note this may take ~30 minutes to run
-
-**Step 7. Create per-gene CDS FASTA files across samples**    
-I.e. we need the nucleotide sequence of each gene from each sample. This is required input for PAL2NAL.    
-Script used: generate_cds_by_gene_strict.py
-*Run as: python generate_cds_by_gene_strict.py*   Note this may take ~30 minutes to run
-Note there is a 'non-strict' version: generate_cds_by_gene.py that may hold on to duplicates.   
-
-**Step 8. Create codon-aware nucleotide alignments**     
-Software used: pal2nal      
-Note I manually downloaded PAL2NAL from [here](https://www.bork.embl.de/pal2nal/#Download). Then uploaded to BRC, unpacked, and added to my path.       
-Script used: run_pal2nal.sh   
-
-**Step 9. Build codon level group consensuses (i.e. clinical vs environmental)**
-Software used: python/3.10.12-gcc-11.4.0
-Note this uses the 'sample_to_group.tsv' previously created, which lists samples and group assignments
-Script uesd: build_group_consensus.py
-
-**Step 10. Count within-group polymorphisms (pS/pS)**
-Software used: python/3.10.12-gcc-11.4.0, egglib v3
-Script used:  compute_pnps_by_group.py 
-Note: may take ~10 minutes to run
-
-*for dN/dS and MK test:*   
-**Step 11. Count between group "divergences" (dN/dS)**
-Software used: python/3.10.12-gcc-11.4.0
-Script used: compute_dnds_between_groups.py   
-
-**Step 12. Conduct MK test from pN/pS and dN/dS counts**
-Software used: python/3.10.12-gcc-11.4.0
-Script used: mk_test_from_counts.py
-
-
-### Investigating gene function and GO terms
-
-Search Gene ID here on NCBI gene search, i.e. here: https://www.ncbi.nlm.nih.gov/gene/?term=Coccidioides+immitis+CIMG_02011 
-
-### Get amino acid sequence for significantly differentiated genes
-
-Purpose: Genes identified as significant on the basis of Fst could be the result of neutral or selective processes. Identifying whether there is corresponding amino acid changes at these genes can help resolve this.   
-Script: aminoacid_pull.sbatch   # But note this only includes clinical samples -- need to add in environmental into the BAM call   
-
-
 ### Construct phylogenetic tree 
 
 ** Note: In order to root the phylogenetic tree, we used the C. posadasii Silveira strain [SRR9644374](https://www.ncbi.nlm.nih.gov/biosample/?term=SRS007089) **
@@ -1226,103 +1029,6 @@ After this finishes, download FinalOutputs/Twisst/boot_[K2a or K2b or K3a or K3b
 
 
 
-## fineSTRUCTURE 
-
-An independent, haplotype-based population strucutre assessment, to complement ADMXIXTURE. Unlike ADMIXTURE (allele-frequency based) and twisst (per-window genealogies), ChromoPainter/fineSTRUCTURE uses linked haplotype (tract-length) information, so it can resolve structure at low differentiation and detect mosaic ancestry missed by the other methods. We used for two purposes:
-1. an **unsupervised, all-vs-all run** to independently check the number and make-up
-   of the populations proposed by ADMIXTURE;
-2. a **targeted ChromoPainter donor–recipient painting** to distinguish admixed clinical
-   isolates (recent mixing of *sampled* soil populations → long, alternating ancestry tracts)
-   from isolates derived from *unsampled* populations (uniform/short tracts) — the question
-   twisst could not resolve.
-
-Software: `fs` v4 (fineSTRUCTURE 4.x + ChromoPainter v2; `danjlawson/finestructure4`), built from source. Run in haploid mode (`-ploidy 1`). Because no recombination map exists for *Coccidioides*, a **uniform recombination map** is used together with EM estimation of Ne and mu (ChromoPainter `-in -iM`), which corrects for the global recombination scale. We did not attempt admixture dating because the absolute tract lengths are approximate 
-
-#### Input preparation
-
-*Convert the analysis VCF (environmental + clinical isolates, no outgroup) into ChromoPainter PHASE, recombination, and ID files.* Isolates are haploid, so each is a single haplotype (one row per isolate — the "diploid" VCF used for ADMIXTURE is **not** used here). Sites are filtered
-to biallelic SNPs with no missing data, then split per scaffold. The tiny scaffold `GG704917.1` (<100 SNPs) is dropped. 51,008 SNPs across 6 scaffolds are retained.
-
-Software: bio/bcftools 1.16
-Script: `makeuniformrecfile.pl` (from fs, not a script I wrote)  
-
-```
-cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
-mkdir -p fs_input
-VCF=Subset_envrclin.final.recode.vcf
-SCAFS="GG704911.1 GG704912.1 GG704913.1 GG704914.1 GG704915.1 GG704916.1"
-
-# biallelic SNPs, complete data
-bcftools view -m2 -M2 -v snps -i 'F_MISSING=0' $VCF -Oz -o cocci43.clean.vcf.gz
-bcftools index cocci43.clean.vcf.gz
-
-# ID file (sample order = bcftools genotype order); population column unused by fs
-bcftools query -l cocci43.clean.vcf.gz | awk '{print $1" Pop1 1"}' > fs_input/cocci.ids
-
-# per-scaffold PHASE (v2) + uniform recombination file
-for s in $SCAFS; do
-  bcftools query -r $s -f '%POS\n'  cocci43.clean.vcf.gz > fs_input/$s.pos ; n=$(wc -l < fs_input/$s.pos)
-  bcftools query -r $s -f '[%GT]\n' cocci43.clean.vcf.gz > fs_input/$s.gtmat   # rows=SNPs, 43-char 0/1 strings
-  { echo 43; echo "$n"; printf 'P '; tr '\n' ' ' < fs_input/$s.pos | sed 's/ $//'; echo;
-    # transpose SNP x sample matrix -> 43 haplotype rows
-    awk '{for(i=1;i<=length($0);i++)a[i,NR]=substr($0,i,1); nc=length($0); nr=NR}
-         END{for(i=1;i<=nc;i++){l="";for(j=1;j<=nr;j++)l=l a[i,j]; print l}}' fs_input/$s.gtmat
-  } > fs_input/$s.phase
-  makeuniformrecfile.pl fs_input/$s.phase fs_input/$s.rec
-done
-rm fs_input/*.gtmat fs_input/*.pos
-```
-
-#### Unsupervised fineSTRUCTURE (population structure check)
-
-*Run the full ChromoPainter → fineSTRUCTURE pipeline all-vs-all (every isolate both donor and recipient), with no a priori groups, so clusters are inferred de novo.* Linked mode is used automatically (recombination files supplied); stage 1 estimates Ne and mu by EM.
-
-Script: finestructure_unsup.sbatch   
-Software used: fs v4
-Code snippet:   
-```
-export PATH=$HOME/software/finestructure4:$HOME/software/finestructure4/scripts:$PATH
-cd /global/scratch/users/lcouper/SoilCocciSeqs/FinalOutputs
-
-SCAFS="GG704911.1 GG704912.1 GG704913.1 GG704914.1 GG704915.1 GG704916.1"
-PH=""; RC=""
-for s in $SCAFS; do PH="$PH fs_input/$s.phase"; RC="$RC fs_input/$s.rec"; done
-
-fs cocci_unsup.cp -n \
-  -idfile fs_input/cocci.ids \
-  -phasefiles $PH \
-  -recombfiles $RC \
-  -ploidy 1 \
-  -go
-```
-
-Notes: EM converged to sensible values (Ne = 920.7, mu = 0.00237). Key outputs that were exported for downstream analysis in R:
-- cocci_unsup_linked_hap.chunkcounts.out (coancestry matrix)
-- cocci_unsup_linked_hap_mcmc.xml (clustering)
-- cocci_unsup_linked_hap_tree.xml (tree)
-  
-#### Chromosome painting
-
-Note that here, we are only allowing the soil isolates to be 'donors'. Clinical isolates are 'recipients' and we run one at a time. We set the effective population size to be similar across all runs.    
-Script: finestructure_soilpaint_updated.sbatch   
-Software used: fs v4  
-Code snippet:   
-
-```
-fs cocci_soil_$F.cp -n \
-   -idfile "$wd/$F.ids" \
-   -phasefiles $PH -recombfiles $RC \
-   -ploidy 1 -s2samples 10 \ 
-   "-s1args:-in -iM --emfilesonly -n $NE" \
-   -go
-#10 = number of sampled paintaints per receipient haplotypes (as recommended by manual)
-```
-
-To repeat the above, but include a few legacy clinical isolates for comparison:
-Script: prep_ghosts.sbatch
-
-Then save output in local machine on fineSTRUCTURE/soilpaint. Downstream analysis in R 
-
 ### Identifying deletion
 
 Three clinical isolates identified as unusual based on phylogenetic tree (they form a monophyletic clade that is basal to all other *C. immitis* and most similar to *C. posadasii*). To identify the underlying cause, we used the genotype matrix (GenotypeMatrix_ClinEnvr.csv) to look for sites where all three isolates were simultaneously `NA` and found 894 such sites. These NAs can mean either "no reads" (deletion) or that reads are too diverged to align. These were distinguished by using the bams for these three samples on Savio (stored in results/bam/Normalized75).    
@@ -1407,77 +1113,4 @@ for bam in *.len75.aligned.sorted.deduped.bam; do
   done
 done >> deletion_depth.tsv
 gzip -f deletion_depth.tsv
-```
-## Old/ No longer using
-
-## Fst differentiation between clinical and environmental isolates
-
-First, created txt files indicating assignment to soil or patient sources from Bakersfield or western Central Valley 'populations'. To avoid spurious detection due to demographic processes, samples were chosen on the basis of: ancestry (Q) >=0.90 to that cluster (from  admixture K = 3) and NOT being present in a divergent clade in the phylogeny. For the soil pairs that appeared to be basically clonal, we thinned to include one of the pairs to avoid inflating Fst. 
-
-```
-# Bakersfield (K3 Cluster1) 
-printf '%s\n' 137a1_redo 34B2 58B1 87A1 22AC2               > bak_soil.txt      # 5
-printf '%s\n' Kern7 Kern13 Kern21 Kern10                    > bak_clinical.txt  # 4
-
-#  western San Joaquin Valley (K3 Cluster3) 
-printf '%s\n' L100 157b2 118a3                              > wsjv_soil.txt     # 3
-printf '%s\n' Kern1 Kern2 Kern5 Kern8 Kern11 Kern19 Kern20 Kern25 Kern18 > wsjv_clinical.txt  # 9
-
-# combined list
-cat bak_soil.txt bak_clinical.txt wsjv_soil.txt wsjv_clinical.txt > samples_hierfst.txt
-
-# design table for hierfstat, including sample and source for each population
-{awk '{print $1"\tBakersfield\tsoil"}'     bak_soil.txt
-  awk '{print $1"\tBakersfield\tclinical"}' bak_clinical.txt
-  awk '{print $1"\twSJV\tsoil"}'            wsjv_soil.txt
-  awk '{print $1"\twSJV\tclinical"}'        wsjv_clinical.txt} > hierfst_design.tsv
-
-# filter vcf file to only the samples listed above, and removing any SNPs that are now monomorphic in this subset
-bcftools view -S samples_hierfst.txt -m2 -M2 -v snps --min-ac 1:minor \
- Subset_envrclin.final.diploid.vcf -Ov -o Subset_hierFst.vcf
-```
-
-Then, run vcftools to estimate Fst along the genome.   
-Here, we estimated Fst per site (can take averages by gene in R if desired)
-
-```
-vcftools --vcf Subset_envrclin.final.diploid.vcf \
-    --weir-fst-pop Pop1a.txt \
-    --weir-fst-pop Pop1b.txt \
-    --out fst_per_site_Pop1
-```
-
-To assess statistical significance, randomly re-shuffle 'population' labels, and re-estimate Fst (repeat 500 times).     
-Script: fst_perm.sbatch   
-Code snippet:
-```
-# number of permutations
-nperm=5000
-
-# file with all sample IDs
-samples=all_samples.txt
-
-# number of samples in group 1 (e.g., environmental)
-group1_n=15
-
-mkdir -p perm_fst
-
-for i in $(seq 1 $nperm); do
-  echo "Permutation $i"
-
-  # Shuffle and split samples
-  shuf $samples > perm_fst/tmp_samples.txt
-  head -n $group1_n perm_fst/tmp_samples.txt > perm_fst/group1.txt
-  tail -n +$((group1_n + 1)) perm_fst/tmp_samples.txt > perm_fst/group2.txt
-
- # Run Fst
-  vcftools --vcf final_diploid.vcf \
-    --weir-fst-pop perm_fst/group1.txt \
-    --weir-fst-pop perm_fst/group2.txt \
-    --out perm_fst/fst_perm_$i \
-    --stdout | grep -v "^#" | awk -v i=$i '{print $1, $2, $3, i}' >> perm_fst/fst_all_perms.txt
-done
-
-For permutation approach here, scripts were:  
-fst_perm_12.sbatch, fst_perm.13.sbtach, fst_perm_23.sbatch   
 ```

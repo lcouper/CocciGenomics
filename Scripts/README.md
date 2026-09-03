@@ -356,91 +356,25 @@ vcftools --vcf Subset_envr.final.diploid.vcf \
 
 ### 4.4 Diversity metrics
 
-These calculations will use the filtered VCF file that contains all samples (rather than subset-specific filtered vcf files since that will confound diversity calculations due to QC steps).   
-First, create txt files indicating sample names for each subset:   
-
+**Notes:** Here we will calculate: the number of segregating sites (S), Nucleotide diversity (θπ), Watterson's theta (θw), and Tajima's D. note that because we are calculating metrics using only variant sites (ie from the VCF), we need to normalize based on the number of 'callable regions'. See **Script:** extract_callable_regions.py, which creates file: callable_regions.bed    
+**Code:** 
 ```
-echo -e "22AC2\n22BC1\n34B2\n58B1\n87A1\n137a1_redo\nPS02PN14-1\nPS02PN14-2\nPS02PN14-3\n13B1\n14B1\n118a3\n118b3\n157b2\n158b3\nL100\n239a3b2" > Envr.txt      
-bcftools query -l Subset_envrclin.final.diploid.vcf | grep '^Kern' > Clin.txt   
-cat Envr.txt Clin.txt > EnvrClin.txt
-```
-
-For these diversity calculations, we exclude one isoalte from each pair that appear nearly clonal (i.e. <200 SNP differences)
-
-| Near-clonal lineage | Keep | Drop (raw VCF name) | Pairwise SNP distance |
-|---|---|---|---|
-| Carrizo_1 / Carrizo_2 | 13B1 | **14B1** | 14 |
-| PS02PN14 trio | PS02PN14-1 | **PS02PN14-2, PS02PN14-3** | 88 / 92 / 121 (3a–3b / 3c–3b / 3a–3c) |
-| Bakersfield_1 / _2 | 22AC2 | **22BC1** | 25 |
-| Coalinga_1 / _2 | 157b2 | **158b3** | 83 |
-| McKittrick_1 / _2 | 118a3 | **118b3** | 120 |
-| VFI19 / VFI20 | Kern19 | **Kern20** | 29 |
-| VFI25 / VFI5 | Kern25 | **Kern5** | 79 |
-
-```
-# list out the near-clones to remove
-cat > Clones.txt <<'EOF'
-14B1
-PS02PN14-2
-PS02PN14-3
-22BC1
-158b3
-118b3
-Kern5
-Kern20
-EOF
-```
-
-#### 4.4.1 Number of segregating sites (S)
-
-```
-S_envr=$(vcftools --vcf allsamples.final.recode.vcf --keep Envr.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
-S_clin=$(vcftools --vcf allsamples.final.recode.vcf --keep Clin.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
-S_envrclin=$(vcftools --vcf allsamples.final.recode.vcf --keep EnvrClin.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
+# Number of segregating sites (S)
 S_all=$(vcftools --vcf allsamples.final.recode.vcf --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
+echo $S_all
 
-S_envr_pop1=$(vcftools --vcf allsamples.final.recode.vcf --keep Pop1.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
-S_envr_pop2=$(vcftools --vcf allsamples.final.recode.vcf --keep Pop2.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
-S_envr_pop3=$(vcftools --vcf allsamples.final.recode.vcf --keep Pop3.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
-
-# read out with: echo $S_envr
-```
-
-
-#### 4.4.2 Watterson's theta (θw)
-*S, normalized by # of samples*
-
-```
+# Nucleotide diversity (θπ). Average # of pairwise differences *per site* between all sequences in a population.
 callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
 
-# Environmental   
-S=$(vcftools --vcf allsamples.final.recode.vcf --keep Envr.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
-n=$(grep -vxFf Clones.txt Envr.txt | wc -l)
-python3 - <<EOF
-S = $S; n = $n; callable = $callable
-a_n = sum(1/i for i in range(1, n))
-print(f"environmental theta_W: {(S / a_n) / callable}")
-EOF
+vcftools --vcf allsamples.final.diploid.vcf \
+  --remove Clones.txt \
+  --site-pi --max-missing 0.9 \
+  --out pi_all_sitewise
+sum_pi=$(awk 'NR > 1 {sum += $3} END {print sum}' pi_all_sitewise.sites.pi)
+awk -v s="$sum_pi" -v c="$callable" 'BEGIN {print "pi_all =", s/c}'
 
-# Clinical    
-S=$(vcftools --vcf allsamples.final.recode.vcf --keep Clin.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
-n=$(grep -vxFf Clones.txt Clin.txt | wc -l)
-python3 - <<EOF
-S = $S; n = $n; callable = $callable
-a_n = sum(1/i for i in range(1, n))
-print(f"clinical theta_W: {(S / a_n) / callable}")
-EOF
 
-# Environmental and clinical   
-S=$(vcftools --vcf allsamples.final.recode.vcf --keep EnvrClin.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
-n=$(grep -vxFf Clones.txt EnvrClin.txt | wc -l)
-python3 - <<EOF
-S = $S; n = $n; callable = $callable
-a_n = sum(1/i for i in range(1, n))
-print(f"envr and clin theta_W: {(S / a_n) / callable}")
-EOF
-
-# All (including legacies)    
+# Watterson's theta (θw) (S, normalized by # of samples)
 S=$(vcftools --vcf allsamples.final.recode.vcf --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
 n=$(bcftools query -l allsamples.final.recode.vcf | grep -vxFf Clones.txt | wc -l)
 python3 - <<EOF
@@ -449,173 +383,13 @@ a_n = sum(1/i for i in range(1, n))
 print(f"all theta_W: {(S / a_n) / callable}")
 EOF
 
-
-# Soil population 1     
-S=$(vcftools --vcf allsamples.final.recode.vcf --keep Pop1.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
-n=$(grep -vxFf Clones.txt Pop1.txt | wc -l)
-python3 - <<EOF
-S = $S; n = $n; callable = $callable
-a_n = sum(1/i for i in range(1, n))
-print(f"soil pop1 theta_W: {(S / a_n) / callable}")
-EOF
-
-# Soil population 2     
-S=$(vcftools --vcf allsamples.final.recode.vcf --keep Pop2.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
-n=$(grep -vxFf Clones.txt Pop2.txt | wc -l)
-python3 - <<EOF
-S = $S; n = $n; callable = $callable
-a_n = sum(1/i for i in range(1, n))
-print(f"soil pop2 theta_W: {(S / a_n) / callable}")
-EOF
-
-# Soil population 3     
-S=$(vcftools --vcf allsamples.final.recode.vcf --keep Pop3.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
-n=$(grep -vxFf Clones.txt Pop3.txt | wc -l)
-python3 - <<EOF
-S = $S; n = $n; callable = $callable
-a_n = sum(1/i for i in range(1, n))
-print(f"soil pop3 theta_W: {(S / a_n) / callable}")
-EOF
-```
-
-
-#### 4.4.3 Nucleotide diversity (θπ)
-θπ is the average number of pairwise differences *per site* between all sequences in a population. **Key note: because we are calculating pi using only variant sites (ie from the VCF), we need to normalize based on the number of 'callable regions'.   
-We did this using:extract_callable_regions.py (python script in RefGenonme directory) to create a file: callable_regions.bed. This calculation requires using diploid version of vcf.  
-```
-callable=$(awk '{sum += $3 - $2} END {print sum}' ../RefGenome/callable_regions.bed)
-
-# environmental:
-vcftools --vcf allsamples.final.diploid.vcf \
-  --keep Envr.txt --remove Clones.txt \
-  --site-pi --max-missing 0.9 \
-  --out pi_environmental_sitewise
-sum_pi=$(awk 'NR > 1 {sum += $3} END {print sum}' pi_environmental_sitewise.sites.pi)
-awk -v s="$sum_pi" -v c="$callable" 'BEGIN {print "pi_environmental =", s/c}'
-
-# clinical:
-vcftools --vcf allsamples.final.diploid.vcf \
-  --keep Clin.txt --remove Clones.txt \
-  --site-pi --max-missing 0.9 \
-  --out pi_clinical_sitewise
-sum_pi=$(awk 'NR > 1 {sum += $3} END {print sum}' pi_clinical_sitewise.sites.pi)
-awk -v s="$sum_pi" -v c="$callable" 'BEGIN {print "pi_clinical =", s/c}'
-
-# envr and clin:
-vcftools --vcf allsamples.final.diploid.vcf \
-  --keep EnvrClin.txt --remove Clones.txt \
-  --site-pi --max-missing 0.9 \
-  --out pi_envrclin_sitewise
-sum_pi=$(awk 'NR > 1 {sum += $3} END {print sum}' pi_envrclin_sitewise.sites.pi)
-awk -v s="$sum_pi" -v c="$callable" 'BEGIN {print "pi_envrclin =", s/c}'
-
-# all (including legacies):
-vcftools --vcf allsamples.final.diploid.vcf \
-  --remove Clones.txt \
-  --site-pi --max-missing 0.9 \
-  --out pi_all_sitewise
-sum_pi=$(awk 'NR > 1 {sum += $3} END {print sum}' pi_all_sitewise.sites.pi)
-awk -v s="$sum_pi" -v c="$callable" 'BEGIN {print "pi_all =", s/c}'
-
-# soil population 1:
-vcftools --vcf allsamples.final.diploid.vcf \
-  --keep Pop1.txt --remove Clones.txt \
-  --site-pi --max-missing 0.9 \
-  --out pi_pop1_sitewise
-sum_pi=$(awk 'NR > 1 {sum += $3} END {print sum}' pi_pop1_sitewise.sites.pi)
-awk -v s="$sum_pi" -v c="$callable" 'BEGIN {print "pi_pop1 =", s/c}'
-
-# soil population 2:
-vcftools --vcf allsamples.final.diploid.vcf \
-  --keep Pop2.txt --remove Clones.txt \
-  --site-pi --max-missing 0.9 \
-  --out pi_pop2_sitewise
-sum_pi=$(awk 'NR > 1 {sum += $3} END {print sum}' pi_pop2_sitewise.sites.pi)
-awk -v s="$sum_pi" -v c="$callable" 'BEGIN {print "pi_pop2 =", s/c}'
-
-# soil population 3:
-vcftools --vcf allsamples.final.diploid.vcf \
-  --keep Pop3.txt --remove Clones.txt \
-  --site-pi --max-missing 0.9 \
-  --out pi_pop3_sitewise
-sum_pi=$(awk 'NR > 1 {sum += $3} END {print sum}' pi_pop3_sitewise.sites.pi)
-awk -v s="$sum_pi" -v c="$callable" 'BEGIN {print "pi_pop3 =", s/c}'
-```
-
-pi_environmental = 0.00063078   
-pi_clinical = 0.000659787  
-pi_envrclin = 0.000672379   
-pi_all = 0.000674751   
-
-pi_pop1 = 0.000461357   
-pi_pop2 = 0.00032205    
-pi_pop3 = 0.00052863    
-
-
-
-#### 4.4.4 Tajima's D
-
-Typically calculcated in  windows. I tried various window sizes but 100 kb seemed to be best. This calculation requires using diploid version of vcf. 
-```
-# Environmental
-vcftools --vcf allsamples.final.diploid.vcf \
-  --keep Envr.txt --remove Clones.txt \
-  --TajimaD 100000 \
-  --out tajimasD_environmental
-awk 'NR > 1 && $4 != "nan" {sum += $4; n++} END {print "mean_TajimasD_environmental =", sum/n}' tajimasD_environmental.Tajima.D
-
-# Clinical
-vcftools --vcf allsamples.final.diploid.vcf \
-  --keep Clin.txt --remove Clones.txt \
-  --TajimaD 100000 \
-  --out tajimasD_clinical
-awk 'NR > 1 && $4 != "nan" {sum += $4; n++} END {print "mean_TajimasD_clinical =", sum/n}' tajimasD_clinical.Tajima.D
-
-# Environmental + clinical
-vcftools --vcf allsamples.final.diploid.vcf \
-  --keep EnvrClin.txt --remove Clones.txt \
-  --TajimaD 100000 \
-  --out tajimasD_envrclin
-awk 'NR > 1 && $4 != "nan" {sum += $4; n++} END {print "mean_TajimasD_envrclin =", sum/n}' tajimasD_envrclin.Tajima.D
-
-# All samples (including legacies)
+# Tajima's D
 vcftools --vcf allsamples.final.diploid.vcf \
   --remove Clones.txt \
   --TajimaD 100000 \
   --out tajimasD_all
 awk 'NR > 1 && $4 != "nan" {sum += $4; n++} END {print "mean_TajimasD_all =", sum/n}' tajimasD_all.Tajima.D
-
-# Soil population 1
-vcftools --vcf allsamples.final.diploid.vcf \
-  --keep Pop1.txt --remove Clones.txt \
-  --TajimaD 100000 \
-  --out tajimasD_pop1
-awk 'NR > 1 && $4 != "nan" {sum += $4; n++} END {print "mean_TajimasD_pop1 =", sum/n}' tajimasD_pop1.Tajima.D
-
-# Soil population 2
-vcftools --vcf allsamples.final.diploid.vcf \
-  --keep Pop2.txt --remove Clones.txt \
-  --TajimaD 100000 \
-  --out tajimasD_pop2
-awk 'NR > 1 && $4 != "nan" {sum += $4; n++} END {print "mean_TajimasD_pop2 =", sum/n}' tajimasD_pop2.Tajima.D
-
-# Soil population 3
-vcftools --vcf allsamples.final.diploid.vcf \
-  --keep Pop3.txt --remove Clones.txt \
-  --TajimaD 100000 \
-  --out tajimasD_pop3
-awk 'NR > 1 && $4 != "nan" {sum += $4; n++} END {print "mean_TajimasD_pop3 =", sum/n}' tajimasD_pop3.Tajima.D
 ```
-
-mean_TajimasD_environmental = 0.825641   
-mean_TajimasD_clinical = 1.13959   
-mean_TajimasD_envrclin = 1.19482    
-mean_TajimasD_all = 1.60022    
-
-mean_TajimasD_pop1 = 1.14279   
-mean_TajimasD_pop2 = 2.25243    
-mean_TajimasD_pop3 = 1.15089    
-
 
 ### 4.5 Construct phylogenetic tree 
 

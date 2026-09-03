@@ -28,8 +28,7 @@ Note that the aligned genomes can be found under NCBI BioProject PRJNA1522484.
 - [2.4 Add or replace read groups](#24-add-or-replace-read-groups)
 - [2.5 Optional: Verify read groups and compute depth](#25-optional-verify-read-groups-and-compute-depth)
 - [2.6 Mark and remove duplicates](#26-mark-and-remove-duplicates)
-- [2.7 Optional: Calculate genome coverage at >10× depth](#27-optional-calculate-genome-coverage-at-10-depth)
-- [2.8 Index BAM files](#28-index-bam-files)
+- [2.7 Index BAM files](#27-index-bam-files)
 
 **[3. Variant calling](#3-variant-calling)**
 
@@ -87,7 +86,7 @@ Note that the aligned genomes can be found under NCBI BioProject PRJNA1522484.
 ```
 
 #### 1.2 Filter low-quality reads and trim bases
-**Notes:** Illumina adapters [are available and downloaded from here (https://github.com/usadellab/Trimmomatic/blob/main/adapters/TruSeq3-PE.fa). Ensure this adapter sequence file is in the same folder as your fastq files.   
+**Notes:** Illumina adapters [are available and downloaded from here (https://github.com/usadellab/Trimmomatic/blob/main/adapters/TruSeq3-PE.fa). Ensure this adapter sequence file is in the same folder as your fastq files     
 **Code:**       
 ```
 module load bio/trimmomatic/0.39-gcc-11.4.0
@@ -99,7 +98,7 @@ ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:35 SLIDINGWINDOW:
 
 #### 1.3 Normalize read lengths to 75 bp 
 
-**Notes:** This is to account for variation in sequenced read lengths across genomes (e.g. 150 bp, 300 bp, 75b p). We want to normalize to the lowest common denominator (here, 75 bp)
+**Notes:** This is to account for variation in sequenced read lengths across genomes (e.g. 150 bp, 300 bp, 75b p). We want to normalize to the lowest common denominator (here, 75 bp)  
 **Code:**
 ```
 fastp \
@@ -126,7 +125,7 @@ fastqc trimmed_fastqc/*.fastq.gz
 
 #### 2.1 Align reads to reference genome
 
-**Notes:** Purpose is to determine where in the genome a given sequence/read is located    
+**Notes:** Purpose is to determine where in the genome a given sequence/read is located. We used C. immitis RS [on NCBI here](https://www.ncbi.nlm.nih.gov/search/all/?term=GCA_000149335.2), after marking and removing duplicates.         
 **Code:** 
 ```
 #First unzip trimmed fastq files if not done already, then align to ref genome
@@ -142,7 +141,7 @@ done
 
 #### 2.2 Sort alignments and convert to BAM
 
-**Notes:** Compress sam to bam and sort bam file     
+**Notes:** Compress sam to bam and sort bam file        
 **Code:**
 ```
 # Set $YOUR-PATH to point to where the gatk package lives
@@ -153,7 +152,7 @@ java -jar "$YOUR-PATH/gatk-package-4.5.0.0-local.jar" SortSam \
 ```
 
 #### 2.3 Optional: Mapping and coverage statistics
-**Notes:** Obtain mapping and coverage statistics for each sample
+**Notes:** Obtain mapping and coverage statistics for each sample    
 **Code:**
 ```
 for bam_file in "$bam_dir"/*.sorted.bam; do
@@ -172,7 +171,7 @@ done
 
 #### 2.4 Add or replace read groups
 **Notes:** The purpose of this step is to organize sequence data by library prep batch and sequencing runs parameters. Information on this step informed by these resources: [1](https://gatk.broadinstitute.org/hc/en-us/articles/360035532352-Errors-about-read-group-RG-information)
-[2](https://gatk.broadinstitute.org/hc/en-us/community/posts/4412745467931-HaplotypeCaller-does-not-work).
+[2](https://gatk.broadinstitute.org/hc/en-us/community/posts/4412745467931-HaplotypeCaller-does-not-work)    
 **Code:** 
 ```
 # Note this is for a single sample
@@ -186,86 +185,35 @@ RGPU=unit1 \
 RGSM=PS02PN14-2
 ```
 
-#### 2.5 Optional: Verify read groups and compute depth
-
-To verify read groups added correctly:
+#### 2.5 Optional: Compute depth
+**Notes:** This step computes the depth at each position of the genome. This creates a txt file where the second and third columns are the position and coverage, respectively. 
+**Code:**  
 ```
-samtools view -H results/bam/14B1.rg.bam 
-```
-
-To compute depth at each position of the genome:   
-Software used: bio/samtools/1.17-gcc-11.4.0   
-Script name: computedepth.sbatch, computedepth_sra.sbatch  
-```
-module load bio/samtools/1.17-gcc-11.4.0
-
-for infile in *.aligned.sorted.bam
-do
-  echo "working with file $infile"
-  base=$(basename "$infile" .aligned.sorted.bam)
-  samtools depth -a "$infile" > "${base}.depth.txt"
+# To compute depth at each position of the genome:   
+samtools depth -a "$sample" > "${sample}.depth.txt"
 done
-```
 
-Note: This creates a txt file where the second and third columns are the position and coverage, respectively.
-To calculate the mean depth from this file:
-
-```
-awk 'BEGIN { total = 0; count = 0 } { total += $3; count += 1; } END { avg = total / count; print avg} ' results/bam/58B1.depth.txt
+# To calculate the mean depth from this file:
+awk 'BEGIN { total = 0; count = 0 } { total += $3; count += 1; } END { avg = total / count; print avg} ' sample.depth.txt 
 ```
 
 #### 2.6 Mark and remove duplicates
-
-Purpose: Duplicates reflect same sequence fragment being amplified and read multiple times. Keeping duplicates can lead to inflated estimates of coverage and can bias variant-calling steps    
-Software used: bio/picard/3.0.0-gcc-11.4.0        
-Script name: markdups.sh, markdups.sra.sh,  
-Code snippet:
-
+**Notes:** Duplicates reflect same sequence fragment being amplified and read multiple times. Keeping duplicates can lead to inflated estimates of coverage and can bias variant-calling steps    
+**Code:**. 
 ```
-for infile in results/sortedbams/*.sorted.bam
-do
-base=$(basename ${infile} .sorted.bam)
 picard MarkDuplicates \
 -REMOVE_DUPLICATES TRUE \
--I results/sortedbams/${base}.sorted.bam \
--O results/dedupedbams/"${base}.deduped.bam" \
--M results/dedupedbams/"${base}.dup_metrics.txt"
+-I ${sample}.sorted.bam \
+-O "${sample}.deduped.bam" \
+-M "${sample}.dup_metrics.txt"
 done
 ```
 
-#### 2.7 Optional: Calculate genome coverage at >10× depth
-
-Software used: bio/bedtools2/2.31.0-gcc-11.4.0, bio/samtools/1.17-gcc-11.4.0    
-Script: depth10x.sbatch, depth10x_sra.sbatch    
-Code snippet:    
+#### 2.7 Index BAM files
+**Notes:** Indexing creates faster referencing/extraction of specific regions based on genomic coordinates
+**Code:**
 ```
-# Note, we are only considering 'callable' bases in our count here
-# i.e., excluding masked bases
-
-for bam in "$BAM_DIR"/*.deduped.bam; do
-  sample=$(basename "$bam" .deduped.bam)
-  echo "Processing $sample..."
-
-  # ensure BAM is indexed (skip if .bai exists)
-  [[ -f "${bam}.bai" || -f "${bam%.bam}.bai" ]] || samtools index -@ 8 "$bam"
-
-  # stream depths only within callable regions; count total callable bases and ≥10×
-  percent=$(samtools depth -a -@ 8 -b "$CALLABLE_BED" "$bam" \
-    | awk 'BEGIN{tot=0; ge10=0} {tot++; if($3>=10) ge10++} END{if(tot>0) printf("%.2f", 100*ge10/tot); else print "NA"}')
-
-  echo -e "${sample}\t${percent}" >> "$OUTFILE"
-done
-
-```
-
-*Note that any samples with <90% of their genome covered at >10x were then removed from downstream analysis. This is to avoid missing genotypes distorting population structure
-
-#### 2.8 Index BAM files
-Software used: bio/samtools/1.17-gcc-11.4.0   
-Script: index_dedupedbams.sbatch, index_dedupedbams.sra.sbatch
-Code snippet:
-```
-samtools index results/bam/${base}.deduped.bam
+samtools index ${sample}.deduped.bam
 ```
 
 ---
@@ -274,20 +222,16 @@ samtools index results/bam/${base}.deduped.bam
 
 #### 3.1 Call variants using GATK HaplotypeCaller
 
-Note on GATK installation: downloaded gatk from [here](https://github.com/broadinstitute/gatk/releases) and then uploaded the jar file to savio to working directory. Guidance on these steps found [here](https://www.biostars.org/p/405702/).   
-Software used: java, gatk 4.5.0.0    
-Script name: haplo.sh, haplosra.sh          
-Code snippet:   
-
+**Notes:** Purpose is to identify specific positions in the genome of each sample that differ from the reference.    
+**Code:**
 ```
-module load java
-java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package-4.5.0.0-local.jar" HaplotypeCaller \
--R ../RefGenome/CocciRef_GCA_000149335.2.masked.fna \
+java -jar "$YOUR-PATH/gatk-package-4.5.0.0-local.jar" HaplotypeCaller \
+-R CocciRef_GCA_000149335.2.masked.fna \
 -ploidy 1 \
 -ERC GVCF \ 
--I results/bam/58B1.deduped.bam \
+-I 14B1.deduped.bam \
 --output-mode EMIT_VARIANTS_ONLY \
--O results/haplocalled/58B1.g.vcf.gz
+-O 14B1.g.vcf.gz
 ```
 
 #### 3.2 Combine GVCF files 

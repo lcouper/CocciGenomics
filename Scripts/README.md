@@ -7,51 +7,53 @@
 
 This repository documents the scripts and steps used to process *Coccidioides* sequencing data from raw reads through downstream genomic analyses.
 
+Note that the aligned genomes can be found under NCBI BioProject PRJNA1522484. 
+
 ---
 
 ## 🔬 Table of Contents
 
-## 1. Raw Data Preparation
+**[1. Raw data processing](#1-raw-data-processing)**
 
-- [2.1 Download raw reads from sequencer](#21-obtain-raw-reads-from-berkeley-qb3)  
-- [2.2 Download published sequences from NCBI SRA](#22-download-published-sequences-from-ncbi-sra)  
-- [2.3 Filter low-quality reads and trim bases](#23-filter-low-quality-reads-and-trim-bases)  
-- [2.4 Normalize read length to 75 bp](#24-normalize-read-length-to-75-bp)  
-- [2.5 Optional: Quality control with FastQC](#25-optional-quality-control-with-fastqc)  
+- [1.1 Obtain raw reads from Berkeley QB3](#11-obtain-raw-reads-from-berkeley-qb3)
+- [1.2 Download published sequences from NCBI SRA](#12-download-published-sequences-from-ncbi-sra)
+- [1.3 Filter low-quality reads and trim bases](#13-filter-low-quality-reads-and-trim-bases)
+- [1.4 Normalize read lengths to 75 bp](#14-normalize-read-lengths-to-75-bp)
+- [1.5 Optional: Quality control with FastQC](#15-optional-quality-control-with-fastqc)
 
-### 2. Alignment and BAM Processing
+**[2. Alignment and BAM processing](#2-alignment-and-bam-processing)**
 
-- [3.1 Align reads to reference genome](#31-align-reads-to-reference-genome)  
-- [3.2 Sort alignments and convert to BAM](#32-sort-alignments-and-convert-to-bam)  
-- [3.3 Optional: Extract mapping and coverage statistics](#33-optional-extract-mapping-and-coverage-statistics)  
-- [3.4 Add or replace read groups](#34-add-or-replace-read-groups)  
-- [3.5 Optional: Verify read groups and compute depth](#35-optional-verify-read-groups-and-compute-depth)  
-- [3.6 Mark and remove duplicates](#36-mark-and-remove-duplicates)
-- [3.7 Optional: Calculate genome coverage at >10× depth](#37-optional-calculate-genome-coverage-at-10-depth)  
-- [3.8 Index BAM files](#38-index-bam-files)
+- [2.1 Align reads to reference genome](#21-align-reads-to-reference-genome)
+- [2.2 Sort alignments and convert to BAM](#22-sort-alignments-and-convert-to-bam)
+- [2.3 Optional: Extract mapping and coverage statistics](#23-optional-extract-mapping-and-coverage-statistics)
+- [2.4 Add or replace read groups](#24-add-or-replace-read-groups)
+- [2.5 Optional: Verify read groups and compute depth](#25-optional-verify-read-groups-and-compute-depth)
+- [2.6 Mark and remove duplicates](#26-mark-and-remove-duplicates)
+- [2.7 Optional: Calculate genome coverage at >10× depth](#27-optional-calculate-genome-coverage-at-10-depth)
+- [2.8 Index BAM files](#28-index-bam-files)
 
-### 3. Variant Calling
+**[3. Variant calling](#3-variant-calling)**
 
-- [4.1 Call variants using GATK HaplotypeCaller](#41-call-variants-using-gatk-haplotypecaller)  
-- [4.2 Combine GVCF files](#42-combine-gvcf-files)  
-- [4.3 Joint genotyping to produce metaVCF](#43-joint-genotyping-to-produce-metavcf)  
-- [4.4 Filter variants to produce project-specific VCF](#44-filter-variants-to-produce-project-specific-vcf)
-- [4.5 Convert final vcf file to a pseudo-diploid genotype](#45-convert-final-vcf-file-to-a-pseudo-diploid-genotype)
+- [3.1 Call variants using GATK HaplotypeCaller](#31-call-variants-using-gatk-haplotypecaller)
+- [3.2 Combine GVCF files](#32-combine-gvcf-files)
+- [3.3 Joint genotyping to produce metaVCF](#33-joint-genotyping-to-produce-metavcf)
+- [3.4 Filter variants to produce project-specific VCF](#34-filter-variants-to-produce-project-specific-vcf)
+- [3.5 Convert final vcf file to a pseudo-diploid genotype](#35-convert-final-vcf-file-to-a-pseudo-diploid-genotype)
 
-### Downstream Genomic Analyses
+**[4. Downstream genomic analyses](#4-downstream-genomic-analyses)**
 
-- [5.2 Population structure analysis](#assess-population-structure)  
-- [5.5 Mating type analysis](#mating-type-locus-assignment)
-- [5.6 Diversity metrics: Segregating sites (S))](#number-of-segregating-sites)  
-- [5.7 Diversity metrics: Tajima’s D](#tajimas-d)  
-- [5.8 Diversity metrics: Nucleotide diversity (θπ)](#nucleotide-diversity-θπ)
-- [5.9 Diversity metrics: Wattersons theta (θπ)](#Wattersons-theta)
-- [5.10 Diversity metrics: Nucleotide diversity (θπ)](#nucleotide-diversity-θπ)  
-- [5.12 Gene function and GO term analysis](#investigating-gene-function-and-go-terms)  
-- [5.14 Construct phylogenetic tree](#construct-phylogenetic-tree)
-- [5.15 Linkage Disequilibrium](#linkage-disequilibrium)
-- [5.16 Twisst](#Twisst-window-based-genomic-relationships)
-- [5.18 Identifying deletion](#identifying-deletion)
+- [4.1 Assess population structure: ADMIXTURE](#41-assess-population-structure-admixture)
+- [4.2 Mating type locus assignment](#42-mating-type-locus-assignment)
+- [4.3 Fst between environmental clusters](#43-fst-between-environmental-clusters)
+- [4.4 Diversity metrics](#44-diversity-metrics)
+  - [4.4.1 Number of segregating sites (S)](#441-number-of-segregating-sites-s)
+  - [4.4.2 Watterson's theta (θw)](#442-wattersons-theta-θw)
+  - [4.4.3 Nucleotide diversity (θπ)](#443-nucleotide-diversity-θπ)
+  - [4.4.4 Tajima's D](#444-tajimas-d)
+- [4.5 Construct phylogenetic tree](#45-construct-phylogenetic-tree)
+- [4.6 Assessing and correcting for linkage disequilibrium](#46-assessing-and-correcting-for-linkage-disequilibrium)
+- [4.7 Twisst, window-based genomic relationships](#47-twisst-window-based-genomic-relationships)
+- [4.8 Identifying deletion](#48-identifying-deletion)
 
 ---
 
@@ -67,10 +69,11 @@ This repository documents the scripts and steps used to process *Coccidioides* s
 - bio/picard/3.0.0-gcc-11.4.0
 - bio/fastqc/0.12.1-gcc-11.4.0
 
+---
 
+## 1. Raw data processing
 
-## Raw data processing
-#### 2.1 Obtain raw reads from Berkeley QB3
+#### 1.1 Obtain raw reads from Berkeley QB3
 
 The fastq.gz files (1 forward, 1 reverse) are stored here on the Remais Group Shared Drive:
 SPORE/WGS/Sequence data (All)/
@@ -78,7 +81,7 @@ SPORE/WGS/Sequence data (All)/
 and Berkeley's HPC BRC at:
 `/global/scratch/users/lcouper/SoilCocciSeqs`
 
-#### 2.2 Download published sequences from NCBI SRA
+#### 1.2 Download published sequences from NCBI SRA
 
 Prior Coccidioides sequences were downloaded from NCBI using the SRA toolkit.
 
@@ -86,7 +89,7 @@ Additional notes [here](https://docs.google.com/document/d/1gkM7m6TjQAOO1pwxe4X2
 Tracker for downloaded sequences and metadata [here](https://docs.google.com/spreadsheets/d/1wrwSLeURp-E7LDD0SKT1wXEnrET5IziknmJWmXCB_7o/edit).
 
 
-#### 2.3 Filter low-quality reads and trim bases
+#### 1.3 Filter low-quality reads and trim bases
 
 Note that Illumina adapters [available and downloaded from here](https://github.com/usadellab/Trimmomatic/blob/main/adapters/TruSeq3-PE.fa). Ensure this adapter sequence file is in the same folder as your fastq files.   
 Job Script: trim.sh and trim.sra.sh   
@@ -99,7 +102,7 @@ PS02PN14-1_S1_L007_R2_001.trim.fastq.gz PS02PN14-1_S1_L007_R2_001.untrim.fastq.g
 ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:35 SLIDINGWINDOW:4:15
 ```
 
-#### 2.4 Normalize read lengths to 75 bp 
+#### 1.4 Normalize read lengths to 75 bp 
 
 Note: this is because there is variation in sequenced read lengths across genomes (ours are all 150bp paired end, but prior genomes vary from 75 - 300 bp PE). We want to normalize to the lowest common denominator -- here 75 bp.
 
@@ -116,7 +119,7 @@ fastp \
   --html PS02PN14_fastp_report.html --thread 4
 ```
 
-#### 2.5 Optional: Quality control with FastQC
+#### 1.5 Optional: Quality control with FastQC
 
 Script: fastqc.sh, fastqc.sra.sh        
 Relevant code snippet:      
@@ -125,8 +128,11 @@ module load bio/fastqc/0.12.1-gcc-11.4.0
 fastqc trimmed_fastqc/*.fastq.gz
 ```
 
-## Alignment and BAM processing
-#### 3.1 Align reads to reference genome
+---
+
+## 2. Alignment and BAM processing
+
+#### 2.1 Align reads to reference genome
 
 Purpose: To determine where in the genome a given sequence/read is located    
 Script name: alignreads.sh, alignreads.sra.sh    
@@ -144,7 +150,7 @@ trimmed_fastq/${base}_R1_001.trim.fastq trimmed_fastq/${base}_R2_001.trim.fastq 
 done
 ```
 
-#### 3.2 Sort alignments and convert to BAM
+#### 2.2 Sort alignments and convert to BAM
 
 Compress sam to bam and sort bam file     
 Script name: SamToBam.sh, SamToBamSRA.sh
@@ -157,7 +163,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -SORT_ORDER coordinate
 ```
 
-#### 3.3 Optional: Extract mapping and coverage statistics
+#### 2.3 Optional: Extract mapping and coverage statistics
 
 Script name: MappingStats.sh, MappingStatsSRA.sh    
 Note that the cap for coverage is 250 so there may be a peak in the histograms at this value
@@ -178,7 +184,7 @@ picard CollectWgsMetrics \
 done
 ```
 
-#### 3.4 Add or replace read groups
+#### 2.4 Add or replace read groups
 
 Followed guidance [here](https://gatk.broadinstitute.org/hc/en-us/articles/360035532352-Errors-about-read-group-RG-information)
 and issue was diagnosed [here](https://gatk.broadinstitute.org/hc/en-us/community/posts/4412745467931-HaplotypeCaller-does-not-work). See [this spreadsheet](https://docs.google.com/spreadsheets/d/1wrwSLeURp-E7LDD0SKT1wXEnrET5IziknmJWmXCB_7o/edit?gid=1963297784#gid=1963297784) for what read group parameters were added:
@@ -202,7 +208,7 @@ RGPU=unit1 \
 RGSM=PS02PN14-2
 ```
 
-#### 3.5 Optional: Verify read groups and compute depth
+#### 2.5 Optional: Verify read groups and compute depth
 
 To verify read groups added correctly:
 ```
@@ -230,7 +236,7 @@ To calculate the mean depth from this file:
 awk 'BEGIN { total = 0; count = 0 } { total += $3; count += 1; } END { avg = total / count; print avg} ' results/bam/58B1.depth.txt
 ```
 
-#### 3.6 Mark and remove duplicates
+#### 2.6 Mark and remove duplicates
 
 Purpose: Duplicates reflect same sequence fragment being amplified and read multiple times. Keeping duplicates can lead to inflated estimates of coverage and can bias variant-calling steps    
 Software used: bio/picard/3.0.0-gcc-11.4.0        
@@ -249,7 +255,7 @@ picard MarkDuplicates \
 done
 ```
 
-#### 3.7 Optional: Calculate genome coverage at >10× depth
+#### 2.7 Optional: Calculate genome coverage at >10× depth
 
 Software used: bio/bedtools2/2.31.0-gcc-11.4.0, bio/samtools/1.17-gcc-11.4.0    
 Script: depth10x.sbatch, depth10x_sra.sbatch    
@@ -276,7 +282,7 @@ done
 
 *Note that any samples with <90% of their genome covered at >10x were then removed from downstream analysis. This is to avoid missing genotypes distorting population structure
 
-#### 3.8 Index BAM files
+#### 2.8 Index BAM files
 Software used: bio/samtools/1.17-gcc-11.4.0   
 Script: index_dedupedbams.sbatch, index_dedupedbams.sra.sbatch
 Code snippet:
@@ -284,9 +290,11 @@ Code snippet:
 samtools index results/bam/${base}.deduped.bam
 ```
 
-### Variant Calling
+---
 
-#### 4.1 Call variants using GATK HaplotypeCaller
+## 3. Variant calling
+
+#### 3.1 Call variants using GATK HaplotypeCaller
 
 Note on GATK installation: downloaded gatk from [here](https://github.com/broadinstitute/gatk/releases) and then uploaded the jar file to savio to working directory. Guidance on these steps found [here](https://www.biostars.org/p/405702/).   
 Software used: java, gatk 4.5.0.0    
@@ -304,7 +312,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -O results/haplocalled/58B1.g.vcf.gz
 ```
 
-#### 4.2 Combine GVCF files 
+#### 3.2 Combine GVCF files 
 
 First, combined all the above files into a single directory 'AllGenomesHaploCalled'. Then, created a list of files in this directory using:
 ```
@@ -314,7 +322,7 @@ ls *.vcf.gz > gvcfs_withCp.list # repeat with CpSilv (outgroup for trees)
 
 ```
 Purpose: Creates a dataset where all variant sites across all samples are considered. This enables variant callers to use information from one sample to infer the most likely genotype in another, improving sensitivity and accuracy in low coverage regions, and reducing false positives.
-Here, all samples are included in the 'gvcfs.list'. We will filter the metaVCF later (step 15) for analyses using specific subsets of samples.  
+Here, all samples are included in the 'gvcfs.list'. We will filter the metaVCF later (step 3.4) for analyses using specific subsets of samples.  
 Software used: java, gatk 4.5.0.0    
 Script name: combinegvcfs.sbatch and combinegvcfs_WithCpSilv.sbatch (for phylo tree later)      
 Note that this is done in batches of sample because otherwise the memory is exhausted. The original, not batched version of the script is: combinegvcfs_og.sbatch   
@@ -330,7 +338,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 
 ```
 
-#### 4.3 Joint genotyping to produce metaVCF
+#### 3.3 Joint genotyping to produce metaVCF
 
 Software used: java, gatk 4.5.0.0   
 Script name: genotypegvcfs.sh and genotypegvcfs_WithCpSilv.sh   
@@ -344,7 +352,7 @@ java -jar "/global/scratch/users/lcouper/SoilCocciSeqs/gatk-4.5.0.0/gatk-package
 -O metavcf.gz
 ```
 
-#### 4.4 Filter variants to produce project-specific VCF
+#### 3.4 Filter variants to produce project-specific VCF
 
 Here, we subset the vcf to the samples included in a particular analyses. Then, flag and remove variants based on quality score, coverage, missingness etc. for just those samples.
 
@@ -408,7 +416,7 @@ Subset_envrclin.final.recode.vcf: 56,282
 allsamples.final.recode.vcf: 55,874   
 allsamples_withCpSilv.final.recode.vcf: 55,336  
 
-#### 4.5 Convert final vcf file to a pseudo-diploid genotype 
+#### 3.5 Convert final vcf file to a pseudo-diploid genotype 
 Purpose: haploid genotypes are not natively supported by vcftools and other packages
 
 ```
@@ -426,9 +434,11 @@ bcftools +fixploidy Subset_envr_withrepreps.final.recode.vcf -- -p ploidy.txt > 
 bcftools +fixploidy allsamples_withCpSilv.final.recode.vcf -- -p ploidy.txt > allsamples_withCpSilv.final.diploid.vcf
 ```
 
-# Additional downstream analyses 
+---
 
-## Assess population structure: ADMIXTURE
+## 4. Downstream genomic analyses
+
+### 4.1 Assess population structure: ADMIXTURE
 
 Downloaded ADMIXTURE [here](https://dalexander.github.io/admixture/download.html) and uploaded for use on savio  
 
@@ -482,7 +492,7 @@ for log in K*_rep*.log; do
 done
 ```
 
-## Mating type locus assignment 
+### 4.2 Mating type locus assignment 
 
 Each isolate of *Coccidioides* has a mating type locus with one or two idiomorphs, MAT1-1 or MAT1-2, and sexual reproduction can only occur between distinct idiomorphs. Identifying the mating type locus for each individual and population can therefore provide clues about sexual reproduction and recombination. 
 
@@ -497,7 +507,7 @@ Optionally, compare reuslts with [Engelthaler et al. 2016](https://journals.asm.
 Step 2. Query samples against these sequences.   
 Script: matingtype_updated.sbatch   
 
-## Fst between environmental clusters
+### 4.3 Fst between environmental clusters
 
 Similar to above, but using only environmental isolates and defining populations based on admixture output
 
@@ -544,7 +554,7 @@ K2: Weir and Cockerham mean Fst estimate: 0.16215; **weighted Fst estimate: 0.24
 
 
 
-### Diversity metrics
+### 4.4 Diversity metrics
 
 These calculations will use the filtered VCF file that contains all samples (rather than subset-specific filtered vcf files since that will confound diversity calculations due to QC steps).   
 First, create txt files indicating sample names for each subset:   
@@ -556,6 +566,7 @@ cat Envr.txt Clin.txt > EnvrClin.txt
 ```
 
 For these diversity calculations, we exclude one isoalte from each pair that appear nearly clonal (i.e. <200 SNP differences)
+
 | Near-clonal lineage | Keep | Drop (raw VCF name) | Pairwise SNP distance |
 |---|---|---|---|
 | Carrizo_1 / Carrizo_2 | 13B1 | **14B1** | 14 |
@@ -565,7 +576,7 @@ For these diversity calculations, we exclude one isoalte from each pair that app
 | McKittrick_1 / _2 | 118a3 | **118b3** | 120 |
 | VFI19 / VFI20 | Kern19 | **Kern20** | 29 |
 | VFI25 / VFI5 | Kern25 | **Kern5** | 79 |
-o
+
 ```
 # list out the near-clones to remove
 cat > Clones.txt <<'EOF'
@@ -580,8 +591,7 @@ Kern20
 EOF
 ```
 
-#### Number of segregating sites
-*S*
+#### 4.4.1 Number of segregating sites (S)
 
 ```
 S_envr=$(vcftools --vcf allsamples.final.recode.vcf --keep Envr.txt --remove Clones.txt --mac 1 --recode --stdout | grep -vc "^#")
@@ -597,7 +607,7 @@ S_envr_pop3=$(vcftools --vcf allsamples.final.recode.vcf --keep Pop3.txt --remov
 ```
 
 
-#### Watterson's theta 
+#### 4.4.2 Watterson's theta (θw)
 *S, normalized by # of samples*
 
 ```
@@ -669,7 +679,7 @@ EOF
 ```
 
 
-#### Nucleotide diversity (θπ)
+#### 4.4.3 Nucleotide diversity (θπ)
 θπ is the average number of pairwise differences *per site* between all sequences in a population. **Key note: because we are calculating pi using only variant sites (ie from the VCF), we need to normalize based on the number of 'callable regions'.   
 We did this using:extract_callable_regions.py (python script in RefGenonme directory) to create a file: callable_regions.bed. This calculation requires using diploid version of vcf.  
 ```
@@ -743,7 +753,7 @@ pi_pop3 = 0.00052863
 
 
 
-#### Tajima's D
+#### 4.4.4 Tajima's D
 
 Typically calculcated in  windows. I tried various window sizes but 100 kb seemed to be best. This calculation requires using diploid version of vcf. 
 ```
@@ -807,7 +817,7 @@ mean_TajimasD_pop2 = 2.25243
 mean_TajimasD_pop3 = 1.15089    
 
 
-### Construct phylogenetic tree 
+### 4.5 Construct phylogenetic tree 
 
 ** Note: In order to root the phylogenetic tree, we used the C. posadasii Silveira strain [SRR9644374](https://www.ncbi.nlm.nih.gov/biosample/?term=SRS007089) **
 These fastqs were then taken through the same steps as all other samples above (e.g. starting from step 1)   
@@ -861,7 +871,7 @@ https://itol.embl.de/tree/136152214211185591747337347
 
 
 
-## Assessing and correcting for Linkage Disequilibrium ##
+### 4.6 Assessing and correcting for linkage disequilibrium
 
 Downloaded plink version 1.9 [here](https://www.cog-genomics.org/plink/). (specifically the 64-bit Linux, stable beta version)
 Uploaded folder to cluster and made it executable. 
@@ -938,7 +948,7 @@ Step 4. Make a pruned vcf file
 Note the pruned vcf is called 'allsamples_ld_r05_pruned.vcf' or 'Subset_envrclin_ld_r05_pruned.vcf'
 
 
-## Twisst, window-based genomic relationships
+### 4.7 Twisst, window-based genomic relationships
 
 We are primarily interseted in our novel clinical samples, but we will use a few legacy clinical genomes as a control here. Therefore, we will use the vcf file with all samples (no re-preps) and CpSilv as an outgroup. These sample names live in: FinalOutputs/samples43.txt. We then subset the meta-sample vcf to these 43 using (which keeps only sites that are polymorphic within these 46 samples): 
 
@@ -1029,7 +1039,7 @@ After this finishes, download FinalOutputs/Twisst/boot_[K2a or K2b or K3a or K3b
 
 
 
-### Identifying deletion
+### 4.8 Identifying deletion
 
 Three clinical isolates identified as unusual based on phylogenetic tree (they form a monophyletic clade that is basal to all other *C. immitis* and most similar to *C. posadasii*). To identify the underlying cause, we used the genotype matrix (GenotypeMatrix_ClinEnvr.csv) to look for sites where all three isolates were simultaneously `NA` and found 894 such sites. These NAs can mean either "no reads" (deletion) or that reads are too diverged to align. These were distinguished by using the bams for these three samples on Savio (stored in results/bam/Normalized75).    
 Here, coverage *shape* is the informative statistic: a deletion gives a hard-edged block of zero depth, whereas divergence gives patchy coverage with conserved islands and graded boundaries. We included a non-deletion carrier in the same commands for comparison:

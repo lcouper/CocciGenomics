@@ -73,23 +73,21 @@ Note that the aligned genomes can be found under NCBI BioProject PRJNA1522484.
 
 ## 1. Raw data processing
 
-#### 1.1 Obtain raw reads from Berkeley QB3
+#### 1.1 Obtain raw reads
+Software used: sratoolkit.3.0.7. 
+Description: Either download raw reads from sequencer or from NCBI SRA for previously published sequences.  
+Example:   
+```
+# To download [this cocci genome](https://www.ncbi.nlm.nih.gov/sra/?term=SRR25635497):
+~/Downloads/sratoolkit*/bin/prefetch SRR25635497
 
-The fastq.gz files (1 forward, 1 reverse) are stored here on the Remais Group Shared Drive:
-SPORE/WGS/Sequence data (All)/
+# To convert from .sra format to fastq:
+~/Downloads/sratoolkit*/bin/fasterq-dump --split-files SRR25635497
 
-and Berkeley's HPC BRC at:
-`/global/scratch/users/lcouper/SoilCocciSeqs`
+# This will generate two files: filename_1.fastq and filename_2.fastq for paired-end reads
+```
 
-#### 1.2 Download published sequences from NCBI SRA
-
-Prior Coccidioides sequences were downloaded from NCBI using the SRA toolkit.
-
-Additional notes [here](https://docs.google.com/document/d/1gkM7m6TjQAOO1pwxe4X2DrIuMPuA3uGd6UalImpb-h4/edit).
-Tracker for downloaded sequences and metadata [here](https://docs.google.com/spreadsheets/d/1wrwSLeURp-E7LDD0SKT1wXEnrET5IziknmJWmXCB_7o/edit).
-
-
-#### 1.3 Filter low-quality reads and trim bases
+#### 1.2 Filter low-quality reads and trim bases
 
 Note that Illumina adapters [available and downloaded from here](https://github.com/usadellab/Trimmomatic/blob/main/adapters/TruSeq3-PE.fa). Ensure this adapter sequence file is in the same folder as your fastq files.   
 Job Script: trim.sh and trim.sra.sh   
